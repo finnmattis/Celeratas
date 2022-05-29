@@ -1,8 +1,10 @@
 import basic
+
 while True:
-    text = input("input> ")
-    result, error = basic.run("<stdin>", text)
+    text = input('basic > ')
+    result, error = basic.run('<stdin>', text)
+
     if error:
         print(error.as_string())
-    else:
-        print(result)
+    elif result:
+        print(repr(result))
