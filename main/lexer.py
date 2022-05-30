@@ -4,8 +4,8 @@
 
 import string
 
-from Helper.errors import *
-from Helper.tokens import *
+from helper.errors import *
+from helper.tokens import *
 
 #######################################
 # CONSTANTS
