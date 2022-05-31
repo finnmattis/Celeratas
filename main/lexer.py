@@ -105,7 +105,10 @@ class Lexer:
                     return [], error
                 tokens.append(token)
             elif self.current_char in LETTERS:
-                tokens.append(self.make_identifier())
+                token, error = self.make_identifier()
+                if error:
+                    return [], error
+                tokens.append(token)
             elif self.current_char in DIGITS:
                 tokens.append(self.make_number())
             elif self.current_char == '"':
@@ -178,7 +181,7 @@ class Lexer:
         numeral_final = toNum(numeral_str)
 
         if numeral_final == None:
-            return None, InvalidNumeral(pos_start, self.pos, "hi jake cole drop to latin 1a")
+            return None, InvalidNumeral(pos_start, self.pos, f"{numeral_str} is not a valid numeral")
         # Function returns None if the numeral is invalid
 
         return Token(TT_NUMERAL, numeral_final, pos_start, self.pos), None
@@ -231,12 +234,32 @@ class Lexer:
         id_str = ''
         pos_start = self.pos.copy()
 
-        while self.current_char != None and self.current_char in LETTERS_DIGITS + '_':
+        while self.current_char != None and self.current_char in LETTERS_DIGITS + '_' + '[' + ']':
+            if self.current_char == ']':
+                return None, ExpectedCharError(pos_start, self.pos, "Expected '[' before ']'")
+
+            if self.current_char == '[':
+                id_str += self.current_char
+                self.advance()
+
+                if not self.current_char:
+                    return None, ExpectedCharError(pos_start, self.pos, "Expected expression")
+
+                # First part nessesary because None in second expr leads in error
+                while self.current_char and self.current_char in DIGITS + " ":
+                    if self.current_char == " ":
+                        pass
+                    else:
+                        id_str += self.current_char
+                    self.advance()
+                    if not self.current_char:
+                        return None, ExpectedCharError(pos_start, self.pos, "Expected ']'")
+
             id_str += self.current_char
             self.advance()
 
         tok_type = TT_KEYWORD if id_str in KEYWORDS else TT_IDENTIFIER
-        return Token(tok_type, id_str, pos_start, self.pos)
+        return Token(tok_type, id_str, pos_start, self.pos), None
 
     def make_minus_or_arrow(self):
         tok_type = TT_MINUS

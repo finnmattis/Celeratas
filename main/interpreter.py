@@ -2,7 +2,6 @@
 # Import
 #######################################
 
-
 import math
 import os
 
@@ -761,6 +760,7 @@ class Interpreter:
         res = RTResult()
         var_name = node.var_name_tok.value
         value = context.symbol_table.get(var_name)
+        list_idx_to_get = node.list_idx_to_get
 
         if not value:
             return res.failure(RTError(
@@ -770,6 +770,16 @@ class Interpreter:
             ))
 
         value = value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
+
+        if list_idx_to_get:
+            if list_idx_to_get < len(value.elements):
+                value.elements = [value.elements[list_idx_to_get]]
+            else:
+                return res.failure(RTError(
+                    node.pos_start, node.pos_end,
+                    'List Index Out of Bounds',
+                    context
+                ))
         return res.success(value)
 
     def visit_VarAssignNode(self, node, context):

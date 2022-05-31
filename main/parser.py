@@ -4,7 +4,7 @@
 
 from helper.tokens import *
 from helper.errors import InvalidSyntaxError
-
+from main.lexer import Token
 #######################################
 # NODES
 #######################################
@@ -52,8 +52,9 @@ class ListNode:
 
 
 class VarAccessNode:
-    def __init__(self, var_name_tok):
+    def __init__(self, var_name_tok, list_idx_to_get=None):
         self.var_name_tok = var_name_tok
+        self.list_idx_to_get = list_idx_to_get
 
         self.pos_start = self.var_name_tok.pos_start
         self.pos_end = self.var_name_tok.pos_end
@@ -472,7 +473,20 @@ class Parser:
         elif tok.type == TT_IDENTIFIER:
             res.register_advancement()
             self.advance()
-            return res.success(VarAccessNode(tok))
+            var_name = tok
+            if '[' in tok.value:
+                var_name = Token(tok.type, tok.value[:tok.value.find(
+                    '[')], tok.pos_start, tok.pos_end)
+
+                # Get list_idx - This will get every char in between square brackets
+                idx_between_brackets = tok.value.find('[') + 1
+                list_idx = ""
+                while idx_between_brackets < len(tok.value)-1:
+                    list_idx += tok.value[idx_between_brackets]
+                    idx_between_brackets += 1
+                list_idx = int(list_idx)
+
+            return res.success(VarAccessNode(var_name, list_idx))
 
         elif tok.type == TT_LPAREN:
             res.register_advancement()
