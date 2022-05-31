@@ -1,61 +1,61 @@
 {} = English Meaning of KEYWORD
 
-statements  : NEWLINE* statement (NEWLINE+ statement)* NEWLINE*
+statements: NEWLINE* statement (NEWLINE+ statement)* NEWLINE*
 
-statement	: KEYWORD:redi{return} expr?
-			: KEYWORD:continua{continue}
-			: KEYWORD:confringe{break}
-			: expr
+statement: KEYWORD:redi{return} expr?
+	     : KEYWORD:continua{continue}
+		 : KEYWORD:confringe{break}
+		 : expr
 
-expr        : KEYWORD:sino(var) IDENTIFIER EQ expr
-            : comp-expr ((KEYWORD:et{and}|KEYWORD:aut{or}) comp-expr)*
+expr: KEYWORD:sino(var) IDENTIFIER EQ expr
+    : comp-expr ((KEYWORD:et{and}|KEYWORD:aut{or}) comp-expr)*
 
-comp-expr   : non(not) comp-expr
-            : arith-expr ((EE|LT|GT|LTE|GTE) arith-expr)*
+comp-expr: non(not) comp-expr
+         : arith-expr ((EE|LT|GT|LTE|GTE) arith-expr)*
 
-arith-expr  : term ((PLUS|MINUS) term)*
+arith-expr: term ((PLUS|MINUS) term)*
 
-term        : factor ((MUL|DIV) factor)*
+term: factor ((MUL|DIV) factor)*
 
-factor      : (PLUS|MINUS) factor
-            : power
+factor: (PLUS|MINUS) factor
+      : power
 
-power       : call (POW factor)*
+power: call (POW factor)*
 
-call        : atom (LPAREN (expr (COMMA expr)*)? RPAREN)?
+call: atom (LPAREN (expr (COMMA expr)*)? RPAREN)?
 
-atom        : INT|FLOAT|STRING|IDENTIFIER
-            : LPAREN expr RPAREN
-            : list-expr
-            : if-expr
-            : for-expr
-            : while-expr
-            : func-def
+atom: INT|FLOAT|STRING|IDENTIFIER
+    : LPAREN expr RPAREN
+    : list-expr
+    : if-expr
+    : for-expr
+    : while-expr
+    : func-def
 
-list-expr   : LSQUARE (expr (COMMA expr)*)? RSQUARE
+list-expr: LSQUARE (expr (COMMA expr)*)? RSQUARE
 
-if-expr     : KEYWORD:si{if} expr KEYWORD:ergo{then}
-              (statement if-expr-b|if-expr-c?)
-            | (NEWLINE statements KEYWORD:finis{end}|if-expr-b|if-expr-c)
+if-expr: KEYWORD:si{if} expr KEYWORD:ergo{then}
+       (statement if-expr-b|if-expr-c?)
+       (NEWLINE statements KEYWORD:finis{end}|if-expr-b|if-expr-c)
 
-if-expr-b   : KEYWORD:alioquinsi{elif} expr KEYWORD:ergo{then}
-              (statement if-expr-b|if-expr-c?)
-            | (NEWLINE statements KEYWORD:finis{end}|if-expr-b|if-expr-c)
+if-expr-b: KEYWORD:alioquinsi{elif} expr KEYWORD:ergo{then}
+         (statement if-expr-b|if-expr-c?)
+         | (NEWLINE statements KEYWORD:finis{end}|if-expr-b|if-expr-c)
 
-if-expr-c   : KEYWORD:alioquin{else}
-              statement
-            | (NEWLINE statements KEYWORD:finis{end})
+if-expr-c: KEYWORD:alioquin{else}
+         statement
+         | (NEWLINE statements KEYWORD:finis{end})
 
-for-expr    : KEYWORD:enim{for} IDENTIFIER EQ expr KEYWORD:ad{to} expr 
-              (KEYWORD:gradus{step} expr)? KEYWORD:ergo{then}
-              statement
-            | (NEWLINE statements KEYWORD:finis{end})
+for-expr: KEYWORD:enim{for} IDENTIFIER EQ expr KEYWORD:ad{to} expr 
+        (KEYWORD:gradus{step} expr)? KEYWORD:ergo{then}
+        statement
+        | (NEWLINE statements KEYWORD:finis{end})
 
-while-expr  : KEYWORD:dum{while} expr KEYWORD:ergo{then}
-              statement
-            | (NEWLINE statements KEYWORD:finis{end})
+while-expr: KEYWORD:dum{while} expr KEYWORD:ergo{then}
+          statement
+          | (NEWLINE statements KEYWORD:finis{end})
 
-func-def    : KEYWORD:opus{fun} IDENTIFIER?
-              LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
-              (ARROW expr)
-            | (NEWLINE statements KEYWORD:finis{end})
+func-def: KEYWORD:opus{fun} IDENTIFIER?
+        LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
+        (ARROW expr)
+        | (NEWLINE statements KEYWORD:finis{end})
