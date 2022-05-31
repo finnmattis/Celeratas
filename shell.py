@@ -11,16 +11,15 @@ import root
 # Date
 #######################################
 
-time = datetime.now().strftime("%b %d %y, %H:%M:%S")
-time = time.replace("Jan", "Unus Martius")
-time = time.replace("Feb", "Duo Martius")
-time = time.replace("Mar", "Martius")
-time = time.replace("Apr", "Aprilis")
-time = time.replace("May", "Maius")
-time = time.replace("Jun", "Junius")
-time = time.replace("Jul", "Quintilis")
-time = time.replace("Aug", "Sextilis")
-# Don't need to replace Sep, Oct, Nov, or Dec bc they are the same in latin
+
+def get_time():
+    time = datetime.now().strftime("%b %d %y, %H:%M:%S")
+    time = time.replace("Jan", "Unus Martius").replace("Feb", "Duo Martius")
+    time = time.replace("Mar", "Martius").replace("Apr", "Aprilis")
+    time = time.replace("May", "Maius").replace("Jun", "Junius")
+    time = time.replace("Jul", "Quintilis").replace("Aug", "Sextilis")
+    return time
+    # Don't need to replace Sep, Oct, Nov, or Dec bc they are the same in latin
 
 #######################################
 # Run Script Function
@@ -41,6 +40,7 @@ def run_script(fn, script):
 #######################################
 # Run File from command line or take input
 #######################################
+
 if len(sys.argv) > 1:
     try:
         fn = sys.argv[1]
@@ -49,7 +49,10 @@ if len(sys.argv) > 1:
         run_script(fn, script)
     except FileNotFoundError as e:
         print(f"Can't open file {fn}: No such file")
+    except UnicodeDecodeError as e:
+        print(f"Can't open file {fn}: Invalid file format")
 else:
+    time = get_time()
     print(
         f"Celeritas versio unum (defalta, {time})\nScribe 'auxilium' auxilio")
     while True:
