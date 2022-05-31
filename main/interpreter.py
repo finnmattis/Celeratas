@@ -459,7 +459,7 @@ class Function(BaseFunction):
             return res
 
         ret_value = (
-            value if self.should_auto_return else None) or res.func_return_value or Number.null
+            value if self.should_auto_return else None) or res.func_return_value or None
         return res.success(ret_value)
 
     def copy(self):
@@ -510,7 +510,7 @@ class BuiltInFunction(BaseFunction):
 
     def execute_print(self, exec_ctx):
         print(str(exec_ctx.symbol_table.get('value')))
-        return RTResult().success(Number.null)
+        return RTResult().success(None)
     execute_print.arg_names = ['value']
 
     def execute_input(self, exec_ctx):
@@ -520,7 +520,7 @@ class BuiltInFunction(BaseFunction):
 
     def execute_clear(self, exec_ctx):
         os.system('cls' if os.name == 'nt' else 'clear')
-        return RTResult().success(Number.null)
+        return RTResult().success(None)
     execute_clear.arg_names = []
 
     def execute_is_number(self, exec_ctx):
@@ -556,7 +556,7 @@ class BuiltInFunction(BaseFunction):
             ))
 
         list_.elements.append(value)
-        return RTResult().success(Number.null)
+        return RTResult().success(None)
     execute_append.arg_names = ["list", "value"]
 
     def execute_pop(self, exec_ctx):
@@ -607,7 +607,7 @@ class BuiltInFunction(BaseFunction):
             ))
 
         listA.elements.extend(listB.elements)
-        return RTResult().success(Number.null)
+        return RTResult().success(None)
     execute_extend.arg_names = ["listA", "listB"]
 
     def execute_len(self, exec_ctx):
@@ -657,7 +657,7 @@ class BuiltInFunction(BaseFunction):
                 exec_ctx
             ))
 
-        return RTResult().success(Number.null)
+        return RTResult().success(None)
     execute_run.arg_names = ["fn"]
 
 
@@ -790,7 +790,7 @@ class Interpreter:
             return res
 
         context.symbol_table.set(var_name, value)
-        return res.success(value)
+        return res.success(None)
 
     def visit_BinOpNode(self, node, context):
         res = RTResult()
@@ -863,16 +863,16 @@ class Interpreter:
                 expr_value = res.register(self.visit(expr, context))
                 if res.should_return():
                     return res
-                return res.success(Number.null if should_return_null else expr_value)
+                return res.success(None if should_return_null else expr_value)
 
         if node.else_case:
             expr, should_return_null = node.else_case
             expr_value = res.register(self.visit(expr, context))
             if res.should_return():
                 return res
-            return res.success(Number.null if should_return_null else expr_value)
+            return res.success(None if should_return_null else expr_value)
 
-        return res.success(Number.null)
+        return res.success(None)
 
     def visit_ForNode(self, node, context):
         res = RTResult()
@@ -918,7 +918,7 @@ class Interpreter:
             elements.append(value)
 
         return res.success(
-            Number.null if node.should_return_null else
+            None if node.should_return_null else
             List(elements).set_context(context).set_pos(
                 node.pos_start, node.pos_end)
         )
@@ -948,7 +948,7 @@ class Interpreter:
             elements.append(value)
 
         return res.success(
-            Number.null if node.should_return_null else
+            None if node.should_return_null else
             List(elements).set_context(context).set_pos(
                 node.pos_start, node.pos_end)
         )
@@ -984,6 +984,9 @@ class Interpreter:
         return_value = res.register(value_to_call.execute(args))
         if res.should_return():
             return res
+        if return_value == None:
+            return res.success(None)
+
         return_value = return_value.copy().set_pos(
             node.pos_start, node.pos_end).set_context(context)
         return res.success(return_value)
@@ -996,7 +999,7 @@ class Interpreter:
             if res.should_return():
                 return res
         else:
-            value = Number.null
+            value = None
 
         return res.success_return(value)
 
