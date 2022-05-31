@@ -2,12 +2,13 @@
 # Import
 #######################################
 
+
 import math
 import os
 
 from helper.errors import *
 from helper.tokens import *
-
+from helper.convert_roman import *
 #######################################
 # RUNTIME RESULT
 #######################################
@@ -258,6 +259,81 @@ Number.null = Number(0)
 Number.false = Number(0)
 Number.true = Number(1)
 Number.math_PI = Number(math.pi)
+
+
+class Numeral(Value):
+    def __init__(self, value):
+        super().__init__()
+        self.value = value
+
+    def added_to(self, other):
+        if isinstance(other, Numeral):
+            return Numeral(self.value + other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def subbed_by(self, other):
+        if isinstance(other, Numeral):
+            return Numeral(self.value - other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def multed_by(self, other):
+        if isinstance(other, Numeral):
+            return Numeral(self.value * other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def dived_by(self, other):
+        if isinstance(other, Numeral):
+            return Numeral(round(self.value / other.value, 3)).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def powed_by(self, other):
+        if isinstance(other, Numeral):
+            return Numeral(self.value ** other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def get_comparison_eq(self, other):
+        if isinstance(other, Numeral):
+            return Number(int(self.value == other.value)).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def get_comparison_ne(self, other):
+        if isinstance(other, Numeral):
+            return Number(int(self.value != other.value)).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def get_comparison_lt(self, other):
+        if isinstance(other, Numeral):
+            return Number(int(self.value < other.value)).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def get_comparison_gt(self, other):
+        if isinstance(other, Numeral):
+            return Number(int(self.value > other.value)).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def get_comparison_lte(self, other):
+        if isinstance(other, Numeral):
+            return Number(int(self.value <= other.value)).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def get_comparison_gte(self, other):
+        if isinstance(other, Numeral):
+            return Number(int(self.value >= other.value)).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def __repr__(self):
+        return toRoman(self.value)
 
 
 class String(Value):
@@ -704,6 +780,12 @@ class Interpreter:
     def visit_NumberNode(self, node, context):
         return RTResult().success(
             Number(node.tok.value).set_context(
+                context).set_pos(node.pos_start, node.pos_end)
+        )
+
+    def visit_NumeralNode(self, node, context):
+        return RTResult().success(
+            Numeral(node.tok.value).set_context(
                 context).set_pos(node.pos_start, node.pos_end)
         )
 

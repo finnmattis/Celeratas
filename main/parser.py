@@ -21,6 +21,17 @@ class NumberNode:
         return f'{self.tok}'
 
 
+class NumeralNode:
+    def __init__(self, tok):
+        self.tok = tok
+
+        self.pos_start = self.tok.pos_start
+        self.pos_end = self.tok.pos_end
+
+    def __repr__(self):
+        return self.tok.value
+
+
 class StringNode:
     def __init__(self, tok):
         self.tok = tok
@@ -442,6 +453,11 @@ class Parser:
     def atom(self):
         res = ParseResult()
         tok = self.current_tok
+
+        if tok.type == TT_NUMERAL:
+            res.register_advancement()
+            self.advance()
+            return res.success(NumeralNode(tok))
 
         if tok.type in (TT_INT, TT_FLOAT):
             res.register_advancement()

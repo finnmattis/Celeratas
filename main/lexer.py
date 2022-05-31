@@ -4,6 +4,7 @@
 
 import string
 
+from helper.convert_roman import *
 from helper.errors import *
 from helper.tokens import *
 
@@ -11,6 +12,7 @@ from helper.tokens import *
 # CONSTANTS
 #######################################
 
+ROMAN_NUMERAL_CHARS = "IVXLCDM"
 DIGITS = '0123456789'
 LETTERS = string.ascii_letters
 LETTERS_DIGITS = LETTERS + DIGITS
@@ -97,6 +99,11 @@ class Lexer:
             elif self.current_char in ';\n':
                 tokens.append(Token(TT_NEWLINE, pos_start=self.pos))
                 self.advance()
+            elif self.current_char in ROMAN_NUMERAL_CHARS:
+                token, error = self.make_numeral()
+                if error:
+                    return [], error
+                tokens.append(token)
             elif self.current_char in DIGITS:
                 tokens.append(self.make_number())
             elif self.current_char in LETTERS:
@@ -151,6 +158,27 @@ class Lexer:
 
         tokens.append(Token(TT_EOF, pos_start=self.pos))
         return tokens, None
+
+    def make_numeral(self):
+        numeral_str = ''
+        dot_count = 0
+        pos_start = self.pos.copy()
+
+        while self.current_char != None and self.current_char in ROMAN_NUMERAL_CHARS + '.':
+            if self.current_char == '.':
+                if dot_count == 1:
+                    break
+                dot_count += 1
+            numeral_str += self.current_char
+            self.advance()
+        # Convert to String to Int or Float
+        numeral_final = toNum(numeral_str)
+
+        if numeral_final == None:
+            return None, InvalidNumeral(pos_start, self.pos, "hi jake cole drop to latin 1a")
+        # Function returns None if the numeral is invalid
+
+        return Token(TT_NUMERAL, numeral_final, pos_start, self.pos), None
 
     def make_number(self):
         num_str = ''
