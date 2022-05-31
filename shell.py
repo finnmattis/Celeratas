@@ -1,8 +1,9 @@
 
-# TODO Add Zeros to Numerals
 # TODO Change ergo to :
+# TODO Add Zeros to Numerals
 # TODO Add Help Menu/Documentation
 
+# TODO Future: Use indents instead of finis{end}
 # TODO Future: Create STD LIB
 # TODO Future: Create vscode extension
 # TODO FUture: Create website
