@@ -99,6 +99,9 @@ class Lexer:
             elif self.current_char in ';\n':
                 tokens.append(Token(TT_NEWLINE, pos_start=self.pos))
                 self.advance()
+            elif self.current_char in LETTERS:
+                tokens.append(self.make_identifier())
+            # Identifiers needs to be above numerals because I in IF gets picked up as a numeral
             elif self.current_char in ROMAN_NUMERAL_CHARS:
                 token, error = self.make_numeral()
                 if error:
@@ -106,8 +109,6 @@ class Lexer:
                 tokens.append(token)
             elif self.current_char in DIGITS:
                 tokens.append(self.make_number())
-            elif self.current_char in LETTERS:
-                tokens.append(self.make_identifier())
             elif self.current_char == '"':
                 tokens.append(self.make_string())
             elif self.current_char == '+':
