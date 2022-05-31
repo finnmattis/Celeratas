@@ -374,47 +374,6 @@ class List(Value):
         super().__init__()
         self.elements = elements
 
-    def added_to(self, other):
-        new_list = self.copy()
-        new_list.elements.append(other)
-        return new_list, None
-
-    def subbed_by(self, other):
-        if isinstance(other, Number):
-            new_list = self.copy()
-            try:
-                new_list.elements.pop(other.value)
-                return new_list, None
-            except:
-                return None, RTError(
-                    other.pos_start, other.pos_end,
-                    'Element at this index could not be removed from list because index is out of bounds',
-                    self.context
-                )
-        else:
-            return None, Value.illegal_operation(self, other)
-
-    def multed_by(self, other):
-        if isinstance(other, List):
-            new_list = self.copy()
-            new_list.elements.extend(other.elements)
-            return new_list, None
-        else:
-            return None, Value.illegal_operation(self, other)
-
-    def dived_by(self, other):
-        if isinstance(other, Number):
-            try:
-                return self.elements[other.value], None
-            except:
-                return None, RTError(
-                    other.pos_start, other.pos_end,
-                    'Element at this index could not be retrieved from list because index is out of bounds',
-                    self.context
-                )
-        else:
-            return None, Value.illegal_operation(self, other)
-
     def copy(self):
         copy = List(self.elements)
         copy.set_pos(self.pos_start, self.pos_end)
@@ -549,28 +508,13 @@ class BuiltInFunction(BaseFunction):
         return RTResult().success(Number.null)
     execute_print.arg_names = ['value']
 
-    def execute_print_ret(self, exec_ctx):
-        return RTResult().success(String(str(exec_ctx.symbol_table.get('value'))))
-    execute_print_ret.arg_names = ['value']
-
     def execute_input(self, exec_ctx):
         text = input()
         return RTResult().success(String(text))
     execute_input.arg_names = []
 
-    def execute_input_int(self, exec_ctx):
-        while True:
-            text = input()
-            try:
-                number = int(text)
-                break
-            except ValueError:
-                print(f"'{text}' must be an integer. Try again!")
-        return RTResult().success(Number(number))
-    execute_input_int.arg_names = []
-
     def execute_clear(self, exec_ctx):
-        os.system('cls' if os.name == 'nt' else 'cls')
+        os.system('cls' if os.name == 'nt' else 'clear')
         return RTResult().success(Number.null)
     execute_clear.arg_names = []
 
@@ -696,7 +640,7 @@ class BuiltInFunction(BaseFunction):
                 exec_ctx
             ))
 
-        # Need the import here to avoid circular imports
+        # Need the import here to avoid circular import
         from root import run
         _, error = run(fn, script)
 
@@ -713,9 +657,7 @@ class BuiltInFunction(BaseFunction):
 
 
 BuiltInFunction.print = BuiltInFunction("print")
-BuiltInFunction.print_ret = BuiltInFunction("print_ret")
 BuiltInFunction.input = BuiltInFunction("input")
-BuiltInFunction.input_int = BuiltInFunction("input_int")
 BuiltInFunction.clear = BuiltInFunction("clear")
 BuiltInFunction.is_number = BuiltInFunction("is_number")
 BuiltInFunction.is_string = BuiltInFunction("is_string")
