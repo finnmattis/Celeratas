@@ -332,6 +332,12 @@ class Numeral(Value):
         else:
             return None, Value.illegal_operation(self, other)
 
+    def copy(self):
+        copy = Numeral(self.value)
+        copy.set_pos(self.pos_start, self.pos_end)
+        copy.set_context(self.context)
+        return copy
+
     def __repr__(self):
         return toRoman(self.value)
 
