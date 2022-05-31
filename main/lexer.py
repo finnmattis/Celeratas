@@ -101,7 +101,6 @@ class Lexer:
                 self.advance()
             elif self.current_char in LETTERS:
                 tokens.append(self.make_identifier())
-            # Identifiers needs to be above numerals because I in IF gets picked up as a numeral
             elif self.current_char in ROMAN_NUMERAL_CHARS:
                 token, error = self.make_numeral()
                 if error:

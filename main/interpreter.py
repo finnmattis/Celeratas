@@ -865,9 +865,9 @@ class Interpreter:
             result, error = left.get_comparison_lte(right)
         elif node.op_tok.type == TT_GTE:
             result, error = left.get_comparison_gte(right)
-        elif node.op_tok.matches(TT_KEYWORD, 'AND'):
+        elif node.op_tok.matches(TT_KEYWORD, 'et'):
             result, error = left.anded_by(right)
-        elif node.op_tok.matches(TT_KEYWORD, 'OR'):
+        elif node.op_tok.matches(TT_KEYWORD, 'aut'):
             result, error = left.ored_by(right)
 
         if error:
@@ -885,7 +885,7 @@ class Interpreter:
 
         if node.op_tok.type == TT_MINUS:
             number, error = number.multed_by(Number(-1))
-        elif node.op_tok.matches(TT_KEYWORD, 'NOT'):
+        elif node.op_tok.matches(TT_KEYWORD, 'non'):
             number, error = number.notted()
 
         if error:

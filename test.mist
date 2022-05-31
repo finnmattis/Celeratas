@@ -1,0 +1,6 @@
+si 1 == 0 ergo;
+PRINT("L");
+finis;
+alioquinsi 1 == 1 ergo;
+PRINT("YAY");
+finis;
