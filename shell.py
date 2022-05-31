@@ -1,3 +1,13 @@
+
+# TODO Add Zeros to Numerals
+# TODO Change ergo to :
+# TODO Add Help Menu/Documentation
+
+# TODO Future: Create STD LIB
+# TODO Future: Create vscode extension
+# TODO FUture: Create website
+
+
 #######################################
 # IMPORTS
 #######################################

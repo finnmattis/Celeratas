@@ -582,13 +582,13 @@ class Parser:
         return res.success(IfNode(cases, else_case))
 
     def if_expr_b(self):
-        return self.if_expr_cases('ELIF')
+        return self.if_expr_cases('alioquinsi')
 
     def if_expr_c(self):
         res = ParseResult()
         else_case = None
 
-        if self.current_tok.matches(TT_KEYWORD, 'ELSE'):
+        if self.current_tok.matches(TT_KEYWORD, 'alioquin'):
             res.register_advancement()
             self.advance()
 
@@ -621,7 +621,7 @@ class Parser:
         res = ParseResult()
         cases, else_case = [], None
 
-        if self.current_tok.matches(TT_KEYWORD, 'ELIF'):
+        if self.current_tok.matches(TT_KEYWORD, 'alioquinsi'):
             all_cases = res.register(self.if_expr_b())
             if res.error:
                 return res

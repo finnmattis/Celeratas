@@ -1,7 +1,5 @@
 import re
 
-# TODO Add Zeros to Numerals
-
 lookup = [
     (1000, 'M'),
     (900, 'CM'),
