@@ -651,10 +651,10 @@ class Parser:
         if res.error:
             return res
 
-        if not self.current_tok.matches(TT_KEYWORD, 'ergo'):
+        if not self.current_tok.type == TT_COLON:
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected 'ergo'"
+                f"Expected ':'"
             ))
 
         res.register_advancement()
@@ -750,10 +750,10 @@ class Parser:
         else:
             step_value = None
 
-        if not self.current_tok.matches(TT_KEYWORD, 'ergo'):
+        if not self.current_tok.type == TT_COLON:
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected 'ergo'"
+                f"Expected ':'"
             ))
 
         res.register_advancement()
@@ -800,10 +800,10 @@ class Parser:
         if res.error:
             return res
 
-        if not self.current_tok.matches(TT_KEYWORD, 'ergo'):
+        if not self.current_tok.type == TT_COLON:
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected 'ergo'"
+                f"Expected ':'"
             ))
 
         res.register_advancement()

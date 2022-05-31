@@ -147,6 +147,9 @@ class Lexer:
                 tokens.append(self.make_less_than())
             elif self.current_char == '>':
                 tokens.append(self.make_greater_than())
+            elif self.current_char == ':':
+                tokens.append(Token(TT_COLON, pos_start=self.pos))
+                self.advance()
             elif self.current_char == ',':
                 tokens.append(Token(TT_COMMA, pos_start=self.pos))
                 self.advance()

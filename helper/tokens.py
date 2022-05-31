@@ -20,6 +20,7 @@ TT_LT = 'LT'
 TT_GT = 'GT'
 TT_LTE = 'LTE'
 TT_GTE = 'GTE'
+TT_COLON = 'COLON'
 TT_COMMA = 'COMMA'
 TT_ARROW = 'ARROW'
 TT_NEWLINE = 'NEWLINE'
@@ -38,7 +39,6 @@ KEYWORDS = [
     'gradus',
     'dum',
     'opus',
-    'ergo',
     'finis',
     'redi',
     'continua',
