@@ -1,5 +1,7 @@
 import re
 
+# TODO Add Zeros to Numerals
+
 lookup = [
     (1000, 'M'),
     (900, 'CM'),
@@ -26,6 +28,9 @@ def toRoman(number):
             before_dot, after_dot = toRoman(
                 int(before_dot)), toRoman(int(after_dot))
             return f"{before_dot}.{after_dot}"
+    if number < 0:
+        number = toRoman(number*-1)
+        return f"-{number}"
 
     res = ''
     for (n, roman) in lookup:
@@ -36,9 +41,13 @@ def toRoman(number):
 
 def toNum(numeral):
     valid = bool(re.search(
-        r"^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})(\..M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3}))?$", numeral))
+        r"^-?M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})(\..M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3}))?$", numeral))
     if not valid:
         return None
+
+    if "-" in numeral:
+        numeral = toNum(numeral[1:])
+        return numeral * -1
 
     if "." in numeral:
         before_dot, after_dot = numeral.split(".")

@@ -5,8 +5,8 @@
 import string
 
 from helper.convert_roman import *
-from helper.errors import *
 from helper.tokens import *
+from helper.errors import InvalidNumeral, IllegalCharError, ExpectedCharError
 
 #######################################
 # CONSTANTS
@@ -99,13 +99,13 @@ class Lexer:
             elif self.current_char in ';\n':
                 tokens.append(Token(TT_NEWLINE, pos_start=self.pos))
                 self.advance()
-            elif self.current_char in LETTERS:
-                tokens.append(self.make_identifier())
             elif self.current_char in ROMAN_NUMERAL_CHARS:
                 token, error = self.make_numeral()
                 if error:
                     return [], error
                 tokens.append(token)
+            elif self.current_char in LETTERS:
+                tokens.append(self.make_identifier())
             elif self.current_char in DIGITS:
                 tokens.append(self.make_number())
             elif self.current_char == '"':

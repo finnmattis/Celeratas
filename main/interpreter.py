@@ -6,9 +6,9 @@
 import math
 import os
 
-from helper.errors import *
-from helper.tokens import *
 from helper.convert_roman import *
+from helper.tokens import *
+from helper.errors import RTError
 #######################################
 # RUNTIME RESULT
 #######################################
