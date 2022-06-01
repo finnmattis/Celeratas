@@ -52,9 +52,9 @@ class ListNode:
 
 
 class VarAccessNode:
-    def __init__(self, var_name_tok, list_idx_to_get):
+    def __init__(self, var_name_tok, idx_to_get):
         self.var_name_tok = var_name_tok
-        self.list_idx_to_get = list_idx_to_get
+        self.idx_to_get = idx_to_get
 
         self.pos_start = self.var_name_tok.pos_start
         self.pos_end = self.var_name_tok.pos_end
@@ -474,21 +474,21 @@ class Parser:
             res.register_advancement()
             self.advance()
             var_name = tok
-            list_idx_to_get = None
+            idx_to_get = None
 
             if '[' in tok.value:
                 var_name = Token(tok.type, tok.value[:tok.value.find(
                     '[')], tok.pos_start, tok.pos_end)
 
-                # Get list_idx_to_get - This will get every char in between square brackets
+                # Get idx_to_get - This will get every char in between square brackets
                 idx_between_brackets = tok.value.find('[') + 1
-                list_idx_to_get = ""
+                idx_to_get = ""
                 while idx_between_brackets < len(tok.value)-1:
-                    list_idx_to_get += tok.value[idx_between_brackets]
+                    idx_to_get += tok.value[idx_between_brackets]
                     idx_between_brackets += 1
-                list_idx_to_get = int(list_idx_to_get)
+                idx_to_get = int(idx_to_get)
 
-            return res.success(VarAccessNode(var_name, list_idx_to_get))
+            return res.success(VarAccessNode(var_name, idx_to_get))
 
         elif tok.type == TT_LPAREN:
             res.register_advancement()

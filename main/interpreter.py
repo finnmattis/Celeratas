@@ -760,7 +760,7 @@ class Interpreter:
         res = RTResult()
         var_name = node.var_name_tok.value
         value = context.symbol_table.get(var_name)
-        list_idx_to_get = node.list_idx_to_get
+        idx_to_get = node.idx_to_get
 
         if not value:
             return res.failure(RTError(
@@ -771,13 +771,29 @@ class Interpreter:
 
         value = value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
 
-        if list_idx_to_get:
-            if list_idx_to_get < len(value.elements):
-                value.elements = [value.elements[list_idx_to_get]]
+        if idx_to_get:
+            if isinstance(value, List):
+                if idx_to_get < len(value.elements):
+                    value.elements = [value.elements[idx_to_get]]
+                else:
+                    return res.failure(RTError(
+                        node.pos_start, node.pos_end,
+                        'List Index Out of Bounds',
+                        context
+                    ))
+            elif isinstance(value, String):
+                if idx_to_get < len(value.value):
+                    value.value = value.value[idx_to_get]
+                else:
+                    return res.failure(RTError(
+                        node.pos_start, node.pos_end,
+                        'String Index Out of Bounds',
+                        context
+                    ))
             else:
                 return res.failure(RTError(
                     node.pos_start, node.pos_end,
-                    'List Index Out of Bounds',
+                    'Invalid Type to get idx, can only process list or string',
                     context
                 ))
         return res.success(value)

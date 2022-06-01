@@ -1,6 +1,5 @@
 
 # TODO Add Zeros to Numerals
-# TODO Add more list functionality
 
 # TODO Future: Use indents instead of finis{end}
 # TODO Future: Create STD LIB
