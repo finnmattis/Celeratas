@@ -1,6 +1,7 @@
 
 # TODO Add Zeros to Numerals
 
+# TODO Dictionaries
 # TODO Type function
 # TODO can't get index of index
 # TODO Future: Use indents instead of finis{end}

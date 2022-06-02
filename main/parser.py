@@ -482,6 +482,8 @@ class Parser:
 
                 idx_to_get = res.register(self.bin_op(
                     self.comp_expr, ((TT_KEYWORD, 'et'), (TT_KEYWORD, 'aut'))))
+                if res.error:
+                    return res
                 res.register_advancement()
                 self.advance()
 
@@ -929,10 +931,19 @@ class Parser:
                 True
             ))
 
+        if self.current_tok.type != TT_COLON:
+            return res.failure(InvalidSyntaxError(
+                self.current_tok.pos_start, self.current_tok.pos_end,
+                f"Expected '->' or ':'"
+            ))
+
+        res.register_advancement()
+        self.advance()
+
         if self.current_tok.type != TT_NEWLINE:
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected '->' or NEWLINE"
+                f"Expected NEWLINE"
             ))
 
         res.register_advancement()
