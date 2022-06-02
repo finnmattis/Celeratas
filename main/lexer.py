@@ -234,27 +234,7 @@ class Lexer:
         id_str = ''
         pos_start = self.pos.copy()
 
-        while self.current_char != None and self.current_char in LETTERS_DIGITS + '_' + '[' + ']':
-            if self.current_char == ']':
-                return None, ExpectedCharError(pos_start, self.pos, "Expected '[' before ']'")
-
-            if self.current_char == '[':
-                id_str += self.current_char
-                self.advance()
-
-                if not self.current_char:
-                    return None, ExpectedCharError(pos_start, self.pos, "Expected expression")
-
-                # First part nessesary because None in second expr leads in error
-                while self.current_char and self.current_char in DIGITS + " ":
-                    if self.current_char == " ":
-                        pass
-                    else:
-                        id_str += self.current_char
-                    self.advance()
-                    if not self.current_char:
-                        return None, ExpectedCharError(pos_start, self.pos, "Expected ']'")
-
+        while self.current_char in LETTERS_DIGITS + '_':
             id_str += self.current_char
             self.advance()
 

@@ -1,6 +1,8 @@
 
 # TODO Add Zeros to Numerals
 
+# TODO Type function
+# TODO can't get index of index
 # TODO Future: Use indents instead of finis{end}
 # TODO Future: Create STD LIB
 # TODO Future: Create vscode extension

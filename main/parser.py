@@ -476,17 +476,14 @@ class Parser:
             var_name = tok
             idx_to_get = None
 
-            if '[' in tok.value:
-                var_name = Token(tok.type, tok.value[:tok.value.find(
-                    '[')], tok.pos_start, tok.pos_end)
+            if self.current_tok.type == TT_LSQUARE:
+                res.register_advancement()
+                self.advance()
 
-                # Get idx_to_get - This will get every char in between square brackets
-                idx_between_brackets = tok.value.find('[') + 1
-                idx_to_get = ""
-                while idx_between_brackets < len(tok.value)-1:
-                    idx_to_get += tok.value[idx_between_brackets]
-                    idx_between_brackets += 1
-                idx_to_get = int(idx_to_get)
+                idx_to_get = res.register(self.bin_op(
+                    self.comp_expr, ((TT_KEYWORD, 'et'), (TT_KEYWORD, 'aut'))))
+                res.register_advancement()
+                self.advance()
 
             return res.success(VarAccessNode(var_name, idx_to_get))
 
