@@ -234,7 +234,7 @@ class Lexer:
         id_str = ''
         pos_start = self.pos.copy()
 
-        while self.current_char in LETTERS_DIGITS + '_':
+        while self.current_char and self.current_char in LETTERS_DIGITS + '_':
             id_str += self.current_char
             self.advance()
 
