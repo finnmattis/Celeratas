@@ -34,11 +34,11 @@ atom: INT|FLOAT|STRING|IDENTIFIER
 
 list-expr: LSQUARE (expr (COMMA expr)*)? RSQUARE
 
-if-expr: KEYWORD:si{if} expr KEYWORD:ergo{then}
+if-expr: KEYWORD:si{if} expr TOKEN:COLON
        (statement if-expr-b|if-expr-c?)
        (NEWLINE statements KEYWORD:finis{end}|if-expr-b|if-expr-c)
 
-if-expr-b: KEYWORD:alioquinsi{elif} expr KEYWORD:ergo{then}
+if-expr-b: KEYWORD:alioquinsi{elif} expr TOKEN:COLON
          (statement if-expr-b|if-expr-c?)
          | (NEWLINE statements KEYWORD:finis{end}|if-expr-b|if-expr-c)
 
@@ -46,12 +46,12 @@ if-expr-c: KEYWORD:alioquin{else}
          statement
          | (NEWLINE statements KEYWORD:finis{end})
 
-for-expr: KEYWORD:enim{for} IDENTIFIER EQ expr KEYWORD:ad{to} expr 
-        (KEYWORD:gradus{step} expr)? KEYWORD:ergo{then}
+for-expr: KEYWORD:pro{for} IDENTIFIER EQ expr KEYWORD:ad{to} expr 
+        (KEYWORD:gradus{step} expr)? TOKEN:COLON
         statement
         | (NEWLINE statements KEYWORD:finis{end})
 
-while-expr: KEYWORD:dum{while} expr KEYWORD:ergo{then}
+while-expr: KEYWORD:dum{while} expr TOKEN:COLON
           statement
           | (NEWLINE statements KEYWORD:finis{end})
 
