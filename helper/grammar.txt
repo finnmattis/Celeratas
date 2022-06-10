@@ -7,10 +7,10 @@ statement: KEYWORD:redi{return} expr?
 		 : KEYWORD:confringe{break}
 		 : expr
 
-expr: KEYWORD:sino(var) IDENTIFIER EQ expr
+expr: KEYWORD:sino{var} IDENTIFIER EQ expr
     : comp-expr ((KEYWORD:et{and}|KEYWORD:aut{or}) comp-expr)*
 
-comp-expr: non(not) comp-expr
+comp-expr: non{not} comp-expr
          : arith-expr ((EE|LT|GT|LTE|GTE) arith-expr)*
 
 arith-expr: term ((PLUS|MINUS) term)*

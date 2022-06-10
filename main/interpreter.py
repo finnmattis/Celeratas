@@ -1,5 +1,5 @@
 #######################################
-# Import
+# IMPORTS
 #######################################
 
 import math
@@ -8,6 +8,7 @@ import os
 from helper.convert_roman import *
 from helper.tokens import *
 from helper.errors import RTError
+
 #######################################
 # RUNTIME RESULT
 #######################################
@@ -646,7 +647,7 @@ class BuiltInFunction(BaseFunction):
             ))
 
         # Need the import here to avoid circular import
-        from root import run
+        from main.root import run
         _, error = run(fn, script)
 
         if error:

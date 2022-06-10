@@ -5,6 +5,7 @@
 from helper.tokens import *
 from helper.errors import InvalidSyntaxError
 from main.lexer import Token
+
 #######################################
 # NODES
 #######################################

@@ -1,3 +1,8 @@
+#######################################
+# ARROW FUNCTION
+#######################################
+
+
 def show_error_loc(text, pos_start, pos_end):
     result = ''
 
@@ -27,6 +32,10 @@ def show_error_loc(text, pos_start, pos_end):
 
     return result.replace('\t', '')
 
+#######################################
+# BASE CLASS
+#######################################
+
 
 class Error:
     def __init__(self, pos_start, pos_end, error_name, details):
@@ -42,6 +51,10 @@ class Error:
             show_error_loc(self.pos_start.ftxt,
                            self.pos_start, self.pos_end)
         return result
+
+#######################################
+# SUB CLASSES
+#######################################
 
 
 class InvalidNumeral(Error):

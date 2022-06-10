@@ -1,15 +1,4 @@
-
-# TODO Add Zeros to Numerals
-
-# TODO Try Except
-# TODO Dictionaries
-# TODO Type function
-# TODO can't get index of index
-# TODO Future: Use indents instead of finis{end}
-# TODO Future: Create STD LIB
-# TODO Future: Create vscode extension
-# TODO FUture: Create website
-
+#!/usr/bin/python3
 
 #######################################
 # IMPORTS
@@ -18,7 +7,7 @@
 import sys
 from datetime import datetime
 
-import root
+import main.root as root
 
 
 class Shell:
@@ -26,7 +15,7 @@ class Shell:
         self.start()
 
     #######################################
-    # Date
+    # DATE
     #######################################
 
     def get_time(self):
@@ -40,10 +29,10 @@ class Shell:
         # Don't need to replace Sep, Oct, Nov, or Dec bc they are the same in latin
 
     #######################################
-    # Help Function
+    # HELP FUNCTION
     #######################################
 
-    def help_menu():
+    def help_menu(self):
         print("\nWhat do you need help with?\n\n1: Keywords\n2: Syntax\n3: Built-In Functions\n")
         while True:
             help_num = input()
@@ -55,17 +44,17 @@ class Shell:
             print('\nsino -> var\net -> and\naut -> or\nnon -> not\nsi -> if\nalioquinsi -> elif\nalioquin -> else\npro -> for')
             print('ad -> to\ngradus -> step\ndum -> while\nopus -> task\nfinis -> end\nredi -> return\ncontinua -> continue\nconfringe -> break')
         elif help_num == "2":
-            with open("grammar.txt", "r") as grammar:
+            with open("helper/grammar.txt", "r") as grammar:
                 print(grammar.read())
         elif help_num == "3":
             print('\nscribe(value_to_print) -> print\ninitus() -> input\npurgo() -> clear\nest_numerus(value_to_check) -> is_number\nest_filum(value_to_check) -> is_string\nest_album(value_to_check) -> is_list')
             print('est_opus(value_to_check) -> is_function\nadde(value_to_add) -> append\nremove(value_to_remove) -> pop\nextende(list_to_extend) -> extend\nlongitudo(value_to_check) -> length\ncurre(file_to_run) -> run')
 
     #######################################
-    # Run Script Function
+    # RUN SCRIPT FUNCTION
     #######################################
 
-    def run_script(fn, script):
+    def run_script(self, fn, script):
         result, error = root.run(fn, script)
         if error:
             print(error.as_string())
@@ -79,31 +68,35 @@ class Shell:
                 print(repr(result))
 
     #######################################
-    # Run File from command line or take input
+    # RUN FILE FROM CLI ARGS OR TAKE INPUT
     #######################################
     def start(self):
-        if len(sys.argv) > 1:
-            try:
-                fn = sys.argv[1]
-                with open(fn, "r") as f:
-                    script = f.read()
-                self.run_script(fn, script)
-            except FileNotFoundError as e:
-                print(f"Can't open file {fn}: No such file")
-            except UnicodeDecodeError as e:
-                print(f"Can't open file {fn}: Invalid file format")
-        else:
-            time = self.get_time()
-            print(
-                f"Celeritas versio unum (defalta, {time})\nScribe 'auxilium' auxilio")
-            while True:
-                text = input('>>> ')
-                if text.strip() == "":
-                    continue
-                if text == "auxilium":
-                    self.help_menu()
-                    continue
-                self.run_script("<stdin>", text)
+        try:
+            if len(sys.argv) > 1:
+                try:
+                    fn = sys.argv[1]
+                    with open(fn, "r") as f:
+                        script = f.read()
+                    self.run_script(fn, script)
+                except FileNotFoundError as e:
+                    print(f"Can't open file {fn}: No such file")
+                except UnicodeDecodeError as e:
+                    print(f"Can't open file {fn}: Invalid file format")
+            else:
+                time = self.get_time()
+                print(
+                    f"Celeritas versio unum (defalta, {time})\nScribe 'auxilium' auxilio")
+                while True:
+                    text = input('>>> ')
+                    if text.strip() == "":
+                        continue
+                    if text == "auxilium":
+                        self.help_menu()
+                        continue
+                    self.run_script("<stdin>", text)
+        except KeyboardInterrupt:
+            # Double Backspace to get rid of ^C
+            print("\b\b\nKeyboard Interrupt")
 
 
 if __name__ == '__main__':
