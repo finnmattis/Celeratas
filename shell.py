@@ -78,9 +78,9 @@ class Shell:
                     with open(fn, "r") as f:
                         script = f.read()
                     self.run_script(fn, script)
-                except FileNotFoundError as e:
+                except FileNotFoundError:
                     print(f"Can't open file {fn}: No such file")
-                except UnicodeDecodeError as e:
+                except UnicodeDecodeError:
                     print(f"Can't open file {fn}: Invalid file format")
             else:
                 time = self.get_time()
@@ -95,8 +95,8 @@ class Shell:
                         continue
                     self.run_script("<stdin>", text)
         except KeyboardInterrupt:
-            # Double Backspace to get rid of ^C
-            print("\b\b\nKeyboard Interrupt")
+            print("\r", end="")
+            print("Keyboard Interrupt")
 
 
 if __name__ == '__main__':
