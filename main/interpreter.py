@@ -777,14 +777,16 @@ class Interpreter:
             method = getattr(self, method_name, self.no_visit_method)
             idx_to_get = method(idx_to_get, context)
 
-            if not isinstance(idx_to_get.value, Number) or type(idx_to_get.value.value) != "<class 'int'>":
+            idx_to_get = idx_to_get.value.value
+
+            if not isinstance(idx_to_get, int):
                 return res.failure(RTError(
                     node.pos_start, node.pos_end,
-                    f'List Index must be an Int',
+                    f'List Index Must be an Int not {type(idx_to_get)}',
                     context
                 ))
+
             # need to get the value of the RTResult and then the Number class
-            idx_to_get = idx_to_get.value.value
 
             # Check if list:
             if isinstance(value, List):
