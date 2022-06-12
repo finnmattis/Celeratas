@@ -3,7 +3,7 @@
 #######################################
 
 from helper.tokens import *
-from helper.errors import InvalidSyntaxError, IndentError
+from helper.errors import ExpectedCharError, InvalidSyntaxError, IndentError
 
 #######################################
 # NODES
@@ -650,23 +650,27 @@ class Parser:
             res.register_advancement()
             self.advance()
 
+            if self.current_tok.type == TT_COLON:
+                res.register_advancement()
+                self.advance()
+            else:
+                return res.failure(ExpectedCharError(
+                    self.current_tok.pos_start, self.current_tok.pos_end,
+                    f"Expected ':'"
+                ))
+
             if self.current_tok.type == TT_NEWLINE:
                 res.register_advancement()
                 self.advance()
 
+                self.indent_count += 1
                 statements = res.register(self.statements())
+                self.indent_count -= 1
+
                 if res.error:
                     return res
                 else_case = (statements, True)
 
-                if self.current_tok.matches(TT_KEYWORD, 'finis'):
-                    res.register_advancement()
-                    self.advance()
-                else:
-                    return res.failure(InvalidSyntaxError(
-                        self.current_tok.pos_start, self.current_tok.pos_end,
-                        "Expected 'finis'"
-                    ))
             else:
                 expr = res.register(self.statement())
                 if res.error:
