@@ -3,8 +3,7 @@
 #######################################
 
 from helper.tokens import *
-from helper.errors import IndentionError, InvalidSyntaxError
-from main.lexer import Token
+from helper.errors import InvalidSyntaxError, IndentError
 
 #######################################
 # NODES
@@ -267,7 +266,7 @@ class Parser:
 
         # Check if greater than expected tab count
         if tab_count > self.indent_count:
-            return None, res.failure(IndentionError(
+            return None, res.failure(IndentError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Tab Parser Error Placeholder"))
         return tab_count, None

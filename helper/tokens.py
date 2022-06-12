@@ -40,7 +40,6 @@ KEYWORDS = [
     'gradus',
     'dum',
     'opus',
-    'finis',
     'redi',
     'continua',
     'confringe',

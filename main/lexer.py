@@ -6,7 +6,7 @@ import string
 
 from helper.convert_roman import *
 from helper.tokens import *
-from helper.errors import InvalidNumeral, IllegalCharError, ExpectedCharError, IndentionError
+from helper.errors import InvalidNumeral, IllegalCharError, ExpectedCharError, IndentError
 
 #######################################
 # CONSTANTS
@@ -193,7 +193,7 @@ class Lexer:
                     # Throw error if not
                     pos_start = self.pos.copy()
                     self.advance()
-                    return None, IndentionError(pos_start, self.pos, "Unexpected Indent")
+                    return None, IndentError(pos_start, self.pos, "Unexpected Indent")
 
                 self.advance()
                 tokens.append(

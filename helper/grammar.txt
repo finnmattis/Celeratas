@@ -36,7 +36,7 @@ list-expr: LSQUARE (expr (COMMA expr)*)? RSQUARE
 
 if-expr: KEYWORD:si{if} expr TOKEN:COLON
        (statement if-expr-b|if-expr-c?)
-       (NEWLINE statements KEYWORD:finis{end}|if-expr-b|if-expr-c)
+       (NEWLINE statements|if-expr-b|if-expr-c)
 
 if-expr-b: KEYWORD:alioquinsi{elif} expr TOKEN:COLON
          (statement if-expr-b|if-expr-c?)
@@ -44,18 +44,18 @@ if-expr-b: KEYWORD:alioquinsi{elif} expr TOKEN:COLON
 
 if-expr-c: KEYWORD:alioquin{else}
          statement
-         | (NEWLINE statements KEYWORD:finis{end})
+         | (NEWLINE statements)
 
 for-expr: KEYWORD:pro{for} IDENTIFIER EQ expr KEYWORD:ad{to} expr 
         (KEYWORD:gradus{step} expr)? TOKEN:COLON
         statement
-        | (NEWLINE statements KEYWORD:finis{end})
+        | (NEWLINE statements)
 
 while-expr: KEYWORD:dum{while} expr TOKEN:COLON
           statement
-          | (NEWLINE statements KEYWORD:finis{end})
+          | (NEWLINE statements)
 
 func-def: KEYWORD:opus{fun} IDENTIFIER?
         LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
         (ARROW expr)
-        | (NEWLINE statements KEYWORD:finis{end})
+        | (NEWLINE statements)
