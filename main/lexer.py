@@ -6,7 +6,7 @@ import string
 
 from helper.convert_roman import *
 from helper.tokens import *
-from helper.errors import InvalidNumeral, IllegalCharError, ExpectedCharError
+from helper.errors import InvalidNumeral, IllegalCharError, ExpectedCharError, IndentionError
 
 #######################################
 # CONSTANTS
@@ -90,15 +90,26 @@ class Lexer:
 
     def make_tokens(self):
         tokens = []
-
+        self.start_of_statement = True
+        # Start of statements is before character other than space/tab - After this is false, tabs and spaces are ignored by make_spaces() method
+        # Grammatical char is set to True is anything other than space/tab is read - This var updates start of statements at the end of while loop
         while self.current_char != None:
+            grammatical_char = True
             if self.current_char in ' \t':
-                self.advance()
+                new_toks, error = self.make_space(tokens)
+                if error:
+                    return [], error
+                tokens = new_toks
+                grammatical_char = False
             elif self.current_char == '#':
                 self.skip_comment()
+                self.start_of_statement = True
+                grammatical_char = False
             elif self.current_char in ';\n':
                 tokens.append(Token(TT_NEWLINE, pos_start=self.pos))
                 self.advance()
+                self.start_of_statement = True
+                grammatical_char = False
             elif self.current_char in ROMAN_NUMERAL_CHARS:
                 token, error = self.make_numeral()
                 if error:
@@ -162,7 +173,40 @@ class Lexer:
                 self.advance()
                 return [], IllegalCharError(pos_start, self.pos, "'" + char + "'")
 
+            # When Grammatical Token is read, tabs/spaces from this point on will be ignored
+            if self.start_of_statement == True and grammatical_char == True:
+                self.start_of_statement = False
+
         tokens.append(Token(TT_EOF, pos_start=self.pos))
+        return tokens, None
+
+    def make_space(self, tokens):
+        if self.current_char == ' ':
+            # If begining of line
+            if self.start_of_statement:
+                # Check if next 3 chars are also space
+                pos_start = self.pos.copy()
+                for _ in range(3):
+                    self.advance()
+                    if self.current_char == " ":
+                        continue
+                    # Throw error if not
+                    pos_start = self.pos.copy()
+                    self.advance()
+                    return None, IndentionError(pos_start, self.pos, "Unexpected Indent")
+
+                self.advance()
+                tokens.append(
+                    Token(TT_TAB, pos_start=pos_start, pos_end=self.pos))
+            # If not at begining of line, ignore
+            else:
+                self.advance()
+        elif self.current_char == '\t':
+            if self.start_of_statement:
+                tokens.append(Token(TT_TAB, pos_start=self.pos))
+                self.advance()
+            else:
+                self.advance()
         return tokens, None
 
     def make_numeral(self):
