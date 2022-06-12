@@ -3,7 +3,7 @@
 #######################################
 
 from helper.tokens import *
-from helper.errors import InvalidSyntaxError
+from helper.errors import IndentionError, InvalidSyntaxError
 from main.lexer import Token
 
 #######################################
@@ -225,6 +225,7 @@ class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
         self.tok_idx = -1
+        self.indent_count = 0
         self.advance()
 
     def advance(self):
@@ -243,12 +244,33 @@ class Parser:
 
     def parse(self):
         res = self.statements()
+
         if not res.error and self.current_tok.type != TT_EOF:
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Token cannot appear after previous tokens"
             ))
         return res
+
+    def check_indent_amount(self):
+        res = ParseResult()
+        tab_count = 0
+
+        # Check Tab count from tokens
+        while True:
+            if self.current_tok.type == TT_TAB:
+                res.register_advancement()
+                self.advance()
+                tab_count += 1
+            else:
+                break
+
+        # Check if greater than expected tab count
+        if tab_count > self.indent_count:
+            return None, res.failure(IndentionError(
+                self.current_tok.pos_start, self.current_tok.pos_end,
+                "Tab Parser Error Placeholder"))
+        return tab_count, None
 
     ###################################
 
@@ -261,11 +283,22 @@ class Parser:
             res.register_advancement()
             self.advance()
 
+        tab_amount, error = self.check_indent_amount()
+        if error:
+            res.register(error)
+            return res
+
+        if tab_amount < self.indent_count:
+            return res.failure(InvalidSyntaxError(
+                self.current_tok.pos_start, self.current_tok.pos_end,
+                "Expected Tab"))
+
         statement = res.register(self.statement())
+
         if res.error:
             return res
-        statements.append(statement)
 
+        statements.append(statement)
         more_statements = True
 
         while True:
@@ -274,16 +307,26 @@ class Parser:
                 res.register_advancement()
                 self.advance()
                 newline_count += 1
-            if newline_count == 0:
+
+            tab_amount, error = self.check_indent_amount()
+
+            if error:
+                res.register(error)
+                return res
+
+            if tab_amount < self.indent_count:
                 more_statements = False
 
             if not more_statements:
                 break
+
             statement = res.try_register(self.statement())
+
             if not statement:
                 self.reverse(res.to_reverse_count)
                 more_statements = False
                 continue
+
             statements.append(statement)
 
         return res.success(ListNode(
@@ -680,7 +723,10 @@ class Parser:
             res.register_advancement()
             self.advance()
 
+            self.indent_count += 1
             statements = res.register(self.statements())
+            self.indent_count -= 1
+
             if res.error:
                 return res
             cases.append((condition, statements, True))
@@ -779,18 +825,12 @@ class Parser:
             res.register_advancement()
             self.advance()
 
+            self.indent_count += 1
             body = res.register(self.statements())
+            self.indent_count -= 1
+
             if res.error:
                 return res
-
-            if not self.current_tok.matches(TT_KEYWORD, 'finis'):
-                return res.failure(InvalidSyntaxError(
-                    self.current_tok.pos_start, self.current_tok.pos_end,
-                    f"Expected 'finis'"
-                ))
-
-            res.register_advancement()
-            self.advance()
 
             return res.success(ForNode(var_name, start_value, end_value, step_value, body, True))
 
@@ -829,18 +869,12 @@ class Parser:
             res.register_advancement()
             self.advance()
 
+            self.indent_count += 1
             body = res.register(self.statements())
+            self.indent_count -= 1
+
             if res.error:
                 return res
-
-            if not self.current_tok.matches(TT_KEYWORD, 'finis'):
-                return res.failure(InvalidSyntaxError(
-                    self.current_tok.pos_start, self.current_tok.pos_end,
-                    f"Expected 'finis'"
-                ))
-
-            res.register_advancement()
-            self.advance()
 
             return res.success(WhileNode(condition, body, True))
 
@@ -950,15 +984,12 @@ class Parser:
         res.register_advancement()
         self.advance()
 
+        self.indent_count += 1
         body = res.register(self.statements())
+        self.indent_count -= 1
+
         if res.error:
             return res
-
-        if not self.current_tok.matches(TT_KEYWORD, 'finis'):
-            return res.failure(InvalidSyntaxError(
-                self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected 'finis'"
-            ))
 
         res.register_advancement()
         self.advance()
