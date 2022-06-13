@@ -368,32 +368,21 @@ class Parser:
     def expr(self):
         res = ParseResult()
 
-        if self.current_tok.matches(TT_KEYWORD, 'sino'):
-            res.register_advancement()
-            self.advance()
-
-            if self.current_tok.type != TT_IDENTIFIER:
-                return res.failure(InvalidSyntaxError(
-                    self.current_tok.pos_start, self.current_tok.pos_end,
-                    "Expected identifier"
-                ))
-
+        if self.current_tok.type == TT_IDENTIFIER:
             var_name = self.current_tok
             res.register_advancement()
             self.advance()
 
             if self.current_tok.type != TT_EQ:
-                return res.failure(InvalidSyntaxError(
-                    self.current_tok.pos_start, self.current_tok.pos_end,
-                    "Expected '='"
-                ))
+                self.reverse(1)
+            else:
+                res.register_advancement()
+                self.advance()
 
-            res.register_advancement()
-            self.advance()
-            expr = res.register(self.expr())
-            if res.error:
-                return res
-            return res.success(VarAssignNode(var_name, expr))
+                expr = res.register(self.expr())
+                if res.error:
+                    return res
+                return res.success(VarAssignNode(var_name, expr))
 
         node = res.register(self.bin_op(
             self.comp_expr, ((TT_KEYWORD, 'et'), (TT_KEYWORD, 'aut'))))
