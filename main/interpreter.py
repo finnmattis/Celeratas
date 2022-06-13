@@ -618,17 +618,17 @@ class BuiltInFunction(BaseFunction):
     execute_extend.arg_names = ["listA", "listB"]
 
     def execute_len(self, exec_ctx):
-        list_ = exec_ctx.symbol_table.get("list")
+        input_ = exec_ctx.symbol_table.get("input")
 
-        if not isinstance(list_, List):
+        if not isinstance(input_, List) and not isinstance(input_, String):
             return RTResult().failure(RTError(
                 self.pos_start, self.pos_end,
-                "Argument must be list",
+                "Argument must be list or string",
                 exec_ctx
             ))
 
-        return RTResult().success(Number(len(list_.elements)))
-    execute_len.arg_names = ["list"]
+        return RTResult().success(Number(len(input_.elements if isinstance(input_, List) else input_.value)))
+    execute_len.arg_names = ["input"]
 
     def execute_run(self, exec_ctx):
         fn = exec_ctx.symbol_table.get("fn")
