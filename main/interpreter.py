@@ -895,6 +895,13 @@ class Interpreter:
             if res.should_return():
                 return res
 
+            if not hasattr(condition_value, "is_true()"):
+                return res.failure(RTError(
+                    node.pos_start, node.pos_end,
+                    'Conditional can not be evaluated',
+                    context
+                ))
+
             if condition_value.is_true():
                 expr_value = res.register(self.visit(expr, context))
                 if res.should_return():
@@ -930,6 +937,13 @@ class Interpreter:
         else:
             step_value = Number(1)
 
+        if not hasattr(start_value, "value"):
+            return res.failure(RTError(
+                node.start_value_node.pos_start, node.start_value_node.pos_end,
+                'Expression does not have a value',
+                context
+            ))
+
         i = start_value.value
 
         if step_value.value >= 0:
@@ -964,11 +978,19 @@ class Interpreter:
         elements = []
 
         while True:
-            condition = res.register(self.visit(node.condition_node, context))
+            condition_value = res.register(
+                self.visit(node.condition_node, context))
             if res.should_return():
                 return res
 
-            if not condition.is_true():
+            if not hasattr(condition_value, "is_true()"):
+                return res.failure(RTError(
+                    node.condition_node.pos_start, node.condition_node.pos_end,
+                    'Conditional can not be evaluated',
+                    context
+                ))
+
+            if not condition_value.is_true():
                 break
 
             value = res.register(self.visit(node.body_node, context))
