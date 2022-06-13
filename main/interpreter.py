@@ -359,6 +359,12 @@ class String(Value):
         else:
             return None, Value.illegal_operation(self, other)
 
+    def get_comparison_eq(self, other):
+        if isinstance(other, String):
+            return Number(int(self.value == other.value)), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
     def is_true(self):
         return len(self.value) > 0
 
@@ -895,7 +901,7 @@ class Interpreter:
             if res.should_return():
                 return res
 
-            if not hasattr(condition_value, "is_true()"):
+            if condition_value == None:
                 return res.failure(RTError(
                     node.pos_start, node.pos_end,
                     'Conditional can not be evaluated',
@@ -937,7 +943,7 @@ class Interpreter:
         else:
             step_value = Number(1)
 
-        if not hasattr(start_value, "value"):
+        if start_value == None:
             return res.failure(RTError(
                 node.start_value_node.pos_start, node.start_value_node.pos_end,
                 'Expression does not have a value',
@@ -983,7 +989,7 @@ class Interpreter:
             if res.should_return():
                 return res
 
-            if not hasattr(condition_value, "is_true()"):
+            if condition_value == None:
                 return res.failure(RTError(
                     node.condition_node.pos_start, node.condition_node.pos_end,
                     'Conditional can not be evaluated',
