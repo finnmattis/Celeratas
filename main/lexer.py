@@ -115,7 +115,7 @@ class Lexer:
                 if error:
                     return [], error
                 tokens.append(token)
-            elif self.current_char in LETTERS:
+            elif self.current_char in LETTERS + "_":
                 token, error = self.make_identifier()
                 if error:
                     return [], error
