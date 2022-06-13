@@ -52,9 +52,9 @@ class ListNode:
 
 
 class VarAccessNode:
-    def __init__(self, var_name_tok, idx_to_get):
+    def __init__(self, var_name_tok, idxes_to_get):
         self.var_name_tok = var_name_tok
-        self.idx_to_get = idx_to_get
+        self.idxes_to_get = idxes_to_get
 
         self.pos_start = self.var_name_tok.pos_start
         self.pos_end = self.var_name_tok.pos_end
@@ -517,20 +517,21 @@ class Parser:
             res.register_advancement()
             self.advance()
             var_name = tok
-            idx_to_get = None
+            idxes_to_get = []
 
-            if self.current_tok.type == TT_LSQUARE:
+            while self.current_tok.type == TT_LSQUARE:
                 res.register_advancement()
                 self.advance()
 
-                idx_to_get = res.register(self.bin_op(
-                    self.comp_expr, ((TT_KEYWORD, 'et'), (TT_KEYWORD, 'aut'))))
+                idxes_to_get.append(res.register(self.bin_op(
+                    self.comp_expr, ((TT_KEYWORD, 'et'), (TT_KEYWORD, 'aut')))))
+
                 if res.error:
                     return res
+
                 res.register_advancement()
                 self.advance()
-
-            return res.success(VarAccessNode(var_name, idx_to_get))
+            return res.success(VarAccessNode(var_name, idxes_to_get))
 
         elif tok.type == TT_LPAREN:
             res.register_advancement()

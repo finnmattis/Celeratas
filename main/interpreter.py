@@ -761,7 +761,7 @@ class Interpreter:
         res = RTResult()
         var_name = node.var_name_tok.value
         value = context.symbol_table.get(var_name)
-        idx_to_get = node.idx_to_get
+        idxes_to_get = node.idxes_to_get
 
         if not value:
             return res.failure(RTError(
@@ -772,7 +772,7 @@ class Interpreter:
 
         value = value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
 
-        if idx_to_get:
+        for idx_to_get in idxes_to_get:
             method_name = f'visit_{type(idx_to_get).__name__}'
             method = getattr(self, method_name, self.no_visit_method)
             idx_to_get = method(idx_to_get, context)
@@ -787,11 +787,14 @@ class Interpreter:
                 ))
 
             # need to get the value of the RTResult and then the Number class
-
             # Check if list:
             if isinstance(value, List):
-                if idx_to_get < len(value.elements):
-                    value.elements = [value.elements[idx_to_get]]
+                # If first statement is false, second will not evaluate
+                if isinstance(value.elements, list) and idx_to_get < len(value.elements):
+                    value.elements = value.elements[idx_to_get]
+                    # If list in list:
+                    if isinstance(value.elements, List):
+                        value.elements = value.elements.elements
                 else:
                     return res.failure(RTError(
                         node.pos_start, node.pos_end,
@@ -813,7 +816,7 @@ class Interpreter:
                     'Invalid Type to get idx, can only process list or string',
                     context
                 ))
-        return res.success(value)
+        return res.success(value.elements if idxes_to_get else value)
 
     def visit_VarAssignNode(self, node, context):
         res = RTResult()
