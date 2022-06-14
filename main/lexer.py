@@ -343,7 +343,8 @@ class Lexer:
     def skip_comment(self):
         self.advance()
 
-        while self.current_char != '\n':
+        # Exclusive and incase it reachs the EOF and self.current == None
+        while self.current_char and self.current_char not in ';\n':
             self.advance()
 
         self.advance()
