@@ -1,8 +1,11 @@
 #MACOS
 .DS_Store
 
-#TESTING
+# MAN TESTING
 test.clr
 
-#checklist file
-todo.txt
+# AUTO TESTING
+.pytest_cache
+
+#VSCODE CONFIG
+.VSCODE
