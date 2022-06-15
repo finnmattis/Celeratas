@@ -5,6 +5,8 @@
 import math
 import os
 
+from numpy import isin
+
 from helper.convert_roman import *
 from helper.tokens import *
 from helper.errors import RTError
@@ -779,11 +781,8 @@ class Interpreter:
         value = value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
 
         for idx_to_get in idxes_to_get:
-            method_name = f'visit_{type(idx_to_get).__name__}'
-            method = getattr(self, method_name, self.no_visit_method)
-            idx_to_get = method(idx_to_get, context)
-
-            idx_to_get = idx_to_get.value.value
+            idx_to_get = res.register(self.visit(idx_to_get, context))
+            idx_to_get = idx_to_get.value
 
             if not isinstance(idx_to_get, int):
                 return res.failure(RTError(
@@ -827,11 +826,47 @@ class Interpreter:
     def visit_VarAssignNode(self, node, context):
         res = RTResult()
         var_name = node.var_name_tok.value
+        idxes_to_change = node.idxes_to_change
+
         value = res.register(self.visit(node.value_node, context))
         if res.should_return():
             return res
 
-        context.symbol_table.set(var_name, value)
+        if idxes_to_change:
+            if var_name not in context.symbol_table.symbols:
+                return res.failure(RTError(
+                    node.pos_start, node.pos_end,
+                    'Variable must be defined in order to set a specific index',
+                    context
+                ))
+
+            var_to_change = context.symbol_table.get(var_name)
+            if not isinstance(var_to_change, List):
+                return res.failure(RTError(
+                    node.pos_start, node.pos_end,
+                    'Variable must be a list in order to set a specific index',
+                    context
+                ))
+
+            element_to_change = var_to_change
+
+            for for_idx, idx_to_change in enumerate(idxes_to_change):
+                if not isinstance(element_to_change, List) or idx_to_change.tok.value > len(element_to_change.elements) - 1:
+                    return res.failure(RTError(
+                        node.pos_start, node.pos_end,
+                        'List Index Out of Bounds',
+                        context
+                    ))
+
+                if for_idx == len(idxes_to_change) - 1:
+                    element_to_change.elements[idx_to_change.tok.value] = value
+                else:
+                    element_to_change = element_to_change.elements[idx_to_change.tok.value]
+
+            context.symbol_table.set(var_name, var_to_change)
+
+        else:
+            context.symbol_table.set(var_name, value)
         return res.success(None)
 
     def visit_BinOpNode(self, node, context):

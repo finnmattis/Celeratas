@@ -61,9 +61,10 @@ class VarAccessNode:
 
 
 class VarAssignNode:
-    def __init__(self, var_name_tok, value_node):
+    def __init__(self, var_name_tok, value_node, idxes_to_change):
         self.var_name_tok = var_name_tok
         self.value_node = value_node
+        self.idxes_to_change = idxes_to_change
 
         self.pos_start = self.var_name_tok.pos_start
         self.pos_end = self.value_node.pos_end
@@ -370,11 +371,25 @@ class Parser:
 
         if self.current_tok.type == TT_IDENTIFIER:
             var_name = self.current_tok
+            idxes_to_change = []
             res.register_advancement()
             self.advance()
 
+            while self.current_tok.type == TT_LSQUARE:
+                res.register_advancement()
+                self.advance()
+
+                idxes_to_change.append(res.register(self.bin_op(
+                    self.comp_expr, ((TT_KEYWORD, 'et'), (TT_KEYWORD, 'aut')))))
+
+                if res.error:
+                    return res
+
+                res.register_advancement()
+                self.advance()
+
             if self.current_tok.type != TT_EQ:
-                self.reverse(1)
+                self.reverse(res.advance_count)
             else:
                 res.register_advancement()
                 self.advance()
@@ -382,7 +397,8 @@ class Parser:
                 expr = res.register(self.expr())
                 if res.error:
                     return res
-                return res.success(VarAssignNode(var_name, expr))
+
+                return res.success(VarAssignNode(var_name, expr, idxes_to_change))
 
         node = res.register(self.bin_op(
             self.comp_expr, ((TT_KEYWORD, 'et'), (TT_KEYWORD, 'aut'))))
