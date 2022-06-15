@@ -366,10 +366,15 @@ class Parser:
             ))
         return res.success(expr)
 
-    def expr(self):
+    def expr(self, could_have_var=True):
         res = ParseResult()
 
         if self.current_tok.type == TT_IDENTIFIER:
+            if could_have_var == False:
+                return res.failure(InvalidSyntaxError(
+                    self.current_tok.pos_start, self.current_tok.pos_end,
+                    "Var can not be set to a another var!"
+                ))
             var_name = self.current_tok
             idxes_to_change = []
             res.register_advancement()
@@ -394,7 +399,7 @@ class Parser:
                 res.register_advancement()
                 self.advance()
 
-                expr = res.register(self.expr())
+                expr = res.register(self.expr(could_have_var=False))
                 if res.error:
                     return res
 
@@ -607,7 +612,7 @@ class Parser:
             res.register_advancement()
             self.advance()
         else:
-            element_nodes.append(res.register(self.expr()))
+            element_nodes.append(res.register(self.expr(could_have_var=False)))
             if res.error:
                 return res.failure(InvalidSyntaxError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
