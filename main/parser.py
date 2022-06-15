@@ -61,10 +61,11 @@ class VarAccessNode:
 
 
 class VarAssignNode:
-    def __init__(self, var_name_tok, value_node, idxes_to_change):
+    def __init__(self, var_name_tok, value_node, idxes_to_change, global_var):
         self.var_name_tok = var_name_tok
         self.value_node = value_node
         self.idxes_to_change = idxes_to_change
+        self.global_var = global_var
 
         self.pos_start = self.var_name_tok.pos_start
         self.pos_end = self.value_node.pos_end
@@ -369,12 +370,19 @@ class Parser:
     def expr(self, could_have_var=True):
         res = ParseResult()
 
-        if self.current_tok.type == TT_IDENTIFIER:
+        if self.current_tok.matches(TT_KEYWORD, "globus") or self.current_tok.type == TT_IDENTIFIER:
             if could_have_var == False:
                 return res.failure(InvalidSyntaxError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
                     "Var can not be set to a another var!"
                 ))
+
+            global_var = False
+            if self.current_tok.matches(TT_KEYWORD, "globus"):
+                global_var = True
+                res.register_advancement()
+                self.advance()
+
             var_name = self.current_tok
             idxes_to_change = []
             res.register_advancement()
@@ -402,8 +410,7 @@ class Parser:
                 expr = res.register(self.expr(could_have_var=False))
                 if res.error:
                     return res
-
-                return res.success(VarAssignNode(var_name, expr, idxes_to_change))
+                return res.success(VarAssignNode(var_name, expr, idxes_to_change, global_var))
 
         node = res.register(self.bin_op(
             self.comp_expr, ((TT_KEYWORD, 'et'), (TT_KEYWORD, 'aut'))))

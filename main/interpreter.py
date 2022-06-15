@@ -5,8 +5,6 @@
 import math
 import os
 
-from numpy import isin
-
 from helper.convert_roman import *
 from helper.tokens import *
 from helper.errors import RTError
@@ -827,6 +825,7 @@ class Interpreter:
         res = RTResult()
         var_name = node.var_name_tok.value
         idxes_to_change = node.idxes_to_change
+        global_var = node.global_var
 
         value = res.register(self.visit(node.value_node, context))
         if res.should_return():
@@ -863,10 +862,24 @@ class Interpreter:
                 else:
                     element_to_change = element_to_change.elements[idx_to_change.tok.value]
 
-            context.symbol_table.set(var_name, var_to_change)
+            value = var_to_change
 
+        from main.root import global_symbol_table
+
+        if global_var:
+            # Global symbol table will also apply to current symbol table
+            global_symbol_table.set(var_name, value)
         else:
+            old_var = global_symbol_table.get(var_name)
+            if old_var:
+                return res.failure(RTError(
+                    node.pos_start, node.pos_end,
+                    'Global var cannot be changed to local var',
+                    context
+                ))
+
             context.symbol_table.set(var_name, value)
+
         return res.success(None)
 
     def visit_BinOpNode(self, node, context):
