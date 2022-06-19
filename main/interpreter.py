@@ -971,6 +971,19 @@ class Interpreter:
 
         return res.success(None)
 
+    def visit_TryNode(self, node, context):
+        res = RTResult()
+        try_body = self.visit(node.try_body, context)
+        if try_body.error == None:
+            try_body = res.register(try_body)
+        else:
+            if node.except_body:
+                except_body = res.register(
+                    self.visit(node.except_body, context))
+                if res.error:
+                    return res
+        return res.success(None)
+
     def visit_ForNode(self, node, context):
         res = RTResult()
         elements = []
@@ -1020,7 +1033,6 @@ class Interpreter:
                 break
 
             elements.append(value)
-
         return res.success(
             None if node.should_return_null else
             List(elements).set_context(context).set_pos(

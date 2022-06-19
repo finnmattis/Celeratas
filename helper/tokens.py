@@ -23,7 +23,7 @@ TT_GTE = 'GTE'
 TT_COLON = 'COLON'
 TT_COMMA = 'COMMA'
 TT_ARROW = 'ARROW'
-TT_TAB = "TAB"
+TT_TAB = 'TAB'
 TT_NEWLINE = 'NEWLINE'
 TT_EOF = 'EOF'
 
@@ -35,6 +35,8 @@ KEYWORDS = [
     'si',
     'alioquinsi',
     'alioquin',
+    'try',
+    'except',
     'pro',
     'ad',
     'gradus',

@@ -106,6 +106,15 @@ class IfNode:
             self.else_case or self.cases[len(self.cases) - 1])[0].pos_end
 
 
+class TryNode:
+    def __init__(self, try_body, except_body):
+        self.try_body = try_body
+        self.except_body = except_body
+
+        self.pos_start = self.try_body.pos_start
+        self.pos_end = self.except_body.pos_end if self.except_body else self.try_body.pos_end
+
+
 class ForNode:
     def __init__(self, var_name_tok, start_value_node, end_value_node, step_value_node, body_node, should_return_null):
         self.var_name_tok = var_name_tok
@@ -270,7 +279,7 @@ class Parser:
         if tab_count > self.indent_count:
             return None, res.failure(IndentError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Tab Parser Error Placeholder"))
+                "Incorrect number of tabs!"))
         return tab_count, None
 
     ###################################
@@ -577,7 +586,11 @@ class Parser:
             if res.error:
                 return res
             return res.success(if_expr)
-
+        elif tok.matches(TT_KEYWORD, 'try'):
+            try_expr = res.register(self.try_expr())
+            if res.error:
+                return res
+            return res.success(try_expr)
         elif tok.matches(TT_KEYWORD, 'pro'):
             for_expr = res.register(self.for_expr())
             if res.error:
@@ -770,6 +783,68 @@ class Parser:
             cases.extend(new_cases)
 
         return res.success((cases, else_case))
+
+    def try_expr(self):
+        res = ParseResult()
+
+        if not self.current_tok.matches(TT_KEYWORD, 'try'):
+            return res.failure(InvalidSyntaxError(
+                self.current_tok.pos_start, self.current_tok.pos_end,
+                f"Expected 'try'"
+            ))
+
+        res.register_advancement()
+        self.advance()
+
+        if self.current_tok == TT_COLON:
+            return res.failure(InvalidSyntaxError(
+                self.current_tok.pos_start, self.current_tok.pos_end,
+                f"Expected ':'"
+            ))
+
+        res.register_advancement()
+        self.advance()
+
+        if self.current_tok.type == TT_NEWLINE:
+            res.register_advancement()
+            self.advance()
+
+            self.indent_count += 1
+            try_body = res.register(self.statements())
+            self.indent_count -= 1
+
+            if self.current_tok.matches(TT_KEYWORD, "except"):
+                self.advance()
+                res.register_advancement()
+
+                if self.current_tok == TT_COLON:
+                    return res.failure(InvalidSyntaxError(
+                        self.current_tok.pos_start, self.current_tok.pos_end,
+                        f"Expected ':'"
+                    ))
+
+                self.advance()
+                res.register_advancement()
+
+                self.indent_count += 1
+                except_body = res.register(self.statements())
+                self.indent_count -= 1
+
+                if res.error:
+                    return res
+            else:
+                except_body = None
+        else:
+            try_body = self.expr()
+
+            if try_body.error:
+                error = True
+            else:
+                error = False
+                try_body = res.register(try_body)
+            except_body = None
+
+        return res.success(TryNode(try_body, except_body))
 
     def for_expr(self):
         res = ParseResult()
