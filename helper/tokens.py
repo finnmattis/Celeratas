@@ -28,7 +28,7 @@ TT_NEWLINE = 'NEWLINE'
 TT_EOF = 'EOF'
 
 KEYWORDS = [
-    'globus',
+    'sino',
     'et',
     'aut',
     'non',
