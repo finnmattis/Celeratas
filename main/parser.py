@@ -752,15 +752,11 @@ class Parser:
                 return res
             cases.append((condition, statements, True))
 
-            if self.current_tok.matches(TT_KEYWORD, 'finis'):
-                res.register_advancement()
-                self.advance()
-            else:
-                all_cases = res.register(self.if_expr_b_or_c())
-                if res.error:
-                    return res
-                new_cases, else_case = all_cases
-                cases.extend(new_cases)
+            all_cases = res.register(self.if_expr_b_or_c())
+            if res.error:
+                return res
+            new_cases, else_case = all_cases
+            cases.extend(new_cases)
         else:
             expr = res.register(self.statement())
             if res.error:
