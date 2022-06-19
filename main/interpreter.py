@@ -401,6 +401,24 @@ class List(Value):
         return f'[{", ".join([repr(x) for x in self.elements])}]'
 
 
+class Dict(Value):
+    def __init__(self, key_pairs):
+        super().__init__()
+        self.key_pairs = key_pairs
+
+    def copy(self):
+        copy = Dict(self.key_pairs)
+        copy.set_pos(self.pos_start, self.pos_end)
+        copy.set_context(self.set_context)
+        return copy
+
+    def __str__(self):
+        return str(self.key_pairs)
+
+    def __repr__(self):
+        return str(self.key_pairs)
+
+
 class BaseFunction(Value):
     def __init__(self, name):
         super().__init__()
@@ -764,6 +782,23 @@ class Interpreter:
             List(elements).set_context(context).set_pos(
                 node.pos_start, node.pos_end)
         )
+
+    def visit_DictNode(self, node, context):
+        res = RTResult()
+        keypairs = {}
+
+        for key, value in node.key_pairs.items():
+            key = res.register(self.visit(key, context))
+            if res.error:
+                return res
+
+            value = res.register(self.visit(value, context))
+            if res.error:
+                return res
+
+            keypairs[key] = value
+
+        return res.success(Dict(keypairs).set_context(context).set_pos(node.pos_start, node.pos_end))
 
     def visit_VarAccessNode(self, node, context):
         res = RTResult()
