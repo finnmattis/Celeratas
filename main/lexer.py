@@ -123,7 +123,10 @@ class Lexer:
             elif self.current_char in DIGITS:
                 tokens.append(self.make_number())
             elif self.current_char == '"':
-                tokens.append(self.make_string())
+                token, error = self.make_string()
+                if error:
+                    return [], error
+                tokens.append(token)
             elif self.current_char == '+':
                 tokens.append(Token(TT_PLUS, pos_start=self.pos))
                 self.advance()
@@ -267,12 +270,14 @@ class Lexer:
                 if self.current_char == '\\':
                     escape_character = True
                 else:
+                    if self.current_char == "\n":
+                        return [], IllegalCharError(pos_start, self.pos, "Unexpected New Line")
                     string += self.current_char
             self.advance()
             escape_character = False
 
         self.advance()
-        return Token(TT_STRING, string, pos_start, self.pos)
+        return Token(TT_STRING, string, pos_start, self.pos), None
 
     def make_identifier(self):
         id_str = ''
