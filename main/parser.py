@@ -306,7 +306,7 @@ class Parser:
             return res
 
         if tab_amount < self.indent_count:
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected Tab"))
 
@@ -377,21 +377,16 @@ class Parser:
 
         expr = res.register(self.expr())
         if res.error:
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected 'redi', 'continua', 'confringe', 'sino', 'si', 'pro', 'dum', 'opus', int, float, identifier, '+', '-', '(', '[' or 'not'"
             ))
         return res.success(expr)
 
-    def expr(self, could_have_var=True):
+    def expr(self, could_have_var_assign=True):
         res = ParseResult()
 
         if self.current_tok.type == TT_IDENTIFIER:
-            if could_have_var == False:
-                return res.failure(InvalidSyntaxError(
-                    self.current_tok.pos_start, self.current_tok.pos_end,
-                    "Var can not be set to a another var!"
-                ))
             var_name = self.current_tok
             idxes_to_change = []
             res.register_advancement()
@@ -413,10 +408,15 @@ class Parser:
             if self.current_tok.type != TT_EQ:
                 self.reverse(res.advance_count)
             else:
+                if could_have_var_assign == False:
+                    return res.failure(InvalidSyntaxError(
+                        self.current_tok.pos_start, self.current_tok.pos_end,
+                        "Var can not be set to a var assign node"
+                    ))
                 res.register_advancement()
                 self.advance()
 
-                expr = res.register(self.expr(could_have_var=False))
+                expr = res.register(self.expr(could_have_var_assign=False))
                 if res.error:
                     return res
 
@@ -426,7 +426,7 @@ class Parser:
             self.comp_expr, ((TT_KEYWORD, 'et'), (TT_KEYWORD, 'aut'))))
 
         if res.error:
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected 'sino', 'si', 'pro', 'dum', 'opus', int, float, identifier, '+', '-', '(', '[' or 'non'"
             ))
@@ -450,7 +450,7 @@ class Parser:
             self.arith_expr, (TT_EE, TT_NE, TT_LT, TT_GT, TT_LTE, TT_GTE)))
 
         if res.error:
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected int, float, identifier, '+', '-', '(', '[', 'si', 'pro', 'dum', 'opus' or 'non'"
             ))
@@ -497,7 +497,7 @@ class Parser:
             else:
                 arg_nodes.append(res.register(self.expr()))
                 if res.error:
-                    return res.failure(InvalidSyntaxError(
+                    return res.failure(ExpectedCharError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
                         "Expected ')', 'sino', 'si', 'pro', 'dum', 'opus', int, float, identifier, '+', '-', '(', '[' or 'non'"
                     ))
@@ -511,7 +511,7 @@ class Parser:
                         return res
 
                 if self.current_tok.type != TT_RPAREN:
-                    return res.failure(InvalidSyntaxError(
+                    return res.failure(ExpectedCharError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
                         f"Expected ',' or ')'"
                     ))
@@ -571,7 +571,7 @@ class Parser:
                 self.advance()
                 return res.success(expr)
             else:
-                return res.failure(InvalidSyntaxError(
+                return res.failure(ExpectedCharError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
                     "Expected ')'"
                 ))
@@ -614,7 +614,7 @@ class Parser:
                 return res
             return res.success(func_def)
 
-        return res.failure(InvalidSyntaxError(
+        return res.failure(ExpectedCharError(
             tok.pos_start, tok.pos_end,
             "Expected int, float, identifier, '+', '-', '(', '[', si', 'pro', 'dum', 'opus'"
         ))
@@ -625,7 +625,7 @@ class Parser:
         pos_start = self.current_tok.pos_start.copy()
 
         if self.current_tok.type != TT_LSQUARE:
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 f"Expected '['"
             ))
@@ -637,9 +637,10 @@ class Parser:
             res.register_advancement()
             self.advance()
         else:
-            element_nodes.append(res.register(self.expr(could_have_var=False)))
+            element_nodes.append(res.register(
+                self.expr(could_have_var_assign=False)))
             if res.error:
-                return res.failure(InvalidSyntaxError(
+                return res.failure(ExpectedCharError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
                     "Expected ']', 'sino', 'si', 'pro', 'dum', 'opus', int, float, identifier, '+', '-', '(', '[' or 'non'"
                 ))
@@ -685,12 +686,12 @@ class Parser:
             res.register_advancement()
             self.advance()
         else:
-            key = res.register(self.expr(could_have_var=False))
+            key = res.register(self.expr(could_have_var_assign=False))
             if res.error:
                 return res
 
             if self.current_tok.type != TT_COLON:
-                return res.failure(InvalidSyntaxError(
+                return res.failure(ExpectedCharError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
                     "Expected ':'"
                 ))
@@ -698,7 +699,7 @@ class Parser:
             res.register_advancement()
             self.advance()
 
-            value = res.register(self.expr(could_have_var=False))
+            value = res.register(self.expr(could_have_var_assign=False))
             if res.error:
                 return res
 
@@ -708,12 +709,12 @@ class Parser:
                 res.register_advancement()
                 self.advance()
 
-                key = res.register(self.expr(could_have_var=False))
+                key = res.register(self.expr(could_have_var_assign=False))
                 if res.error:
                     return res
 
                 if self.current_tok.type != TT_COLON:
-                    return res.failure(InvalidSyntaxError(
+                    return res.failure(ExpectedCharError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
                         "Expected ':'"
                     ))
@@ -721,7 +722,7 @@ class Parser:
                 res.register_advancement()
                 self.advance()
 
-                value = res.register(self.expr(could_have_var=False))
+                value = res.register(self.expr(could_have_var_assign=False))
                 if res.error:
                     return res
 
@@ -808,7 +809,7 @@ class Parser:
         else_case = None
 
         if not self.current_tok.matches(TT_KEYWORD, case_keyword):
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 f"Expected '{case_keyword}'"
             ))
@@ -821,7 +822,7 @@ class Parser:
             return res
 
         if not self.current_tok.type == TT_COLON:
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 f"Expected ':'"
             ))
@@ -864,7 +865,7 @@ class Parser:
         res = ParseResult()
 
         if not self.current_tok.matches(TT_KEYWORD, 'try'):
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 f"Expected 'try'"
             ))
@@ -873,7 +874,7 @@ class Parser:
         self.advance()
 
         if self.current_tok == TT_COLON:
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 f"Expected ':'"
             ))
@@ -894,7 +895,7 @@ class Parser:
                 res.register_advancement()
 
                 if self.current_tok == TT_COLON:
-                    return res.failure(InvalidSyntaxError(
+                    return res.failure(ExpectedCharError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
                         f"Expected ':'"
                     ))
@@ -926,7 +927,7 @@ class Parser:
         res = ParseResult()
 
         if not self.current_tok.matches(TT_KEYWORD, 'pro'):
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 f"Expected 'pro'"
             ))
@@ -935,7 +936,7 @@ class Parser:
         self.advance()
 
         if self.current_tok.type != TT_IDENTIFIER:
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 f"Expected identifier"
             ))
@@ -945,7 +946,7 @@ class Parser:
         self.advance()
 
         if self.current_tok.type != TT_EQ:
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 f"Expected '='"
             ))
@@ -958,7 +959,7 @@ class Parser:
             return res
 
         if not self.current_tok.matches(TT_KEYWORD, 'ad'):
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 f"Expected 'ad'"
             ))
@@ -981,7 +982,7 @@ class Parser:
             step_value = None
 
         if not self.current_tok.type == TT_COLON:
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 f"Expected ':'"
             ))
@@ -1012,7 +1013,7 @@ class Parser:
         res = ParseResult()
 
         if not self.current_tok.matches(TT_KEYWORD, 'dum'):
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 f"Expected 'dum'"
             ))
@@ -1025,7 +1026,7 @@ class Parser:
             return res
 
         if not self.current_tok.type == TT_COLON:
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 f"Expected ':'"
             ))
@@ -1056,7 +1057,7 @@ class Parser:
         res = ParseResult()
 
         if not self.current_tok.matches(TT_KEYWORD, 'opus'):
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 f"Expected 'opus'"
             ))
@@ -1069,14 +1070,14 @@ class Parser:
             res.register_advancement()
             self.advance()
             if self.current_tok.type != TT_LPAREN:
-                return res.failure(InvalidSyntaxError(
+                return res.failure(ExpectedCharError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
                     f"Expected '('"
                 ))
         else:
             var_name_tok = None
             if self.current_tok.type != TT_LPAREN:
-                return res.failure(InvalidSyntaxError(
+                return res.failure(ExpectedCharError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
                     f"Expected identifier or '('"
                 ))
@@ -1095,7 +1096,7 @@ class Parser:
                 self.advance()
 
                 if self.current_tok.type != TT_IDENTIFIER:
-                    return res.failure(InvalidSyntaxError(
+                    return res.failure(ExpectedCharError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
                         f"Expected identifier"
                     ))
@@ -1105,13 +1106,13 @@ class Parser:
                 self.advance()
 
             if self.current_tok.type != TT_RPAREN:
-                return res.failure(InvalidSyntaxError(
+                return res.failure(ExpectedCharError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
                     f"Expected ',' or ')'"
                 ))
         else:
             if self.current_tok.type != TT_RPAREN:
-                return res.failure(InvalidSyntaxError(
+                return res.failure(ExpectedCharError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
                     f"Expected identifier or ')'"
                 ))
@@ -1135,7 +1136,7 @@ class Parser:
             ))
 
         if self.current_tok.type != TT_COLON:
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 f"Expected '->' or ':'"
             ))
@@ -1144,7 +1145,7 @@ class Parser:
         self.advance()
 
         if self.current_tok.type != TT_NEWLINE:
-            return res.failure(InvalidSyntaxError(
+            return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 f"Expected NEWLINE"
             ))

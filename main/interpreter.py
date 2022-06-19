@@ -341,7 +341,7 @@ class Numeral(Value):
         return copy
 
     def __repr__(self):
-        return toRoman(self.value)
+        return toRoman(self.value) if self.value != 0 else "nil"
 
 
 class String(Value):
