@@ -6,7 +6,7 @@ import string
 
 from helper.convert_roman import *
 from helper.tokens import *
-from helper.errors import InvalidNumeral, IllegalCharError, ExpectedCharError, IndentError
+from helper.errors import InvalidNumeral, IllegalCharError, ExpectedItemError, IndentError
 
 #######################################
 # CONSTANTS
@@ -318,7 +318,7 @@ class Lexer:
             return Token(TT_NE, pos_start=pos_start, pos_end=self.pos), None
 
         self.advance()
-        return None, ExpectedCharError(pos_start, self.pos, "'=' (after '!')")
+        return None, ExpectedItemError(pos_start, self.pos, "'=' (after '!')")
 
     def make_equals(self):
         tok_type = TT_EQ

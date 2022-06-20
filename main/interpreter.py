@@ -1032,14 +1032,30 @@ class Interpreter:
     def visit_TryNode(self, node, context):
         res = RTResult()
         try_body = self.visit(node.try_body, context)
-        if try_body.error == None:
-            try_body = res.register(try_body)
+
+        if node.except_name and node.except_name.value not in ["TypeError", "NameError", "IndexError", "ZeroDivisionError"]:
+            return res.failure(NamingError(
+                node.except_name.pos_start, node.except_name.pos_end,
+                'Exception type not supported',
+                context
+            ))
+
+        if node.except_body and not node.except_name or try_body.error.error_name == node.except_name.value:
+            if node.except_as:
+                context.symbol_table.set(
+                    node.except_as.value, String(try_body.error.details))
+
+            except_body = res.register(
+                self.visit(node.except_body, context))
+            if res.error:
+                return res
+
+            if node.except_as:
+                context.symbol_table.remove(node.except_as.value)
         else:
-            if node.except_body:
-                except_body = res.register(
-                    self.visit(node.except_body, context))
-                if res.error:
-                    return res
+            try_body = res.register(try_body)
+            if res.error:
+                return res
         return res.success(None)
 
     def visit_ForNode(self, node, context):
@@ -1091,6 +1107,8 @@ class Interpreter:
                 break
 
             elements.append(value)
+
+        context.symbol_table.remove(node.var_name_tok.value)
         return res.success(
             None if node.should_return_null else
             List(elements).set_context(context).set_pos(

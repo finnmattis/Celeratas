@@ -64,7 +64,7 @@ class InvalidNumeral(Error):
 
 class IllegalCharError(Error):
     def __init__(self, pos_start, pos_end, details):
-        super().__init__(pos_start, pos_end, 'Illegal Character', details)
+        super().__init__(pos_start, pos_end, 'IllegalCharacterError', details)
 
 
 class IndentError(Error):
@@ -72,18 +72,18 @@ class IndentError(Error):
         super().__init__(pos_start, pos_end, 'IndentionError', details)
 
 
-class ExpectedCharError(Error):
+class ExpectedItemError(Error):
     def __init__(self, pos_start, pos_end, details):
-        super().__init__(pos_start, pos_end, 'Expected Character', details)
+        super().__init__(pos_start, pos_end, 'ExpectedItemError', details)
 
 
 class InvalidSyntaxError(Error):
     def __init__(self, pos_start, pos_end, details=''):
-        super().__init__(pos_start, pos_end, 'Invalid Syntax', details)
+        super().__init__(pos_start, pos_end, 'SyntaxError', details)
 
 
 class RTError(Error):
-    def __init__(self, pos_start, pos_end, details, context, type_='Runtime Error'):
+    def __init__(self, pos_start, pos_end, details, context, type_='RuntimeError'):
         super().__init__(pos_start, pos_end, type_, details)
         self.context = context
 
@@ -110,19 +110,19 @@ class RTError(Error):
 
 class TypingError(RTError):
     def __init__(self, pos_start, pos_end, details, context):
-        super().__init__(pos_start, pos_end, details, context, 'Type Error')
+        super().__init__(pos_start, pos_end, details, context, 'TypeError')
 
 
 class NamingError(RTError):
     def __init__(self, pos_start, pos_end, details, context):
-        super().__init__(pos_start, pos_end, details, context, 'Name Error')
+        super().__init__(pos_start, pos_end, details, context, 'NameError')
 
 
 class IndexingError(RTError):
     def __init__(self, pos_start, pos_end, details, context):
-        super().__init__(pos_start, pos_end, details, context, 'Index Error')
+        super().__init__(pos_start, pos_end, details, context, 'IndexError')
 
 
 class DivisionByZeroError(RTError):
     def __init__(self, pos_start, pos_end, details, context):
-        super().__init__(pos_start, pos_end, details, context, 'Zero Division Error')
+        super().__init__(pos_start, pos_end, details, context, 'ZeroDivisionError')

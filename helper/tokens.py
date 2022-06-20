@@ -39,6 +39,7 @@ KEYWORDS = [
     'alioquin',
     'try',
     'except',
+    'as',
     'pro',
     'ad',
     'gradus',
