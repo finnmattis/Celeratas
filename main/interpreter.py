@@ -819,16 +819,15 @@ class Interpreter:
             idx_to_get = res.register(self.visit(idx_to_get, context))
             idx_to_get = idx_to_get.value
 
-            if not isinstance(idx_to_get, int):
-                return res.failure(RTError(
-                    node.pos_start, node.pos_end,
-                    f'List Index Must be an Int not {type(idx_to_get)}',
-                    context
-                ))
-
             # need to get the value of the RTResult and then the Number class
             # Check if list:
             if isinstance(value, List):
+                if not isinstance(idx_to_get, int):
+                    return res.failure(RTError(
+                        node.pos_start, node.pos_end,
+                        f'List Index Must be an Int not {type(idx_to_get)}',
+                        context
+                    ))
                 # If first statement is false, second will not evaluate
                 if isinstance(value.elements, list) and idx_to_get < len(value.elements):
                     value.elements = value.elements[idx_to_get]
@@ -841,7 +840,28 @@ class Interpreter:
                         'List Index Out of Bounds',
                         context
                     ))
+            elif isinstance(value, Dict):
+                found = False
+
+                for key in value.key_pairs:
+                    if key.value == idx_to_get:
+                        value = value.key_pairs[key]
+                        found = True
+                        break
+
+                if not found:
+                    return res.failure(RTError(
+                        node.pos_start, node.pos_end,
+                        'Dict Index Out of Bounds',
+                        context
+                    ))
             elif isinstance(value, String):
+                if not isinstance(idx_to_get, int):
+                    return res.failure(RTError(
+                        node.pos_start, node.pos_end,
+                        f'String Index Must be an Int not {type(idx_to_get)}',
+                        context
+                    ))
                 if idx_to_get < len(value.value):
                     value.value = value.value[idx_to_get]
                 else:
@@ -853,10 +873,11 @@ class Interpreter:
             else:
                 return res.failure(RTError(
                     node.pos_start, node.pos_end,
-                    'Invalid Type to get idx, can only process list or string',
+                    'Invalid Type to get idx, can only process list, dict, or string',
                     context
                 ))
-        return res.success(value.elements if idxes_to_get else value)
+        # idxes to get will have elements but value will no elements if value is a dict
+        return res.success(value.elements if idxes_to_get and hasattr(value, "elements") else value)
 
     def visit_VarAssignNode(self, node, context):
         res = RTResult()
