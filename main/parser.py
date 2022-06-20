@@ -686,29 +686,7 @@ class Parser:
             res.register_advancement()
             self.advance()
         else:
-            key = res.register(self.expr(could_have_var_assign=False))
-            if res.error:
-                return res
-
-            if self.current_tok.type != TT_COLON:
-                return res.failure(ExpectedCharError(
-                    self.current_tok.pos_start, self.current_tok.pos_end,
-                    "Expected ':'"
-                ))
-
-            res.register_advancement()
-            self.advance()
-
-            value = res.register(self.expr(could_have_var_assign=False))
-            if res.error:
-                return res
-
-            key_pairs[key] = value
-
-            while self.current_tok.type == TT_COMMA:
-                res.register_advancement()
-                self.advance()
-
+            while True:
                 key = res.register(self.expr(could_have_var_assign=False))
                 if res.error:
                     return res
@@ -728,11 +706,11 @@ class Parser:
 
                 key_pairs[key] = value
 
-            if self.current_tok.type != TT_RBRACE:
-                return res.failure(ExpectedCharError(
-                    self.current_tok.pos_start, self.current_tok.pos_end,
-                    "Expected '}'"
-                ))
+                if self.current_tok.type != TT_COMMA:
+                    break
+
+                res.register_advancement()
+                self.advance()
 
             res.register_advancement()
             self.advance()

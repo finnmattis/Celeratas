@@ -29,7 +29,7 @@ basepos = Position(0, 0, 0, "<stdin>", "1")
      [VarAccessNode(Token(TT_IDENTIFIER, "a", basepos), [])])]),
     # Test Var Assign
     ("x = 1", [VarAssignNode(Token(TT_IDENTIFIER, "x", basepos),
-     NumberNode(Token(TT_INT, 1, basepos)), [], False)])
+     NumberNode(Token(TT_INT, 1, basepos)), [])])
 ])
 def test_parser(test_input, expected):
     lexer = Lexer("<std_in>", test_input)
