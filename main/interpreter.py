@@ -2,16 +2,14 @@
 # IMPORTS
 #######################################
 
-from ast import Num
 import math
 import os
+from typing import Type
 
 from numpy import isin
-
 from helper.convert_roman import *
 from helper.tokens import *
-from helper.errors import RTError
-from main.parser import NumberNode, StringNode
+from helper.errors import DivisionByZeroError, IndexingError, NamingError, RTError, TypingError
 
 #######################################
 # RUNTIME RESULT
@@ -143,7 +141,7 @@ class Value:
     def illegal_operation(self, other=None):
         if not other:
             other = self
-        return RTError(
+        return TypingError(
             self.pos_start, other.pos_end,
             'Illegal operation',
             self.context
@@ -176,7 +174,7 @@ class Number(Value):
     def dived_by(self, other):
         if isinstance(other, Number):
             if other.value == 0:
-                return None, RTError(
+                return None, DivisionByZeroError(
                     other.pos_start, other.pos_end,
                     'Division by zero',
                     self.context
@@ -435,16 +433,16 @@ class BaseFunction(Value):
         res = RTResult()
 
         if len(args) > len(arg_names):
-            return res.failure(RTError(
+            return res.failure(TypingError(
                 self.pos_start, self.pos_end,
-                f"{len(args) - len(arg_names)} too many args passed into {self}",
+                f"{len(args) - len(arg_names)} too many args passed into {self.name}()",
                 self.context
             ))
 
         if len(args) < len(arg_names):
-            return res.failure(RTError(
+            return res.failure(TypingError(
                 self.pos_start, self.pos_end,
-                f"{len(arg_names) - len(args)} too few args passed into {self}",
+                f"{len(arg_names) - len(args)} too few args passed into {self}()",
                 self.context
             ))
 
@@ -578,7 +576,7 @@ class BuiltInFunction(BaseFunction):
         value = exec_ctx.symbol_table.get("value")
 
         if not isinstance(list_, List):
-            return RTResult().failure(RTError(
+            return RTResult().failure(TypingError(
                 self.pos_start, self.pos_end,
                 "First argument must be list",
                 exec_ctx
@@ -593,14 +591,14 @@ class BuiltInFunction(BaseFunction):
         index = exec_ctx.symbol_table.get("index")
 
         if not isinstance(list_, List):
-            return RTResult().failure(RTError(
+            return RTResult().failure(TypingError(
                 self.pos_start, self.pos_end,
                 "First argument must be list",
                 exec_ctx
             ))
 
         if not isinstance(index, Number):
-            return RTResult().failure(RTError(
+            return RTResult().failure(TypingError(
                 self.pos_start, self.pos_end,
                 "Second argument must be number",
                 exec_ctx
@@ -609,7 +607,7 @@ class BuiltInFunction(BaseFunction):
         try:
             element = list_.elements.pop(index.value)
         except:
-            return RTResult().failure(RTError(
+            return RTResult().failure(IndexingError(
                 self.pos_start, self.pos_end,
                 'Element at this index could not be removed from list because index is out of bounds',
                 exec_ctx
@@ -622,14 +620,14 @@ class BuiltInFunction(BaseFunction):
         listB = exec_ctx.symbol_table.get("listB")
 
         if not isinstance(listA, List):
-            return RTResult().failure(RTError(
+            return RTResult().failure(TypingError(
                 self.pos_start, self.pos_end,
                 "First argument must be list",
                 exec_ctx
             ))
 
         if not isinstance(listB, List):
-            return RTResult().failure(RTError(
+            return RTResult().failure(TypingError(
                 self.pos_start, self.pos_end,
                 "Second argument must be list",
                 exec_ctx
@@ -643,7 +641,7 @@ class BuiltInFunction(BaseFunction):
         input_ = exec_ctx.symbol_table.get("input")
 
         if not isinstance(input_, List) and not isinstance(input_, String):
-            return RTResult().failure(RTError(
+            return RTResult().failure(TypingError(
                 self.pos_start, self.pos_end,
                 "Argument must be list or string",
                 exec_ctx
@@ -656,7 +654,7 @@ class BuiltInFunction(BaseFunction):
         fn = exec_ctx.symbol_table.get("fn")
 
         if not isinstance(fn, String):
-            return RTResult().failure(RTError(
+            return RTResult().failure(TypingError(
                 self.pos_start, self.pos_end,
                 "Second argument must be string",
                 exec_ctx
@@ -668,7 +666,7 @@ class BuiltInFunction(BaseFunction):
             with open(fn, "r") as f:
                 script = f.read()
         except Exception as e:
-            return RTResult().failure(RTError(
+            return RTResult().failure(TypingError(
                 self.pos_start, self.pos_end,
                 f"Failed to load script \"{fn}\"\n" + str(e),
                 exec_ctx
@@ -679,7 +677,7 @@ class BuiltInFunction(BaseFunction):
         _, error = run(fn, script)
 
         if error:
-            return RTResult().failure(RTError(
+            return RTResult().failure(TypingError(
                 self.pos_start, self.pos_end,
                 f"Failed to finish executing script \"{fn}\"\n" +
                 error.as_string(),
@@ -796,7 +794,7 @@ class Interpreter:
                 return res
 
             if isinstance(key, List):
-                return res.failure(RTError(
+                return res.failure(TypingError(
                     key.pos_start, key.pos_end,
                     "Key cannot be a list",
                     context
@@ -817,7 +815,7 @@ class Interpreter:
         idxes_to_get = node.idxes_to_get
 
         if not value:
-            return res.failure(RTError(
+            return res.failure(NamingError(
                 node.pos_start, node.pos_end,
                 f"'{var_name}' is not defined",
                 context
@@ -833,9 +831,9 @@ class Interpreter:
             # Check if list:
             if isinstance(value, List):
                 if not isinstance(idx_to_get, int):
-                    return res.failure(RTError(
+                    return res.failure(IndexingError(
                         node.pos_start, node.pos_end,
-                        f'List Index Must be an Int not {type(idx_to_get)}',
+                        f'List index must be an int',
                         context
                     ))
                 # If first statement is false, second will not evaluate
@@ -845,9 +843,9 @@ class Interpreter:
                     if isinstance(value.elements, List):
                         value.elements = value.elements.elements
                 else:
-                    return res.failure(RTError(
+                    return res.failure(IndexingError(
                         node.pos_start, node.pos_end,
-                        'List Index Out of Bounds',
+                        'List index out of bounds',
                         context
                     ))
             elif isinstance(value, Dict):
@@ -860,30 +858,30 @@ class Interpreter:
                         break
 
                 if not found:
-                    return res.failure(RTError(
+                    return res.failure(IndexingError(
                         node.pos_start, node.pos_end,
-                        'Dict Index Out of Bounds',
+                        'Dict index out of bounds',
                         context
                     ))
             elif isinstance(value, String):
                 if not isinstance(idx_to_get, int):
-                    return res.failure(RTError(
+                    return res.failure(IndexingError(
                         node.pos_start, node.pos_end,
-                        f'String Index Must be an Int not {type(idx_to_get)}',
+                        f'String index must be an int',
                         context
                     ))
                 if idx_to_get < len(value.value):
                     value.value = value.value[idx_to_get]
                 else:
-                    return res.failure(RTError(
+                    return res.failure(IndexingError(
                         node.pos_start, node.pos_end,
-                        'String Index Out of Bounds',
+                        'String index out of bounds',
                         context
                     ))
             else:
-                return res.failure(RTError(
+                return res.failure(TypingError(
                     node.pos_start, node.pos_end,
-                    'Invalid Type to get idx, can only process list, dict, or string',
+                    'Can only get idx of list, dict, or string',
                     context
                 ))
         # idxes to get will have elements but value will no elements if value is a dict
@@ -900,9 +898,9 @@ class Interpreter:
 
         if idxes_to_change:
             if var_name not in context.symbol_table.symbols:
-                return res.failure(RTError(
+                return res.failure(NamingError(
                     node.pos_start, node.pos_end,
-                    'Variable must be defined in order to set a specific index',
+                    f"'{var_name}' is not defined",
                     context
                 ))
 
@@ -913,9 +911,9 @@ class Interpreter:
 
                 for for_idx, idx_to_change in enumerate(idxes_to_change):
                     if not isinstance(element_to_change, List) or idx_to_change.tok.value > len(element_to_change.elements) - 1:
-                        return res.failure(RTError(
+                        return res.failure(IndexingError(
                             node.pos_start, node.pos_end,
-                            'List Index Out of Bounds',
+                            'List index out of bounds',
                             context
                         ))
 
@@ -924,17 +922,13 @@ class Interpreter:
                     else:
                         element_to_change = element_to_change.elements[idx_to_change.tok.value]
             elif isinstance(var_to_change, Dict):
-
-                for item in idxes_to_change:
-                    print(type(item))
-
                 for for_idx, idx_to_change in enumerate(idxes_to_change):
                     if for_idx == len(idxes_to_change) - 1:
                         var_to_change.key_pairs[idx_to_change.tok.value] = value
                     else:
                         var_to_change = var_to_change.key_pairs[idx_to_change.tok.value]
             else:
-                return res.failure(RTError(
+                return res.failure(IndexingError(
                     node.pos_start, node.pos_end,
                     'Variable must be a list or dict in order to set a specific index',
                     context

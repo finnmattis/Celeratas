@@ -379,7 +379,7 @@ class Parser:
         if res.error:
             return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected 'redi', 'continua', 'confringe', 'sino', 'si', 'pro', 'dum', 'opus', int, float, identifier, '+', '-', '(', '[' or 'not'"
+                "Expected expression"
             ))
         return res.success(expr)
 
@@ -428,7 +428,7 @@ class Parser:
         if res.error:
             return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected 'sino', 'si', 'pro', 'dum', 'opus', int, float, identifier, '+', '-', '(', '[' or 'non'"
+                "Expected expression"
             ))
 
         return res.success(node)
@@ -452,7 +452,7 @@ class Parser:
         if res.error:
             return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected int, float, identifier, '+', '-', '(', '[', 'si', 'pro', 'dum', 'opus' or 'non'"
+                "Expected expression"
             ))
 
         return res.success(node)
@@ -499,7 +499,7 @@ class Parser:
                 if res.error:
                     return res.failure(ExpectedCharError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
-                        "Expected ')', 'sino', 'si', 'pro', 'dum', 'opus', int, float, identifier, '+', '-', '(', '[' or 'non'"
+                        "Expected ')' or expression"
                     ))
 
                 while self.current_tok.type == TT_COMMA:
@@ -616,7 +616,7 @@ class Parser:
 
         return res.failure(ExpectedCharError(
             tok.pos_start, tok.pos_end,
-            "Expected int, float, identifier, '+', '-', '(', '[', si', 'pro', 'dum', 'opus'"
+            "Expected expression"
         ))
 
     def list_expr(self):
@@ -642,7 +642,7 @@ class Parser:
             if res.error:
                 return res.failure(ExpectedCharError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
-                    "Expected ']', 'sino', 'si', 'pro', 'dum', 'opus', int, float, identifier, '+', '-', '(', '[' or 'non'"
+                    "Expected ']' or expression"
                 ))
 
             while self.current_tok.type == TT_COMMA:
@@ -676,7 +676,7 @@ class Parser:
         if self.current_tok.type != TT_LBRACE:
             return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected '\{'"
+                "Expected '{'"
             ))
 
         res.register_advancement()
@@ -1147,7 +1147,7 @@ class Parser:
         if self.current_tok.type != TT_NEWLINE:
             return res.failure(ExpectedCharError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected NEWLINE"
+                f"Expected a newline"
             ))
 
         res.register_advancement()

@@ -83,8 +83,8 @@ class InvalidSyntaxError(Error):
 
 
 class RTError(Error):
-    def __init__(self, pos_start, pos_end, details, context):
-        super().__init__(pos_start, pos_end, 'Runtime Error', details)
+    def __init__(self, pos_start, pos_end, details, context, type_='Runtime Error'):
+        super().__init__(pos_start, pos_end, type_, details)
         self.context = context
 
     def as_string(self):
@@ -106,3 +106,23 @@ class RTError(Error):
             ctx = ctx.parent
 
         return 'Traceback (most recent call last):\n' + result
+
+
+class TypingError(RTError):
+    def __init__(self, pos_start, pos_end, details, context):
+        super().__init__(pos_start, pos_end, details, context, 'Type Error')
+
+
+class NamingError(RTError):
+    def __init__(self, pos_start, pos_end, details, context):
+        super().__init__(pos_start, pos_end, details, context, 'Name Error')
+
+
+class IndexingError(RTError):
+    def __init__(self, pos_start, pos_end, details, context):
+        super().__init__(pos_start, pos_end, details, context, 'Index Error')
+
+
+class DivisionByZeroError(RTError):
+    def __init__(self, pos_start, pos_end, details, context):
+        super().__init__(pos_start, pos_end, details, context, 'Zero Division Error')

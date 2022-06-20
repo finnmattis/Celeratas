@@ -81,6 +81,7 @@ class Lexer:
         self.text = text
         self.pos = Position(-1, 0, -1, fn, text)
         self.current_char = None
+        self.tab_style = ""
         self.advance()
 
     def advance(self):
@@ -190,32 +191,34 @@ class Lexer:
         return tokens, None
 
     def make_space(self, tokens):
-        if self.current_char == ' ':
-            # If begining of line
-            if self.start_of_statement:
+        pos_start = self.pos.copy()
+        if self.start_of_statement:
+            if self.current_char == ' ':
+                # Check tab style
+                if not self.tab_style in ["", "space"]:
+                    return [], IndentError(pos_start, self.pos, "Inconsistent indentation")
                 # Check if next 3 chars are also space
-                pos_start = self.pos.copy()
                 for _ in range(3):
                     self.advance()
                     if self.current_char == " ":
                         continue
                     # Throw error if not
-                    pos_start = self.pos.copy()
-                    self.advance()
-                    return None, IndentError(pos_start, self.pos, "Unexpected Indent")
+                    return None, IndentError(pos_start, self.pos, "Improper indentation")
 
                 self.advance()
+                self.tab_style = "space"
                 tokens.append(
                     Token(TT_TAB, pos_start=pos_start, pos_end=self.pos))
-            # If not at begining of line, ignore
-            else:
+            elif self.current_char == '\t':
+                # Check tab style
+                if not self.tab_style in ["", "tab"]:
+                    return [], IndentError(pos_start, self.pos, "Inconsistent indentation")
+
                 self.advance()
-        elif self.current_char == '\t':
-            if self.start_of_statement:
+                self.tab_style = "tab"
                 tokens.append(Token(TT_TAB, pos_start=self.pos))
-                self.advance()
-            else:
-                self.advance()
+        else:
+            self.advance()
         return tokens, None
 
     def make_numeral(self):
@@ -230,12 +233,11 @@ class Lexer:
                 dot_count += 1
             numeral_str += self.current_char
             self.advance()
-        # Convert to String to Int or Float
+        # Convert String to Int or Float
         numeral_final = toNum(numeral_str)
 
         if numeral_final == None:
             return None, InvalidNumeral(pos_start, self.pos, f"{numeral_str} is not a valid numeral")
-        # Function returns None if the numeral is invalid
 
         return Token(TT_NUMERAL, numeral_final, pos_start, self.pos), None
 
@@ -277,7 +279,7 @@ class Lexer:
                     escape_character = True
                 else:
                     if self.current_char == "\n":
-                        return [], IllegalCharError(pos_start, self.pos, "Unexpected New Line")
+                        return [], IllegalCharError(pos_start, self.pos, "Unexpected new line")
                     string += self.current_char
             self.advance()
             escape_character = False
@@ -354,7 +356,7 @@ class Lexer:
     def skip_comment(self):
         self.advance()
 
-        # Exclusive and incase it reachs the EOF and self.current == None
+        # Exclusive incase it reachs the EOF and self.current_char == None
         while self.current_char and self.current_char not in ';\n':
             self.advance()
 
