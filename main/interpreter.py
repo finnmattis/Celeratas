@@ -2,6 +2,7 @@
 # IMPORTS
 #######################################
 
+from ast import Num
 import math
 import os
 
@@ -10,6 +11,7 @@ from numpy import isin
 from helper.convert_roman import *
 from helper.tokens import *
 from helper.errors import RTError
+from main.parser import NumberNode, StringNode
 
 #######################################
 # RUNTIME RESULT
@@ -789,14 +791,22 @@ class Interpreter:
 
         for key, value in node.key_pairs.items():
             key = res.register(self.visit(key, context))
+
             if res.error:
                 return res
+
+            if isinstance(key, List):
+                return res.failure(RTError(
+                    key.pos_start, key.pos_end,
+                    "Key cannot be a list",
+                    context
+                ))
 
             value = res.register(self.visit(value, context))
             if res.error:
                 return res
 
-            keypairs[key] = value
+            keypairs[key.value] = value
 
         return res.success(Dict(keypairs).set_context(context).set_pos(node.pos_start, node.pos_end))
 
@@ -844,7 +854,7 @@ class Interpreter:
                 found = False
 
                 for key in value.key_pairs:
-                    if key.value == idx_to_get:
+                    if key == idx_to_get:
                         value = value.key_pairs[key]
                         found = True
                         break
@@ -897,27 +907,38 @@ class Interpreter:
                 ))
 
             var_to_change = context.symbol_table.get(var_name)
-            if not isinstance(var_to_change, List):
+
+            if isinstance(var_to_change, List):
+                element_to_change = var_to_change
+
+                for for_idx, idx_to_change in enumerate(idxes_to_change):
+                    if not isinstance(element_to_change, List) or idx_to_change.tok.value > len(element_to_change.elements) - 1:
+                        return res.failure(RTError(
+                            node.pos_start, node.pos_end,
+                            'List Index Out of Bounds',
+                            context
+                        ))
+
+                    if for_idx == len(idxes_to_change) - 1:
+                        element_to_change.elements[idx_to_change.tok.value] = value
+                    else:
+                        element_to_change = element_to_change.elements[idx_to_change.tok.value]
+            elif isinstance(var_to_change, Dict):
+
+                for item in idxes_to_change:
+                    print(type(item))
+
+                for for_idx, idx_to_change in enumerate(idxes_to_change):
+                    if for_idx == len(idxes_to_change) - 1:
+                        var_to_change.key_pairs[idx_to_change.tok.value] = value
+                    else:
+                        var_to_change = var_to_change.key_pairs[idx_to_change.tok.value]
+            else:
                 return res.failure(RTError(
                     node.pos_start, node.pos_end,
-                    'Variable must be a list in order to set a specific index',
+                    'Variable must be a list or dict in order to set a specific index',
                     context
                 ))
-
-            element_to_change = var_to_change
-
-            for for_idx, idx_to_change in enumerate(idxes_to_change):
-                if not isinstance(element_to_change, List) or idx_to_change.tok.value > len(element_to_change.elements) - 1:
-                    return res.failure(RTError(
-                        node.pos_start, node.pos_end,
-                        'List Index Out of Bounds',
-                        context
-                    ))
-
-                if for_idx == len(idxes_to_change) - 1:
-                    element_to_change.elements[idx_to_change.tok.value] = value
-                else:
-                    element_to_change = element_to_change.elements[idx_to_change.tok.value]
 
             context.symbol_table.set(var_name, var_to_change)
 
