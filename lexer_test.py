@@ -50,6 +50,8 @@ from helper.tokens import *
     (")", [TT_RPAREN]),
     ("[", [TT_LSQUARE]),
     ("]", [TT_RSQUARE]),
+    ("{", [TT_LBRACE]),
+    ("}", [TT_RBRACE]),
     # Test Misc
     ("=", [TT_EQ]),
     (":", [TT_COLON]),
