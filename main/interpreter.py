@@ -154,25 +154,25 @@ class Number(Value):
         self.value = value
 
     def added_to(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, Number) or isinstance(other, Numeral):
             return Number(self.value + other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def subbed_by(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, Number) or isinstance(other, Numeral):
             return Number(self.value - other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def multed_by(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, Number) or isinstance(other, Numeral):
             return Number(self.value * other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def dived_by(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, Number) or isinstance(other, Numeral):
             if other.value == 0:
                 return None, DivisionByZeroError(
                     other.pos_start, other.pos_end,
@@ -185,55 +185,55 @@ class Number(Value):
             return None, Value.illegal_operation(self, other)
 
     def powed_by(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, Number) or isinstance(other, Numeral):
             return Number(self.value ** other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_eq(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, Number) or isinstance(other, Numeral):
             return Number(int(self.value == other.value)).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_ne(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, Number) or isinstance(other, Numeral):
             return Number(int(self.value != other.value)).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_lt(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, Number) or isinstance(other, Numeral):
             return Number(int(self.value < other.value)).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_gt(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, Number) or isinstance(other, Numeral):
             return Number(int(self.value > other.value)).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_lte(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, Number) or isinstance(other, Numeral):
             return Number(int(self.value <= other.value)).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_gte(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, Number) or isinstance(other, Numeral):
             return Number(int(self.value >= other.value)).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def anded_by(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, Number) or isinstance(other, Numeral):
             return Number(int(self.value and other.value)).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def ored_by(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, Number) or isinstance(other, Numeral):
             return Number(int(self.value or other.value)).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
@@ -269,67 +269,74 @@ class Numeral(Value):
         self.value = value
 
     def added_to(self, other):
-        if isinstance(other, Numeral):
+        if isinstance(other, Numeral) or isinstance(other, Number):
             return Numeral(self.value + other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def subbed_by(self, other):
-        if isinstance(other, Numeral):
+        if isinstance(other, Numeral) or isinstance(other, Number):
             return Numeral(self.value - other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def multed_by(self, other):
-        if isinstance(other, Numeral):
+        if isinstance(other, Numeral) or isinstance(other, Number):
             return Numeral(self.value * other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def dived_by(self, other):
-        if isinstance(other, Numeral):
-            return Numeral(round(self.value / other.value, 3)).set_context(self.context), None
+        if isinstance(other, Numeral) or isinstance(other, Number):
+            if other.value == 0:
+                return None, DivisionByZeroError(
+                    other.pos_start, other.pos_end,
+                    'Division by zero',
+                    self.context
+                )
+
+            return Numeral(self.value / other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def powed_by(self, other):
-        if isinstance(other, Numeral):
+        if isinstance(other, Numeral) or isinstance(other, Number):
             return Numeral(self.value ** other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_eq(self, other):
-        if isinstance(other, Numeral):
+        if isinstance(other, Numeral) or isinstance(other, Number):
             return Number(int(self.value == other.value)).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_ne(self, other):
-        if isinstance(other, Numeral):
+        if isinstance(other, Numeral) or isinstance(other, Number):
             return Number(int(self.value != other.value)).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_lt(self, other):
-        if isinstance(other, Numeral):
+        if isinstance(other, Numeral) or isinstance(other, Number):
             return Number(int(self.value < other.value)).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_gt(self, other):
-        if isinstance(other, Numeral):
+        if isinstance(other, Numeral) or isinstance(other, Number):
             return Number(int(self.value > other.value)).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_lte(self, other):
-        if isinstance(other, Numeral):
+        if isinstance(other, Numeral) or isinstance(other, Number):
             return Number(int(self.value <= other.value)).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_gte(self, other):
-        if isinstance(other, Numeral):
+        if isinstance(other, Numeral) or isinstance(other, Number):
             return Number(int(self.value >= other.value)).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
@@ -341,7 +348,7 @@ class Numeral(Value):
         return copy
 
     def __repr__(self):
-        return toRoman(self.value) if self.value != 0 else "nil"
+        return toRoman(round(self.value, 3)) if self.value != 0 else "nil"
 
 
 class String(Value):
