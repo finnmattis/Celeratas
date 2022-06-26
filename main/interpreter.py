@@ -1033,26 +1033,25 @@ class Interpreter:
         res = RTResult()
         try_body = self.visit(node.try_body, context)
 
-        if node.except_name and node.except_name.value not in ["TypeError", "NameError", "IndexError", "ZeroDivisionError"]:
+        if node.except_name and node.except_name.value not in ["Exception", "TypeError", "NameError", "IndexError", "ZeroDivisionError"]:
             return res.failure(NamingError(
                 node.except_name.pos_start, node.except_name.pos_end,
                 'Exception type not supported',
                 context
             ))
 
-        if node.except_body and not node.except_name or try_body.error.error_name == node.except_name.value:
+        if try_body.error and node.except_body and (not node.except_name or node.except_name.value == "Exception" or try_body.error.error_name == node.except_name.value):
             if node.except_as:
                 context.symbol_table.set(
                     node.except_as.value, String(try_body.error.details))
 
-            except_body = res.register(
-                self.visit(node.except_body, context))
+            res.register(self.visit(node.except_body, context))
             if res.error:
                 return res
 
             if node.except_as:
                 context.symbol_table.remove(node.except_as.value)
-        else:
+        elif try_body.error == None:
             try_body = res.register(try_body)
             if res.error:
                 return res
