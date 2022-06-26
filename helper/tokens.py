@@ -38,6 +38,8 @@ TT_NEWLINE = 'NEWLINE'
 TT_EOF = 'EOF'
 
 KEYWORDS = [
+    'True',
+    'False',
     'sino',
     'et',
     'aut',

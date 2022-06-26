@@ -144,7 +144,7 @@ class Value:
             other = self
         return TypingError(
             self.pos_start, other.pos_end,
-            'Illegal operation',
+            f'Illegal operation between {type(self).__name__} and {type(other).__name__}',
             self.context
         )
 
@@ -193,54 +193,54 @@ class Number(Value):
 
     def get_comparison_eq(self, other):
         if isinstance(other, Number) or isinstance(other, Numeral):
-            return Number(int(self.value == other.value)).set_context(self.context), None
+            return Bool(self.value == other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_ne(self, other):
         if isinstance(other, Number) or isinstance(other, Numeral):
-            return Number(int(self.value != other.value)).set_context(self.context), None
+            return Bool(self.value != other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_lt(self, other):
         if isinstance(other, Number) or isinstance(other, Numeral):
-            return Number(int(self.value < other.value)).set_context(self.context), None
+            return Bool(self.value < other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_gt(self, other):
         if isinstance(other, Number) or isinstance(other, Numeral):
-            return Number(int(self.value > other.value)).set_context(self.context), None
+            return Bool(self.value > other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_lte(self, other):
         if isinstance(other, Number) or isinstance(other, Numeral):
-            return Number(int(self.value <= other.value)).set_context(self.context), None
+            return Bool(self.value <= other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_gte(self, other):
         if isinstance(other, Number) or isinstance(other, Numeral):
-            return Number(int(self.value >= other.value)).set_context(self.context), None
+            return Bool(self.value >= other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def anded_by(self, other):
         if isinstance(other, Number) or isinstance(other, Numeral):
-            return Number(int(self.value and other.value)).set_context(self.context), None
+            return Bool(self.value and other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def ored_by(self, other):
         if isinstance(other, Number) or isinstance(other, Numeral):
-            return Number(int(self.value or other.value)).set_context(self.context), None
+            return Bool(self.value or other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def notted(self):
-        return Number(1 if self.value == 0 else 0).set_context(self.context), None
+        return Bool(True if self.value == 0 else False).set_context(self.context), None
 
     def copy(self):
         copy = Number(self.value)
@@ -308,45 +308,63 @@ class Numeral(Value):
 
     def get_comparison_eq(self, other):
         if isinstance(other, Numeral) or isinstance(other, Number):
-            return Number(int(self.value == other.value)).set_context(self.context), None
+            return Bool(self.value == other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_ne(self, other):
         if isinstance(other, Numeral) or isinstance(other, Number):
-            return Number(int(self.value != other.value)).set_context(self.context), None
+            return Bool(self.value != other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_lt(self, other):
         if isinstance(other, Numeral) or isinstance(other, Number):
-            return Number(int(self.value < other.value)).set_context(self.context), None
+            return Bool(self.value < other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_gt(self, other):
         if isinstance(other, Numeral) or isinstance(other, Number):
-            return Number(int(self.value > other.value)).set_context(self.context), None
+            return Bool(self.value > other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_lte(self, other):
         if isinstance(other, Numeral) or isinstance(other, Number):
-            return Number(int(self.value <= other.value)).set_context(self.context), None
+            return Bool(self.value <= other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_gte(self, other):
         if isinstance(other, Numeral) or isinstance(other, Number):
-            return Number(int(self.value >= other.value)).set_context(self.context), None
+            return Bool(self.value >= other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
+
+    def anded_by(self, other):
+        if isinstance(other, Numeral) or isinstance(other, Number):
+            return Bool(self.value and other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def ored_by(self, other):
+        if isinstance(other, Numeral) or isinstance(other, Number):
+            return Bool(self.value or other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def notted(self):
+        return Bool(True if self.value == 0 else False).set_context(self.context), None
 
     def copy(self):
         copy = Numeral(self.value)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
         return copy
+
+    def __str__(self):
+        return toRoman(round(self.value, 3)) if self.value != 0 else "nil"
 
     def __repr__(self):
         return toRoman(round(self.value, 3)) if self.value != 0 else "nil"
@@ -390,6 +408,78 @@ class String(Value):
 
     def __repr__(self):
         return f'"{self.value}"'
+
+
+class Bool(Value):
+    def __init__(self, value):
+        super().__init__()
+        self.value = value
+
+    def copy(self):
+        copy = Bool(self.value)
+        copy.set_pos(self.pos_start, self.pos_end)
+        copy.set_context(self.context)
+        return copy
+
+    def get_comparison_eq(self, other):
+        if isinstance(other, Bool):
+            return Bool(self.value == other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def get_comparison_ne(self, other):
+        if isinstance(other, Bool):
+            return Bool(self.value != other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def get_comparison_lt(self, other):
+        if isinstance(other, Bool):
+            return Bool(self.value < other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def get_comparison_gt(self, other):
+        if isinstance(other, Bool):
+            return Bool(self.value > other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def get_comparison_lte(self, other):
+        if isinstance(other, Bool):
+            return Bool(self.value <= other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def get_comparison_gte(self, other):
+        if isinstance(other, Bool):
+            return Bool(self.value >= other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def anded_by(self, other):
+        if isinstance(other, Bool):
+            return Bool(self.value and other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def ored_by(self, other):
+        if isinstance(Bool):
+            return Bool(self.value or other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def notted(self):
+        return Bool(not self.value).set_context(self.context), None
+
+    def is_true(self):
+        return self.value
+
+    def __str__(self):
+        return str(self.value)
+
+    def __repr__(self):
+        return str(self.value)
 
 
 class List(Value):
@@ -775,6 +865,12 @@ class Interpreter:
     def visit_StringNode(self, node, context):
         return RTResult().success(
             String(node.tok.value).set_context(
+                context).set_pos(node.pos_start, node.pos_end)
+        )
+
+    def visit_BoolNode(self, node, context):
+        return RTResult().success(
+            Bool(True if node.tok.value == "True" else False).set_context(
                 context).set_pos(node.pos_start, node.pos_end)
         )
 

@@ -43,6 +43,17 @@ class StringNode:
         return f'{self.tok}'
 
 
+class BoolNode:
+    def __init__(self, tok):
+        self.tok = tok
+
+        self.pos_start = self.tok.pos_start
+        self.pos_end = self.tok.pos_end
+
+    def __repr__(self):
+        return self.tok.value
+
+
 class ListNode:
     def __init__(self, element_nodes, pos_start, pos_end):
         self.element_nodes = element_nodes
@@ -546,6 +557,11 @@ class Parser:
             res.register_advancement()
             self.advance()
             return res.success(StringNode(tok))
+
+        elif tok.matches(TT_KEYWORD, 'True') or tok.matches(TT_KEYWORD, 'False'):
+            res.register_advancement()
+            self.advance()
+            return res.success(BoolNode(tok))
 
         elif tok.type == TT_IDENTIFIER:
             res.register_advancement()
