@@ -123,7 +123,7 @@ class Lexer:
                 tokens.append(token)
             elif self.current_char in DIGITS:
                 tokens.append(self.make_number())
-            elif self.current_char == '"':
+            elif self.current_char == '"' or self.current_char == "'":
                 token, error = self.make_string()
                 if error:
                     return [], error
@@ -263,6 +263,8 @@ class Lexer:
         string = ''
         pos_start = self.pos.copy()
         escape_character = False
+        # Can be either " or '
+        string_char = self.current_char
         self.advance()
 
         escape_characters = {
@@ -270,19 +272,24 @@ class Lexer:
             't': '\t'
         }
 
-        while self.current_char != None and (self.current_char != '"' or escape_character):
+        if not self.current_char:
+            return None, IllegalCharError(pos_start, self.pos, "Unexpected end to string")
+
+        while self.current_char and self.current_char != string_char:
             if escape_character:
                 string += escape_characters.get(self.current_char,
                                                 self.current_char)
+                escape_character = False
             else:
                 if self.current_char == '\\':
                     escape_character = True
                 else:
                     if self.current_char == "\n":
-                        return [], IllegalCharError(pos_start, self.pos, "Unexpected new line")
+                        return None, IllegalCharError(pos_start, self.pos, "Unexpected end to string")
                     string += self.current_char
             self.advance()
-            escape_character = False
+            if self.current_char == None:
+                return None, IllegalCharError(pos_start, self.pos, "Unexpected end to string")
 
         self.advance()
         return Token(TT_STRING, string, pos_start, self.pos), None
