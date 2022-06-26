@@ -118,6 +118,11 @@ class NamingError(RTError):
         super().__init__(pos_start, pos_end, details, context, 'NameError')
 
 
+class AttrError(RTError):
+    def __init__(self, pos_start, pos_end, details, context):
+        super().__init__(pos_start, pos_end, details, context, 'AttributeError')
+
+
 class IndexingError(RTError):
     def __init__(self, pos_start, pos_end, details, context):
         super().__init__(pos_start, pos_end, details, context, 'IndexError')

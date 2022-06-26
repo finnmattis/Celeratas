@@ -4,12 +4,12 @@
 
 import math
 import os
-from typing import Type
 
-from numpy import isin
+from attr import attr
+
 from helper.convert_roman import *
 from helper.tokens import *
-from helper.errors import DivisionByZeroError, IndexingError, NamingError, RTError, TypingError
+from helper.errors import DivisionByZeroError, IndexingError, NamingError, AttrError, RTError, TypingError
 
 #######################################
 # RUNTIME RESULT
@@ -77,6 +77,7 @@ class Value:
     def __init__(self):
         self.set_pos()
         self.set_context()
+        self.attributes = {}
 
     def set_pos(self, pos_start=None, pos_end=None):
         self.pos_start = pos_start
@@ -355,6 +356,7 @@ class String(Value):
     def __init__(self, value):
         super().__init__()
         self.value = value
+        self.attributes = {"length": len(value)}
 
     def added_to(self, other):
         if isinstance(other, String):
@@ -820,6 +822,7 @@ class Interpreter:
         var_name = node.var_name_tok.value
         value = context.symbol_table.get(var_name)
         idxes_to_get = node.idxes_to_get
+        attr_to_get = node.attr_to_get
 
         if not value:
             return res.failure(NamingError(
@@ -891,8 +894,22 @@ class Interpreter:
                     'Can only get idx of list, dict, or string',
                     context
                 ))
+        if attr_to_get:
+            if value.elements:
+                value = value.elements
+
+            value_attr = value.attributes.get(attr_to_get, None)
+            if value_attr == None:
+                return res.failure(AttrError(
+                    node.pos_start, node.pos_end,
+                    f"'{var_name}' does not have the attribute '{attr_to_get}'",
+                    context
+                ))
+
+            value_attr = Number(value_attr)
+            return res.success(value_attr)
         # idxes to get will have elements but value will no elements if value is a dict
-        return res.success(value.elements if idxes_to_get and hasattr(value, "elements") else value)
+        return res.success(value.elements if hasattr(value, "elements") else value)
 
     def visit_VarAssignNode(self, node, context):
         res = RTResult()

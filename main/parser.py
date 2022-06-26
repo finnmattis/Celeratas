@@ -60,9 +60,10 @@ class DictNode:
 
 
 class VarAccessNode:
-    def __init__(self, var_name_tok, idxes_to_get):
+    def __init__(self, var_name_tok, idxes_to_get, attr_to_get):
         self.var_name_tok = var_name_tok
         self.idxes_to_get = idxes_to_get
+        self.attr_to_get = attr_to_get
 
         self.pos_start = self.var_name_tok.pos_start
         self.pos_end = self.var_name_tok.pos_end
@@ -551,20 +552,37 @@ class Parser:
             self.advance()
             var_name = tok
             idxes_to_get = []
+            attr_to_get = None
 
-            while self.current_tok.type == TT_LSQUARE:
+            if self.current_tok.type == TT_LSQUARE:
+                while self.current_tok.type == TT_LSQUARE:
+                    res.register_advancement()
+                    self.advance()
+
+                    idxes_to_get.append(res.register(self.bin_op(
+                        self.comp_expr, ((TT_KEYWORD, 'et'), (TT_KEYWORD, 'aut')))))
+
+                    if res.error:
+                        return res
+
                 res.register_advancement()
                 self.advance()
 
-                idxes_to_get.append(res.register(self.bin_op(
-                    self.comp_expr, ((TT_KEYWORD, 'et'), (TT_KEYWORD, 'aut')))))
-
-                if res.error:
-                    return res
-
+            if self.current_tok.type == TT_DOT:
                 res.register_advancement()
                 self.advance()
-            return res.success(VarAccessNode(var_name, idxes_to_get))
+
+                if self.current_tok.type != TT_IDENTIFIER:
+                    return res.failure(ExpectedItemError(
+                        self.current_tok.pos_start, self.current_tok.pos_end,
+                        "Expected Identifier"
+                    ))
+
+                attr_to_get = self.current_tok.value
+                res.register_advancement()
+                self.advance()
+
+            return res.success(VarAccessNode(var_name, idxes_to_get, attr_to_get))
 
         elif tok.type == TT_LPAREN:
             res.register_advancement()
