@@ -129,15 +129,14 @@ class Lexer:
                     return [], error
                 tokens.append(token)
             elif self.current_char == '+':
-                tokens.append(Token(TT_PLUS, pos_start=self.pos))
-                self.advance()
+                tokens.append(self.make_plus())
             elif self.current_char == '-':
-                tokens.append(self.make_minus_or_arrow())
+                tokens.append(self.make_minus())
             elif self.current_char == '*':
-                tokens.append(Token(TT_MUL, pos_start=self.pos))
+                tokens.append(self.make_mul())
                 self.advance()
             elif self.current_char == '/':
-                tokens.append(Token(TT_DIV, pos_start=self.pos))
+                tokens.append(self.make_div())
                 self.advance()
             elif self.current_char == '^':
                 tokens.append(Token(TT_POW, pos_start=self.pos))
@@ -305,7 +304,7 @@ class Lexer:
         tok_type = TT_KEYWORD if id_str in KEYWORDS else TT_IDENTIFIER
         return Token(tok_type, id_str, pos_start, self.pos), None
 
-    def make_minus_or_arrow(self):
+    def make_minus(self):
         tok_type = TT_MINUS
         pos_start = self.pos.copy()
         self.advance()
@@ -313,6 +312,9 @@ class Lexer:
         if self.current_char == '>':
             self.advance()
             tok_type = TT_ARROW
+        elif self.current_char == '=':
+            self.advance()
+            tok_type = TT_MIN_EQ
 
         return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
 
@@ -327,38 +329,34 @@ class Lexer:
         self.advance()
         return None, ExpectedItemError(pos_start, self.pos, "'=' (after '!')")
 
-    def make_equals(self):
-        tok_type = TT_EQ
+    def make_mult_toks(self, tok_type_1, tok_type_2, switch_factor):
+        tok_type = tok_type_1
         pos_start = self.pos.copy()
         self.advance()
 
-        if self.current_char == '=':
+        if self.current_char == switch_factor:
             self.advance()
-            tok_type = TT_EE
+            tok_type = tok_type_2
 
         return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
+
+    def make_plus(self):
+        return(self.make_mult_toks(TT_PLUS, TT_PLUS_EQ, "="))
+
+    def make_mul(self):
+        return(self.make_mult_toks(TT_MUL, TT_MUL_EQ, "="))
+
+    def make_div(self):
+        return(self.make_mult_toks(TT_DIV, TT_DIV_EQ, "="))
+
+    def make_equals(self):
+        return self.make_mult_toks(TT_EQ, TT_EE, "=")
 
     def make_less_than(self):
-        tok_type = TT_LT
-        pos_start = self.pos.copy()
-        self.advance()
-
-        if self.current_char == '=':
-            self.advance()
-            tok_type = TT_LTE
-
-        return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
+        return self.make_mult_toks(TT_LT, TT_LTE, "=")
 
     def make_greater_than(self):
-        tok_type = TT_GT
-        pos_start = self.pos.copy()
-        self.advance()
-
-        if self.current_char == '=':
-            self.advance()
-            tok_type = TT_GTE
-
-        return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
+        return self.make_mult_toks(TT_GT, TT_GTE, "=")
 
     def skip_comment(self):
         self.advance()

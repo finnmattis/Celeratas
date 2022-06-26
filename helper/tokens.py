@@ -1,3 +1,6 @@
+from pyrsistent import m
+
+
 TT_INT = 'INT'
 TT_FLOAT = 'FLOAT'
 TT_STRING = 'STRING'
@@ -10,6 +13,10 @@ TT_MUL = 'MUL'
 TT_DIV = 'DIV'
 TT_POW = 'POW'
 TT_EQ = 'EQ'
+TT_PLUS_EQ = 'PLUS_EQ'
+TT_MIN_EQ = 'MIN_EQ'
+TT_MUL_EQ = "MUL_EQ"
+TT_DIV_EQ = "DIV_EQ"
 TT_LPAREN = 'LPAREN'
 TT_RPAREN = 'RPAREN'
 TT_LSQUARE = 'LSQUARE'

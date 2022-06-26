@@ -898,6 +898,7 @@ class Interpreter:
         res = RTResult()
         var_name = node.var_name_tok.value
         idxes_to_change = node.idxes_to_change
+        assign_type = node.assign_type
 
         value = res.register(self.visit(node.value_node, context))
         if res.should_return():
@@ -941,10 +942,32 @@ class Interpreter:
                     context
                 ))
 
-            context.symbol_table.set(var_name, var_to_change)
+            value = var_to_change
 
-        else:
-            context.symbol_table.set(var_name, value)
+        if assign_type.type != "EQ":
+            error = None
+            old_value = context.symbol_table.get(var_name)
+
+            if old_value == None:
+                return res.failure(NamingError(
+                    node.pos_start, node.pos_end,
+                    f"'{var_name}' is not defined",
+                    context
+                ))
+
+            if assign_type.type == "PLUS_EQ":
+                value, error = old_value.added_to(value)
+            elif assign_type.type == "MIN_EQ":
+                value, error = old_value.subbed_by(value)
+            elif assign_type.type == "MUL_EQ":
+                value, error = old_value.multed_by(value)
+            elif assign_type.type == "DIV_EQ":
+                value, error = old_value.dived_by(value)
+
+            if error:
+                return res.failure(error)
+
+        context.symbol_table.set(var_name, value)
         return res.success(None)
 
     def visit_BinOpNode(self, node, context):

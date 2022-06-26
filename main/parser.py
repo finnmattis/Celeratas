@@ -69,10 +69,11 @@ class VarAccessNode:
 
 
 class VarAssignNode:
-    def __init__(self, var_name_tok, value_node, idxes_to_change):
+    def __init__(self, var_name_tok, value_node, idxes_to_change, assign_type):
         self.var_name_tok = var_name_tok
         self.value_node = value_node
         self.idxes_to_change = idxes_to_change
+        self.assign_type = assign_type
 
         self.pos_start = self.var_name_tok.pos_start
         self.pos_end = self.value_node.pos_end
@@ -407,14 +408,17 @@ class Parser:
                 res.register_advancement()
                 self.advance()
 
-            if self.current_tok.type != TT_EQ:
+            if self.current_tok.type not in [TT_EQ, TT_PLUS_EQ, TT_MIN_EQ, TT_MUL_EQ, TT_DIV_EQ]:
                 self.reverse(res.advance_count)
             else:
                 if could_have_var_assign == False:
                     return res.failure(InvalidSyntaxError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
-                        "Var can not be set to a var assign node"
+                        "Inappropriate Var Assign Node"
                     ))
+
+                assign_type = self.current_tok
+
                 res.register_advancement()
                 self.advance()
 
@@ -422,7 +426,7 @@ class Parser:
                 if res.error:
                     return res
 
-                return res.success(VarAssignNode(var_name, expr, idxes_to_change))
+                return res.success(VarAssignNode(var_name, expr, idxes_to_change, assign_type))
 
         node = res.register(self.bin_op(
             self.comp_expr, ((TT_KEYWORD, 'et'), (TT_KEYWORD, 'aut'))))
