@@ -33,7 +33,7 @@ class String(Value):
         return len(self.components) > 0
 
     def copy(self):
-        from interpreter.interpreter import Interpreter
+        from interpreter.Interpreter import Interpreter
         interpreter = Interpreter()
         new_value = interpreter.visit(self.node, self.context)
 

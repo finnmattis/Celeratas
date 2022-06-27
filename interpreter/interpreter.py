@@ -2,25 +2,12 @@
 # IMPORTS
 #######################################
 
-import os
-
-from helper.convert_roman import *
 from helper.tokens import *
-from helper.errors import IndexingError, NamingError, AttrError, RTError, TypingError
+from helper import IndexingError, NamingError, AttrError, RTError, TypingError
 from interpreter.RTResult import RTResult
 
-from interpreter.values.Number import Number, Numeral
-from interpreter.values.String import String
-from interpreter.values.Bool import Bool
-from interpreter.values.List import List
-from interpreter.values.Dict import Dict
-
-from interpreter.Context import Context
+from interpreter.values import *
 from interpreter.constants import *
-from interpreter.SymbolTable import SymbolTable
-from interpreter.values.functions.BaseFunction import BaseFunction
-from interpreter.values.functions.Function import Function
-from interpreter.values.functions.BuiltInFunction import BuiltInFunction
 
 
 #######################################

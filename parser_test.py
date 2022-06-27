@@ -1,6 +1,6 @@
 import pytest
 from lexer.Lexer import *
-from parser.parser import *
+from parser.Parser import *
 from helper.tokens import *
 
 basepos = Position(0, 0, 0, "<stdin>", "1")

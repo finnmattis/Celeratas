@@ -2,10 +2,9 @@
 # IMPORTS
 #######################################
 
-from helper.errors import *
-from lexer.Lexer import *
-from parser.parser import Parser
-from interpreter.interpreter import *
+from lexer import Lexer
+from parser import Parser
+from interpreter import *
 
 #######################################
 # RUN

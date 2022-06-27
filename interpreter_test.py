@@ -1,7 +1,7 @@
 import pytest
 from lexer.Lexer import *
-from parser.parser import *
-from interpreter.interpreter import *
+from parser.Parser import *
+from interpreter.Interpreter import *
 from helper.tokens import *
 from root.root import *
 

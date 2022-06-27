@@ -12,7 +12,7 @@ class Function(BaseFunction):
     def execute(self, args):
         res = RTResult()
         interpreter = Interpreter()
-        from interpreter.interpreter import Interpreter
+        from interpreter.Interpreter import Interpreter
         exec_ctx = self.generate_new_context()
 
         res.register(self.check_and_populate_args(
