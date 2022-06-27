@@ -1,5 +1,5 @@
 import pytest
-from lexer.lexer import Lexer
+from lexer.Lexer import Lexer
 from helper.tokens import *
 
 # Should add testing values as well as types for stuff like strings, vars, numbers, and numerals

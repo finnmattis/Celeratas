@@ -7,7 +7,7 @@
 import sys
 from datetime import datetime
 
-import main.root as root
+import root.root as root
 
 
 class Shell:

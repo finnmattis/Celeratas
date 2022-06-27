@@ -7,8 +7,8 @@ from helper.convert_roman import *
 from helper.tokens import *
 from helper.errors import InvalidNumeral, IllegalCharError, ExpectedItemError, IndentError
 from lexer.constants import *
-from lexer.position import Position
-from lexer.token import Token
+from lexer.Position import Position
+from lexer.Token import Token
 
 #######################################
 # LEXER

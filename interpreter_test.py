@@ -1,9 +1,9 @@
 import pytest
-from lexer.lexer import *
-from main.parser import *
-from main.interpreter import *
+from lexer.Lexer import *
+from parser.parser import *
+from interpreter.interpreter import *
 from helper.tokens import *
-from main.root import *
+from root.root import *
 
 
 def interpreter_test_base(test_input):

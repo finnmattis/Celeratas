@@ -8,143 +8,8 @@ import os
 from helper.convert_roman import *
 from helper.tokens import *
 from helper.errors import DivisionByZeroError, IndexingError, NamingError, AttrError, RTError, TypingError
-
-#######################################
-# RUNTIME RESULT
-#######################################
-
-
-class RTResult:
-    def __init__(self):
-        self.reset()
-
-    def reset(self):
-        self.value = None
-        self.error = None
-        self.func_return_value = None
-        self.loop_should_continue = False
-        self.loop_should_break = False
-
-    def register(self, res):
-        self.error = res.error
-        self.func_return_value = res.func_return_value
-        self.loop_should_continue = res.loop_should_continue
-        self.loop_should_break = res.loop_should_break
-        return res.value
-
-    def success(self, value):
-        self.reset()
-        self.value = value
-        return self
-
-    def success_return(self, value):
-        self.reset()
-        self.func_return_value = value
-        return self
-
-    def success_continue(self):
-        self.reset()
-        self.loop_should_continue = True
-        return self
-
-    def success_break(self):
-        self.reset()
-        self.loop_should_break = True
-        return self
-
-    def failure(self, error):
-        self.reset()
-        self.error = error
-        return self
-
-    def should_return(self):
-        # Note: this will allow you to continue and break outside the current function
-        return (
-            self.error or
-            self.func_return_value or
-            self.loop_should_continue or
-            self.loop_should_break
-        )
-
-#######################################
-# VALUES
-#######################################
-
-
-class Value:
-    def __init__(self):
-        self.set_pos()
-        self.set_context()
-        self.attributes = {}
-
-    def set_pos(self, pos_start=None, pos_end=None):
-        self.pos_start = pos_start
-        self.pos_end = pos_end
-        return self
-
-    def set_context(self, context=None):
-        self.context = context
-        return self
-
-    def added_to(self, other):
-        return None, self.illegal_operation(other)
-
-    def subbed_by(self, other):
-        return None, self.illegal_operation(other)
-
-    def multed_by(self, other):
-        return None, self.illegal_operation(other)
-
-    def dived_by(self, other):
-        return None, self.illegal_operation(other)
-
-    def powed_by(self, other):
-        return None, self.illegal_operation(other)
-
-    def get_comparison_eq(self, other):
-        return None, self.illegal_operation(other)
-
-    def get_comparison_ne(self, other):
-        return None, self.illegal_operation(other)
-
-    def get_comparison_lt(self, other):
-        return None, self.illegal_operation(other)
-
-    def get_comparison_gt(self, other):
-        return None, self.illegal_operation(other)
-
-    def get_comparison_lte(self, other):
-        return None, self.illegal_operation(other)
-
-    def get_comparison_gte(self, other):
-        return None, self.illegal_operation(other)
-
-    def anded_by(self, other):
-        return None, self.illegal_operation(other)
-
-    def ored_by(self, other):
-        return None, self.illegal_operation(other)
-
-    def notted(self, other):
-        return None, self.illegal_operation(other)
-
-    def execute(self, args):
-        return RTResult().failure(self.illegal_operation())
-
-    def copy(self):
-        raise Exception('No copy method defined')
-
-    def is_true(self):
-        return False
-
-    def illegal_operation(self, other=None):
-        if not other:
-            other = self
-        return TypingError(
-            self.pos_start, other.pos_end,
-            f'Illegal operation between {type(self).__name__} and {type(other).__name__}',
-            self.context
-        )
+from interpreter.RTResult import RTResult
+from interpreter.Value import Value
 
 
 class Number(Value):
@@ -776,7 +641,7 @@ class BuiltInFunction(BaseFunction):
             ))
 
         # Need the import here to avoid circular import
-        from main.root import run
+        from root.root import run
         _, error = run(fn, script)
 
         if error:

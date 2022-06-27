@@ -3,9 +3,9 @@
 #######################################
 
 from helper.errors import *
-from lexer.lexer import *
-from main.parser import Parser
-from main.interpreter import *
+from lexer.Lexer import *
+from parser.parser import Parser
+from interpreter.interpreter import *
 
 #######################################
 # RUN
