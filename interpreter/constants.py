@@ -1,6 +1,15 @@
+#######################################
+# IMPORTS
+#######################################
+
 import math
+
 from interpreter.values.Number import Number
 from interpreter.values.functions.BuiltInFunction import BuiltInFunction
+
+#######################################
+# CONSTANTS
+#######################################
 
 Number.null = Number(0)
 Number.math_PI = Number(math.pi)

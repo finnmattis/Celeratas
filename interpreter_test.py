@@ -1,9 +1,15 @@
+#######################################
+# IMPORTS
+#######################################
+
 import pytest
-from lexer.Lexer import *
-from parser.Parser import *
-from interpreter.Interpreter import *
-from helper.tokens import *
-from root.root import *
+from lexer import Lexer
+from parser import Parser
+from interpreter import *
+
+#######################################
+# TESTS
+#######################################
 
 
 def interpreter_test_base(test_input):
@@ -15,7 +21,8 @@ def interpreter_test_base(test_input):
 
     interpreter = Interpreter()
     context = Context('<program>')
-    context.symbol_table = global_symbol_table
+    symbol_table = SymbolTable()
+    context.symbol_table = symbol_table
     result = interpreter.visit(ast.node, context)
 
     assert result.error == None

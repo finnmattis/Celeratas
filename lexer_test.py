@@ -1,8 +1,16 @@
+#######################################
+# IMPORTS
+#######################################
+
 import pytest
-from lexer.Lexer import Lexer
+from lexer import Lexer
 from helper.tokens import *
 
-# Should add testing values as well as types for stuff like strings, vars, numbers, and numerals
+#######################################
+# TESTS
+#######################################
+
+# TODO Should add testing values as well as types for stuff like strings, vars, numbers, and numerals
 
 
 @pytest.mark.parametrize("test_input,expected", [

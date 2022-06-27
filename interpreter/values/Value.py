@@ -1,5 +1,13 @@
+#######################################
+# IMPORTS
+#######################################
+
 from helper.errors import TypingError
 from interpreter.RTResult import RTResult
+
+#######################################
+# VALUE
+#######################################
 
 
 class Value:

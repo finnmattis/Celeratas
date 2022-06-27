@@ -81,6 +81,10 @@ class InvalidSyntaxError(Error):
     def __init__(self, pos_start, pos_end, details=''):
         super().__init__(pos_start, pos_end, 'SyntaxError', details)
 
+#######################################
+# RTERROR BASE
+#######################################
+
 
 class RTError(Error):
     def __init__(self, pos_start, pos_end, details, context, type_='RuntimeError'):
@@ -106,6 +110,10 @@ class RTError(Error):
             ctx = ctx.parent
 
         return 'Traceback (most recent call last):\n' + result
+
+#######################################
+# RTERROR SUB CLASSES
+#######################################
 
 
 class TypingError(RTError):

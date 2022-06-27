@@ -3,7 +3,8 @@
 #######################################
 
 from helper.tokens import *
-from helper.errors import ExpectedItemError, InvalidSyntaxError, IndentError
+from helper import ExpectedItemError, InvalidSyntaxError, IndentError
+
 from parser.nodes import *
 from parser.ParseResult import ParseResult
 

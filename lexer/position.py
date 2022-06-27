@@ -1,4 +1,3 @@
-
 class Position:
     def __init__(self, idx, ln, col, fn, ftxt):
         self.idx = idx

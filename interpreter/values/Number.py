@@ -1,8 +1,16 @@
-from helper.convert_roman import toRoman
+#######################################
+# IMPORTS
+#######################################
+
+from helper import toRoman
 from helper.errors import DivisionByZeroError
 
 from interpreter.values.Value import Value
-from interpreter.values.Bool import Bool
+from interpreter.values import Bool
+
+#######################################
+# NUMBER
+#######################################
 
 
 class Number(Value):
@@ -112,6 +120,10 @@ class Number(Value):
 
     def __repr__(self):
         return str(self.value)
+
+#######################################
+# NUMERAL
+#######################################
 
 
 class Numeral(Value):

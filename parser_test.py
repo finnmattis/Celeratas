@@ -1,7 +1,20 @@
+#######################################
+# IMPORTS
+#######################################
+
 import pytest
-from lexer.Lexer import *
-from parser.Parser import *
+
 from helper.tokens import *
+
+from lexer import Lexer
+from lexer.Position import Position
+from lexer.Token import Token
+from parser import Parser
+from parser.nodes import *
+
+#######################################
+# TESTS
+#######################################
 
 basepos = Position(0, 0, 0, "<stdin>", "1")
 # Use basepos because error location does not matter
@@ -21,7 +34,7 @@ def parser_test_base(test_input):
 @pytest.mark.parametrize("test_input,expected", [
     ("1", NumberNode(Token(TT_INT, 1, basepos))),
     ("IV", NumeralNode(Token(TT_NUMERAL, 4, basepos))),
-    ("\"x\"", StringNode(Token(TT_STRING, "x", basepos))),
+    # ("\"x\"", StringNode(Token(TT_STRING, "x", basepos))),
     pytest.param("\"x", [], marks=pytest.mark.xfail),
 ])
 def test_parser_data_type(test_input, expected):
@@ -65,11 +78,11 @@ def test_parser_list(test_input, expected):
 
 
 @pytest.mark.parametrize("test_input,expected", [
-    ("x", VarAccessNode(Token(TT_IDENTIFIER, "x", basepos), [])),
+    ("x", VarAccessNode(Token(TT_IDENTIFIER, "x", basepos,), [], None)),
     ("x[0]", VarAccessNode(Token(TT_IDENTIFIER, "x", basepos),
-                           [NumberNode(Token(TT_INT, 0, basepos))])),
+                           [NumberNode(Token(TT_INT, 0, basepos))], None)),
     ("x[0][0]", VarAccessNode(Token(TT_IDENTIFIER, "x", basepos),
-                              [NumberNode(Token(TT_INT, 0, basepos)), NumberNode(Token(TT_INT, 0, basepos))])),
+                              [NumberNode(Token(TT_INT, 0, basepos)), NumberNode(Token(TT_INT, 0, basepos))], None)),
 ])
 def test_parser_var_access(test_input, expected):
     ast = parser_test_base(test_input)
@@ -80,9 +93,9 @@ def test_parser_var_access(test_input, expected):
 
 @pytest.mark.parametrize("test_input,expected", [
     ("x = 1", VarAssignNode(Token(TT_IDENTIFIER, "x", basepos),
-                            NumberNode(Token(TT_INT, 1, basepos)), [])),
+                            NumberNode(Token(TT_INT, 1, basepos)), [], Token(TT_EQ, basepos))),
     ("x[0] = 1", VarAssignNode(Token(TT_IDENTIFIER, "x", basepos),
-                               NumberNode(Token(TT_INT, 1, basepos)), [NumberNode(Token(TT_INT, 0, basepos))])),
+                               NumberNode(Token(TT_INT, 1, basepos)), [NumberNode(Token(TT_INT, 0, basepos))], Token(TT_EQ, basepos))),
 
 ])
 def test_parser_var_assign(test_input, expected):

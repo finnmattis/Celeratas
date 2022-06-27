@@ -1,5 +1,13 @@
-from interpreter.values import Number
+#######################################
+# IMPORTS
+#######################################
+
 from interpreter.values.Value import Value
+from interpreter.values import Bool, Number
+
+#######################################
+# STRING
+#######################################
 
 
 class String(Value):
@@ -25,7 +33,7 @@ class String(Value):
 
     def get_comparison_eq(self, other):
         if isinstance(other, String):
-            return Number(int(self.components == other.components)), None
+            return Bool(self.components == other.components), None
         else:
             return None, Value.illegal_operation(self, other)
 

@@ -117,6 +117,7 @@ class Shell:
     #######################################
     # RUN FILE FROM CLI ARGS OR TAKE INPUT
     #######################################
+
     def start(self):
         try:
             if len(sys.argv) > 1:

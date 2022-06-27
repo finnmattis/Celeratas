@@ -4,7 +4,6 @@
 
 from helper.tokens import *
 from helper import IndexingError, NamingError, AttrError, RTError, TypingError
-from interpreter.RTResult import RTResult
 
 from interpreter.values import *
 from interpreter.constants import *
