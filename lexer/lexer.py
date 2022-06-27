@@ -3,7 +3,7 @@
 #######################################
 
 
-from helper import toNum, toRoman, InvalidNumeral, IllegalCharError, ExpectedItemError, IndentError
+from helper import toNum, InvalidNumeral, IllegalCharError, ExpectedItemError, IndentError
 from helper.tokens import *
 
 from lexer.constants import *
@@ -260,6 +260,11 @@ class Lexer:
                 tokens, error = lexer.make_tokens()
                 if error:
                     return None, error
+
+                # Check if there is a string in tokens
+                for token in tokens:
+                    if token.type == TT_STRING:
+                        return None, IllegalCharError(pos_after_brace, self.pos, "Unexpected string")
 
                 # Add the tokens to str_components
                 str_components.append(tokens)
