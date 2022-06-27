@@ -2,6 +2,8 @@
 # IMPORTS
 #######################################
 
+from ast import Num
+from urllib.parse import ParseResult
 import pytest
 
 from helper.tokens import *
@@ -34,12 +36,25 @@ def parser_test_base(test_input):
 @pytest.mark.parametrize("test_input,expected", [
     ("1", NumberNode(Token(TT_INT, 1, basepos))),
     ("IV", NumeralNode(Token(TT_NUMERAL, 4, basepos))),
-    # ("\"x\"", StringNode(Token(TT_STRING, "x", basepos))),
     pytest.param("\"x", [], marks=pytest.mark.xfail),
 ])
-def test_parser_data_type(test_input, expected):
+def test_parser_numbers(test_input, expected):
     ast = parser_test_base(test_input)
     assert ast.tok.value == expected.tok.value
+
+
+@pytest.mark.parametrize("test_input,expected", [
+    ("\"x\"", StringNode(["x"], basepos, basepos)),
+    ("f\"{1}\"", StringNode(
+        [NumberNode(Token(TT_INT, 1, basepos))], basepos, basepos))
+])
+def test_parser_strings(test_input, expected):
+    ast = parser_test_base(test_input)
+    for i, e in zip(ast.str_components, expected.str_components):
+        if hasattr(i, "tok"):
+            assert i.tok.value == e.tok.value
+        else:
+            assert i == e
 
 
 @pytest.mark.parametrize("test_input,expected", [

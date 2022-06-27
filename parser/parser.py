@@ -318,7 +318,7 @@ class Parser:
             for val in str_components:
                 if isinstance(val, list):
                     parser = Parser(val)
-                    ast = parser.parse()
+                    ast = parser.expr()
                     if ast.error:
                         return res.failure(ast.error)
                     str_components[str_components.index(val)] = ast.node

@@ -10,7 +10,7 @@ from helper.tokens import *
 # TESTS
 #######################################
 
-# TODO Should add testing values as well as types for stuff like strings, vars, numbers, and numerals
+# TODO f-string test
 
 
 @pytest.mark.parametrize("test_input,expected", [
@@ -19,8 +19,8 @@ from helper.tokens import *
     # Should throw error for improper tab - Tabs must either be 4 spaces or a tab unicode character
     pytest.param(" ", [], marks=pytest.mark.xfail),
     # Should skip empty space bc it is after first grammatical char
-    ("x ", [TT_IDENTIFIER]),
-    ("x\t", [TT_IDENTIFIER]),
+    ("x ", [TT_IDENTIFIER, "x"]),
+    ("x\t", [TT_IDENTIFIER, "x"]),
     # Should create a tab
     ("\t", [TT_TAB]),
     ("    ", [TT_TAB]),
@@ -30,16 +30,16 @@ from helper.tokens import *
     (";", [TT_NEWLINE]),
     ("\n", [TT_NEWLINE]),
     # Test comments:
-    ("#.;1", [TT_INT]),
+    ("#.;x", [TT_IDENTIFIER, "x"]),
     # Test strings:
-    ("\"x\"", [TT_STRING]),
+    ("\"x\"", [TT_STRING, ["x"]]),
     # Test identifiers:
-    ("x", [TT_IDENTIFIER]),
+    ("x", [TT_IDENTIFIER, "x"]),
     # Test ints and floats
-    ("1", [TT_INT]),
-    ("1.0", [TT_FLOAT]),
+    ("1", [TT_INT, 1]),
+    ("1.0", [TT_FLOAT, 1.0]),
     # Test numerals - dont test invalid numerals because that is the fault of convert roman not the lexer
-    ("IV", [TT_NUMERAL]),
+    ("IV", [TT_NUMERAL, 4]),
     # Test Comparison Ops
     ("==", [TT_EE]),
     ("!=", [TT_NE]),
@@ -73,5 +73,6 @@ def test_lexer(test_input, expected):
     assert error == None
     expected.append(TT_EOF)
 
-    for idx, item in enumerate(tokens):
-        assert item.type == expected[idx]
+    assert tokens[0].type == expected[0]
+    if tokens[0].value:
+        assert tokens[0].value == expected[1]
