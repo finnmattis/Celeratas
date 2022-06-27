@@ -4,7 +4,7 @@
 
 import os
 
-from helper.errors import IndexingError, TypingError
+from helper.errors import IndexingError, RTError, TypingError
 from interpreter.RTResult import RTResult
 from interpreter.values.functions.BaseFunction import BaseFunction
 from interpreter.values import Number, String, List
@@ -180,9 +180,9 @@ class BuiltInFunction(BaseFunction):
             with open(fn, "r") as f:
                 script = f.read()
         except Exception as e:
-            return RTResult().failure(TypingError(
+            return RTResult().failure(RTError(
                 self.pos_start, self.pos_end,
-                f"Failed to load script \"{fn}\"\n" + str(e),
+                f"Failed to load script \"{fn}\"",
                 exec_ctx
             ))
 
