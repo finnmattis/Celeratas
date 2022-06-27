@@ -127,7 +127,12 @@ class Lexer:
             elif self.current_char in DIGITS:
                 tokens.append(self.make_number())
             elif self.current_char == '"' or self.current_char == "'":
-                token, error = self.make_string()
+                if tokens[-1].matches(TT_IDENTIFIER, 'f'):
+                    tokens.pop()
+                    token, error = self.make_string(fstring=True)
+                else:
+                    token, error = self.make_string(fstring=False)
+
                 if error:
                     return [], error
                 tokens.append(token)
@@ -261,8 +266,7 @@ class Lexer:
         else:
             return Token(TT_FLOAT, float(num_str), pos_start, self.pos)
 
-    def make_string(self):
-        string = ''
+    def make_string(self, fstring):
         pos_start = self.pos.copy()
         escape_character = False
         # Can be either " or '
@@ -274,27 +278,62 @@ class Lexer:
             't': '\t'
         }
 
+        str_components = []
+        cur_str = ""
+
         if not self.current_char:
             return None, IllegalCharError(pos_start, self.pos, "Unexpected end to string")
 
-        while self.current_char and self.current_char != string_char:
+        while self.current_char != string_char:
             if escape_character:
+                # If the escape character is not in the lookup, it simply adds the character
                 string += escape_characters.get(self.current_char,
                                                 self.current_char)
                 escape_character = False
+            elif self.current_char == '\\':
+                # This affect the next iteration
+                escape_character = True
+            elif self.current_char == "\n":
+                return None, IllegalCharError(pos_start, self.pos, "Unexpected end to string")
+            elif fstring and self.current_char == "{":
+                # Append cur_str to str_components and reset cur_str
+                if cur_str != "":
+                    str_components.append(cur_str)
+                    cur_str = ""
+
+                # Put the text between braces into the string to_lex
+                to_lex = ""
+                self.advance()
+
+                pos_after_brace = self.pos.copy()
+
+                while self.current_char != "}":
+                    to_lex += self.current_char
+                    self.advance()
+
+                    if self.current_char == None or self.current_char in "{\n":
+                        return None, ExpectedItemError(pos_after_brace, self.pos, "Expected '}'")
+
+                # Lex to_lex and return the error if it exists
+                lexer = Lexer("fstring", to_lex)
+                tokens, error = lexer.make_tokens()
+                if error:
+                    return None, error
+
+                # Add the tokens to str_components
+                str_components.append(tokens)
             else:
-                if self.current_char == '\\':
-                    escape_character = True
-                else:
-                    if self.current_char == "\n":
-                        return None, IllegalCharError(pos_start, self.pos, "Unexpected end to string")
-                    string += self.current_char
+                cur_str += self.current_char
+
             self.advance()
             if self.current_char == None:
                 return None, IllegalCharError(pos_start, self.pos, "Unexpected end to string")
 
+        if cur_str != "":
+            str_components.append(cur_str)
+
         self.advance()
-        return Token(TT_STRING, string, pos_start, self.pos), None
+        return Token(TT_STRING, str_components, pos_start, self.pos), None
 
     def make_identifier(self):
         id_str = ''

@@ -33,11 +33,11 @@ class NumeralNode:
 
 
 class StringNode:
-    def __init__(self, tok):
-        self.tok = tok
+    def __init__(self, str_components, pos_start, pos_end):
+        self.str_components = str_components
 
-        self.pos_start = self.tok.pos_start
-        self.pos_end = self.tok.pos_end
+        self.pos_start = pos_start
+        self.pos_end = pos_end
 
     def __repr__(self):
         return f'{self.tok}'
@@ -554,9 +554,18 @@ class Parser:
             return res.success(NumberNode(tok))
 
         elif tok.type == TT_STRING:
+            str_components = tok.value
+            for val in str_components:
+                if isinstance(val, list):
+                    parser = Parser(val)
+                    ast = parser.parse()
+                    if ast.error:
+                        return res.failure(ast.error)
+                    str_components[str_components.index(val)] = ast.node
+
             res.register_advancement()
             self.advance()
-            return res.success(StringNode(tok))
+            return res.success(StringNode(str_components, tok.pos_start, tok.pos_end))
 
         elif tok.matches(TT_KEYWORD, 'True') or tok.matches(TT_KEYWORD, 'False'):
             res.register_advancement()

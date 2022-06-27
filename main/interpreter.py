@@ -4,12 +4,14 @@
 
 import math
 import os
+from urllib.parse import ParseResult
 
 from attr import attr
 
 from helper.convert_roman import *
 from helper.tokens import *
 from helper.errors import DivisionByZeroError, IndexingError, NamingError, AttrError, RTError, TypingError
+from main.parser import ListNode
 
 #######################################
 # RUNTIME RESULT
@@ -371,34 +373,40 @@ class Numeral(Value):
 
 
 class String(Value):
-    def __init__(self, value):
+    def __init__(self, node, value, length):
         super().__init__()
+        self.node = node
         self.value = value
-        self.attributes = {"length": len(value)}
+        self.length = length
+
+        self.attributes = {"length": length}
 
     def added_to(self, other):
         if isinstance(other, String):
-            return String(self.value + other.value).set_context(self.context), None
+            return String(self.components + other.components).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def multed_by(self, other):
         if isinstance(other, Number):
-            return String(self.value * other.value).set_context(self.context), None
+            return String(self.components * other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def get_comparison_eq(self, other):
         if isinstance(other, String):
-            return Number(int(self.value == other.value)), None
+            return Number(int(self.components == other.components)), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def is_true(self):
-        return len(self.value) > 0
+        return len(self.components) > 0
 
     def copy(self):
-        copy = String(self.value)
+        interpreter = Interpreter()
+        new_value = interpreter.visit(self.node, self.context)
+
+        copy = new_value.value
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
         return copy
@@ -746,7 +754,7 @@ class BuiltInFunction(BaseFunction):
                 exec_ctx
             ))
 
-        return RTResult().success(Number(len(input_.elements if isinstance(input_, List) else input_.value)))
+        return RTResult().success(Number(len(input_.elements if isinstance(input_, List) else input_.components)))
     execute_len.arg_names = ["input"]
 
     def execute_run(self, exec_ctx):
@@ -759,7 +767,7 @@ class BuiltInFunction(BaseFunction):
                 exec_ctx
             ))
 
-        fn = fn.value
+        fn = fn.components
 
         try:
             with open(fn, "r") as f:
@@ -863,8 +871,31 @@ class Interpreter:
         )
 
     def visit_StringNode(self, node, context):
-        return RTResult().success(
-            String(node.tok.value).set_context(
+        res = RTResult()
+
+        # Get the string
+        string = ""
+        for component in node.str_components:
+            if isinstance(component, str):
+                string += component
+            else:
+                result = self.visit(component, context)
+                if result.error:
+                    return res.failure(result.error)
+                string += str(result.value)
+
+        # Get the length
+        length = 0
+        for component in node.str_components:
+            if isinstance(component, str):
+                length += len(component)
+            # Inbetween braces:
+            else:
+                length += 1
+
+        # Return the String Value Class
+        return res.success(
+            String(node, string, length).set_context(
                 context).set_pos(node.pos_start, node.pos_end)
         )
 
@@ -976,8 +1007,8 @@ class Interpreter:
                         f'String index must be an int',
                         context
                     ))
-                if idx_to_get < len(value.value):
-                    value.value = value.value[idx_to_get]
+                if idx_to_get < len(value.components):
+                    value.components = value.components[idx_to_get]
                 else:
                     return res.failure(IndexingError(
                         node.pos_start, node.pos_end,
@@ -991,7 +1022,7 @@ class Interpreter:
                     context
                 ))
         if attr_to_get:
-            if value.elements:
+            if hasattr(value, "elements"):
                 value = value.elements
 
             value_attr = value.attributes.get(attr_to_get, None)
