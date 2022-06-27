@@ -67,7 +67,8 @@ class Lexer:
             elif self.current_char in DIGITS:
                 tokens.append(self.make_number())
             elif self.current_char == '"' or self.current_char == "'":
-                if tokens[-1].matches(TT_IDENTIFIER, 'f'):
+                # Need the first clause incase the code starts with a quote
+                if len(tokens) > 0 and tokens[-1].matches(TT_IDENTIFIER, 'f'):
                     tokens.pop()
                     token, error = self.make_string(fstring=True)
                 else:
