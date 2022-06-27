@@ -9,3 +9,6 @@
 
 #TESTING
 .coverage
+
+#BUILDING
+src/Celeratas.egg-info/
