@@ -1,6 +1,5 @@
-from email.mime import base
 import pytest
-from main.lexer import *
+from lexer.lexer import *
 from main.parser import *
 from helper.tokens import *
 

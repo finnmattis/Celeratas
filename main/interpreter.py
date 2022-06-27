@@ -4,14 +4,10 @@
 
 import math
 import os
-from urllib.parse import ParseResult
-
-from attr import attr
 
 from helper.convert_roman import *
 from helper.tokens import *
 from helper.errors import DivisionByZeroError, IndexingError, NamingError, AttrError, RTError, TypingError
-from main.parser import ListNode
 
 #######################################
 # RUNTIME RESULT

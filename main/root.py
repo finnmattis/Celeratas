@@ -3,7 +3,7 @@
 #######################################
 
 from helper.errors import *
-from main.lexer import *
+from lexer.lexer import *
 from main.parser import Parser
 from main.interpreter import *
 

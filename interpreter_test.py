@@ -1,5 +1,5 @@
 import pytest
-from main.lexer import *
+from lexer.lexer import *
 from main.parser import *
 from main.interpreter import *
 from helper.tokens import *
