@@ -7,7 +7,29 @@
 import sys
 from datetime import datetime
 
-import root.root as root
+from lexer import Lexer
+from parser import Parser
+from interpreter import *
+
+#######################################
+# GLOBAL SYMBOL TABLE
+#######################################
+
+global_symbol_table = SymbolTable()
+global_symbol_table.set("nil", Number.null)
+global_symbol_table.set("pi", Number.math_PI)
+global_symbol_table.set("scribe", BuiltInFunction.print)
+global_symbol_table.set("initus", BuiltInFunction.input)
+global_symbol_table.set("purgo", BuiltInFunction.clear)
+global_symbol_table.set("est_numerus", BuiltInFunction.is_number)
+global_symbol_table.set("est_filum", BuiltInFunction.is_string)
+global_symbol_table.set("est_album", BuiltInFunction.is_list)
+global_symbol_table.set("est_opus", BuiltInFunction.is_function)
+global_symbol_table.set("adde", BuiltInFunction.append)
+global_symbol_table.set("remove", BuiltInFunction.pop)
+global_symbol_table.set("extende", BuiltInFunction.extend)
+global_symbol_table.set("longitudo", BuiltInFunction.len)
+global_symbol_table.set("curre", BuiltInFunction.run)
 
 
 class Shell:
@@ -54,8 +76,33 @@ class Shell:
     # RUN SCRIPT FUNCTION
     #######################################
 
-    def run_script(self, fn, script):
-        result, error = root.run(fn, script)
+    def run_script(self, fn, text):
+        # Generate tokens
+        lexer = Lexer(fn, text)
+        tokens, error = lexer.make_tokens()
+        if error:
+            return None, error
+
+        # Generate AST
+        parser = Parser(tokens)
+        ast = parser.parse()
+        if ast.error:
+            return None, ast.error
+
+        # Run program
+        interpreter = Interpreter()
+        context = Context('<program>')
+        context.symbol_table = global_symbol_table
+        result = interpreter.visit(ast.node, context)
+
+        return result.value, result.error
+
+    #######################################
+    # GET RESULT FUNCTION
+    #######################################
+
+    def get_result(self, fn, script):
+        result, error = self.run_script(fn, script)
         if error:
             print(error.as_string())
         elif result:
@@ -77,7 +124,7 @@ class Shell:
                     fn = sys.argv[1]
                     with open(fn, "r") as f:
                         script = f.read()
-                    self.run_script(fn, script)
+                    self.get_result(fn, script)
                 except FileNotFoundError:
                     print(f"Can't open file {fn}: No such file")
                 except UnicodeDecodeError:
@@ -93,7 +140,7 @@ class Shell:
                     if text == "auxilium":
                         self.help_menu()
                         continue
-                    self.run_script("<stdin>", text)
+                    self.get_result("<stdin>", text)
         except KeyboardInterrupt:
             print("\r", end="")
             print("Keyboard Interrupt")
