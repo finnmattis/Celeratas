@@ -1,11 +1,11 @@
 #MACOS
 .DS_Store
 
-# MAN TESTING
-test.clr
+#VSCODE
+.vscode
 
-# AUTO TESTING
-.pytest_cache
+#VIRTUAL ENVIROMENT
+.venv
 
-#VSCODE CONFIG
-.VSCODE
+#TESTING
+.coverage
