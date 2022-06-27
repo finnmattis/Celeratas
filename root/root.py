@@ -14,8 +14,6 @@ from interpreter.interpreter import *
 
 global_symbol_table = SymbolTable()
 global_symbol_table.set("nil", Number.null)
-global_symbol_table.set("falsus", Number.false)
-global_symbol_table.set("verus", Number.true)
 global_symbol_table.set("pi", Number.math_PI)
 global_symbol_table.set("scribe", BuiltInFunction.print)
 global_symbol_table.set("initus", BuiltInFunction.input)

@@ -1,4 +1,4 @@
-from interpreter.Value import Value
+from interpreter.values.Value import Value
 
 
 class Bool(Value):

@@ -8,48 +8,14 @@ from helper.convert_roman import *
 from helper.tokens import *
 from helper.errors import IndexingError, NamingError, AttrError, RTError, TypingError
 from interpreter.RTResult import RTResult
-from interpreter.Value import Value
+from interpreter.values.Value import Value
 
-from interpreter.Number import Number, Numeral
-from interpreter.String import String
-from interpreter.Bool import Bool
+from interpreter.values.Number import Number, Numeral
+from interpreter.values.String import String
+from interpreter.values.Bool import Bool
+from interpreter.values.List import List
+from interpreter.values.Dict import Dict
 from interpreter.constants import *
-
-
-class List(Value):
-    def __init__(self, elements):
-        super().__init__()
-        self.elements = elements
-
-    def copy(self):
-        copy = List(self.elements)
-        copy.set_pos(self.pos_start, self.pos_end)
-        copy.set_context(self.context)
-        return copy
-
-    def __str__(self):
-        return ", ".join([str(x) for x in self.elements])
-
-    def __repr__(self):
-        return f'[{", ".join([repr(x) for x in self.elements])}]'
-
-
-class Dict(Value):
-    def __init__(self, key_pairs):
-        super().__init__()
-        self.key_pairs = key_pairs
-
-    def copy(self):
-        copy = Dict(self.key_pairs)
-        copy.set_pos(self.pos_start, self.pos_end)
-        copy.set_context(self.set_context)
-        return copy
-
-    def __str__(self):
-        return str(self.key_pairs)
-
-    def __repr__(self):
-        return str(self.key_pairs)
 
 
 class BaseFunction(Value):

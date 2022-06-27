@@ -1,4 +1,5 @@
-from interpreter import SymbolTable, Number, BuiltInFunction
+from interpreter import SymbolTable, BuiltInFunction
+from interpreter.values import Number
 
 global_symbol_table = SymbolTable()
 global_symbol_table.set("nil", Number.null)

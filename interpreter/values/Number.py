@@ -1,7 +1,7 @@
 from helper.convert_roman import toRoman
 from helper.errors import DivisionByZeroError
-from interpreter.Value import Value
-from interpreter.Bool import Bool
+from interpreter.values.Value import Value
+from interpreter.values.Bool import Bool
 
 
 class Number(Value):

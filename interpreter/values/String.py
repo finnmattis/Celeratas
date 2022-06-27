@@ -1,5 +1,5 @@
-from interpreter import Number
-from interpreter.Value import Value
+from interpreter.values import Number
+from interpreter.values.Value import Value
 
 
 class String(Value):
