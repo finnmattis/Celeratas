@@ -1,10 +1,17 @@
+#####################################
+# IMPORTS
+#####################################
+
 import os
+
 from helper.errors import IndexingError, TypingError
-from interpreter.values.functions.BaseFunction import BaseFunction
 from interpreter.RTResult import RTResult
-from interpreter.values.String import String
-from interpreter.values.Number import Number
-from interpreter.values.List import List
+from interpreter.values.functions.BaseFunction import BaseFunction
+from interpreter.values import Number, String, List
+
+#####################################
+# BUILT IN FUNCTIONS
+#####################################
 
 
 class BuiltInFunction(BaseFunction):
@@ -167,7 +174,7 @@ class BuiltInFunction(BaseFunction):
                 exec_ctx
             ))
 
-        fn = fn.components
+        fn = fn.value
 
         try:
             with open(fn, "r") as f:
@@ -180,8 +187,8 @@ class BuiltInFunction(BaseFunction):
             ))
 
         # Need the import here to avoid circular import
-        from root.root import run
-        _, error = run(fn, script)
+        from shell import run_script
+        _, error = run_script(fn, script)
 
         if error:
             return RTResult().failure(TypingError(

@@ -30,6 +30,33 @@ global_symbol_table.set("remove", BuiltInFunction.pop)
 global_symbol_table.set("extende", BuiltInFunction.extend)
 global_symbol_table.set("longitudo", BuiltInFunction.len)
 global_symbol_table.set("curre", BuiltInFunction.run)
+#######################################
+# RUN SCRIPT FUNCTION
+#######################################
+
+# Function Out oo class because curre() needs to access it
+
+
+def run_script(fn, text):
+    # Generate tokens
+    lexer = Lexer(fn, text)
+    tokens, error = lexer.make_tokens()
+    if error:
+        return None, error
+
+    # Generate AST
+    parser = Parser(tokens)
+    ast = parser.parse()
+    if ast.error:
+        return None, ast.error
+
+    # Run program
+    interpreter = Interpreter()
+    context = Context('<program>')
+    context.symbol_table = global_symbol_table
+    result = interpreter.visit(ast.node, context)
+
+    return result.value, result.error
 
 
 class Shell:
@@ -73,36 +100,11 @@ class Shell:
             print('est_opus(value_to_check) -> is_function\nadde(value_to_add) -> append\nremove(value_to_remove) -> pop\nextende(list_to_extend) -> extend\nlongitudo(value_to_check) -> length\ncurre(file_to_run) -> run')
 
     #######################################
-    # RUN SCRIPT FUNCTION
-    #######################################
-
-    def run_script(self, fn, text):
-        # Generate tokens
-        lexer = Lexer(fn, text)
-        tokens, error = lexer.make_tokens()
-        if error:
-            return None, error
-
-        # Generate AST
-        parser = Parser(tokens)
-        ast = parser.parse()
-        if ast.error:
-            return None, ast.error
-
-        # Run program
-        interpreter = Interpreter()
-        context = Context('<program>')
-        context.symbol_table = global_symbol_table
-        result = interpreter.visit(ast.node, context)
-
-        return result.value, result.error
-
-    #######################################
     # GET RESULT FUNCTION
     #######################################
 
     def get_result(self, fn, script):
-        result, error = self.run_script(fn, script)
+        result, error = run_script(fn, script)
         if error:
             print(error.as_string())
         elif result:
