@@ -108,9 +108,12 @@ class Shell:
     # GET RESULT FUNCTION
     #######################################
 
-    def get_result(self, fn, script):
+    def get_result(self, fn, script, interactive):
         result, error = run_script(fn, script)
-        if error:
+
+        if hasattr(error, "interactive") and error.interactive == True:
+            return True
+        elif error:
             print(error.as_string())
         elif result:
             result.elements = [x for x in result.elements if repr(x) != "None"]
@@ -120,6 +123,7 @@ class Shell:
                 print(repr(result.elements[0]))
             else:
                 print(repr(result))
+        return False
 
     #######################################
     # RUN FILE FROM CLI ARGS OR TAKE INPUT
@@ -132,7 +136,7 @@ class Shell:
                     fn = sys.argv[1]
                     with open(fn, "r") as f:
                         script = f.read()
-                    self.get_result(fn, script)
+                    self.get_result(fn, script, interactive=False)
                 except FileNotFoundError:
                     print(f"Can't open file {fn}: No such file")
                 except UnicodeDecodeError:
@@ -141,14 +145,35 @@ class Shell:
                 time = self.get_time()
                 print(
                     f"Celeritas versio unum (defalta, {time})\nScribe 'auxilium' auxilio")
+                more_statements = False
+                statements_txt = ""
+
                 while True:
-                    text = input('>>> ')
-                    if text.strip() == "":
-                        continue
-                    if text == "auxilium":
+                    text = input("... " if more_statements else ">>> ")
+
+                    if text == "auxilium" and not more_statements:
                         self.help_menu()
                         continue
-                    self.get_result("<stdin>", text)
+
+                    if text.strip() == "":
+                        if more_statements:
+                            self.get_result(
+                                "<stdin>", statements_txt, interactive=False)
+                            more_statements = False
+                            continue
+                        else:
+                            continue
+
+                    if more_statements:
+                        statements_txt += f"\n{text.rjust(len(text) + 4)}"
+                    else:
+                        error = self.get_result(
+                            "<stdin>", text, interactive=False)
+                        # Error is true when program throws an interactive error
+                        if error:
+                            more_statements = True
+                            statements_txt = text
+
         except KeyboardInterrupt:
             print("\r", end="")
             print("Keyboard Interrupt")

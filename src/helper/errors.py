@@ -73,8 +73,9 @@ class IndentError(Error):
 
 
 class ExpectedItemError(Error):
-    def __init__(self, pos_start, pos_end, details):
+    def __init__(self, pos_start, pos_end, details, interactive=False):
         super().__init__(pos_start, pos_end, 'ExpectedItemError', details)
+        self.interactive = interactive
 
 
 class InvalidSyntaxError(Error):

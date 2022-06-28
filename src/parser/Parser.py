@@ -617,6 +617,12 @@ class Parser:
         res.register_advancement()
         self.advance()
 
+        if self.current_tok.type == TT_EOF:
+            return res.failure(ExpectedItemError(
+                self.current_tok.pos_start, self.current_tok.pos_end,
+                "Expected statement", interactive=True
+            ))
+
         if self.current_tok.type == TT_NEWLINE:
             res.register_advancement()
             self.advance()
@@ -668,6 +674,12 @@ class Parser:
 
         res.register_advancement()
         self.advance()
+
+        if self.current_tok.type == TT_EOF:
+            return res.failure(ExpectedItemError(
+                self.current_tok.pos_start, self.current_tok.pos_end,
+                "Expected statement", interactive=True
+            ))
 
         if self.current_tok.type == TT_NEWLINE:
             res.register_advancement()
@@ -803,6 +815,12 @@ class Parser:
         res.register_advancement()
         self.advance()
 
+        if self.current_tok.type == TT_EOF:
+            return res.failure(ExpectedItemError(
+                self.current_tok.pos_start, self.current_tok.pos_end,
+                "Expected statement", interactive=True
+            ))
+
         if self.current_tok.type == TT_NEWLINE:
             res.register_advancement()
             self.advance()
@@ -846,6 +864,12 @@ class Parser:
 
         res.register_advancement()
         self.advance()
+
+        if self.current_tok.type == TT_EOF:
+            return res.failure(ExpectedItemError(
+                self.current_tok.pos_start, self.current_tok.pos_end,
+                "Expected statement", interactive=True
+            ))
 
         if self.current_tok.type == TT_NEWLINE:
             res.register_advancement()
@@ -956,6 +980,12 @@ class Parser:
 
         res.register_advancement()
         self.advance()
+
+        if self.current_tok.type == TT_EOF:
+            return res.failure(ExpectedItemError(
+                self.current_tok.pos_start, self.current_tok.pos_end,
+                "Expected statement", interactive=True
+            ))
 
         if self.current_tok.type != TT_NEWLINE:
             return res.failure(ExpectedItemError(
