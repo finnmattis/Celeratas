@@ -12,13 +12,11 @@ from parser.nodes import StringNode
 
 
 class String(Value):
-    def __init__(self, node, value, length):
+    def __init__(self, value):
         super().__init__()
-        self.node = node
         self.value = value
-        self.length = length
 
-        self.attributes = {"length": length}
+        self.attributes = {"length": len(value)}
 
     def added_to(self, other):
         if isinstance(other, String):
@@ -72,11 +70,7 @@ class String(Value):
         return len(self.value) > 0
 
     def copy(self):
-        from interpreter.Interpreter import Interpreter
-        interpreter = Interpreter()
-        new_value = interpreter.visit(self.node, self.context)
-
-        copy = new_value.value
+        copy = String(self.value)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
         return copy

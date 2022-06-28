@@ -51,18 +51,9 @@ class Interpreter:
                     return res.failure(result.error)
                 string += str(result.value)
 
-        # Get the length
-        length = 0
-        for component in node.str_components:
-            if isinstance(component, str):
-                length += len(component)
-            # Inbetween braces:
-            else:
-                length += 1
-
         # Return the String Value Class
         return res.success(
-            String(node, string, length).set_context(
+            String(string).set_context(
                 context).set_pos(node.pos_start, node.pos_end)
         )
 
