@@ -400,7 +400,7 @@ class Parser:
             if res.error:
                 return res
             return res.success(if_expr)
-        elif tok.matches(TT_KEYWORD, 'try'):
+        elif tok.matches(TT_KEYWORD, 'tempta'):
             try_expr = res.register(self.try_expr())
             if res.error:
                 return res
@@ -654,7 +654,7 @@ class Parser:
         if not self.current_tok.matches(TT_KEYWORD, 'tempta'):
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected 'try'"
+                f"Expected 'tempta'"
             ))
 
         res.register_advancement()
@@ -679,7 +679,7 @@ class Parser:
             if res.error:
                 return res
 
-            if self.current_tok.matches(TT_KEYWORD, "except"):
+            if self.current_tok.matches(TT_KEYWORD, "praeter"):
                 self.advance()
                 res.register_advancement()
 
@@ -690,7 +690,7 @@ class Parser:
                 else:
                     except_name = None
 
-                if self.current_tok.matches(TT_KEYWORD, "as"):
+                if self.current_tok.matches(TT_KEYWORD, "tam"):
                     res.register_advancement()
                     self.advance()
 

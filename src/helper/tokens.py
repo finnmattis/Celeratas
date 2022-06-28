@@ -50,6 +50,7 @@ KEYWORDS = [
     'alioquin',
     'tempta',
     'praeter',
+    'tam',
     'pro',
     'ad',
     'gradus',

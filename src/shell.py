@@ -93,7 +93,7 @@ class Shell:
                     print("\nPlease only type 1, 2, 3, or 4\n")
 
             if help_num == "1":
-                print('\nVerus -> True\nFalsus -> False\net -> and\naut -> or\nnon -> not\nsi -> if\nalioquinsi -> elif\nalioquin -> else\ntempta -> try\npraeter -> except\npro -> for')
+                print('\nVerus -> True\nFalsus -> False\net -> and\naut -> or\nnon -> not\nsi -> if\nalioquinsi -> elif\nalioquin -> else\ntempta -> try\npraeter -> except\tam -> as\nnpro -> for')
                 print('ad -> to\ngradus -> step\ndum -> while\nopus -> task\nfinis -> end\nredi -> return\ncontinua -> continue\nconfringe -> break')
             elif help_num == "2":
                 with open("src/helper/grammar.txt", "r") as grammar:
