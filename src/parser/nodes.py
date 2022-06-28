@@ -28,7 +28,7 @@ class StringNode:
         self.pos_end = pos_end
 
     def __repr__(self):
-        return f'{self.tok}'
+        return f'{self.str_components}'
 
 
 class BoolNode:

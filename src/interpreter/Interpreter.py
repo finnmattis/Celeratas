@@ -146,6 +146,8 @@ class Interpreter:
                     # If list in list:
                     if isinstance(value.elements, List):
                         value.elements = value.elements.elements
+                    else:
+                        value = value.elements
                 else:
                     return res.failure(IndexingError(
                         node.pos_start, node.pos_end,
@@ -168,14 +170,15 @@ class Interpreter:
                         context
                     ))
             elif isinstance(value, String):
+                print(hasattr(value, "elements"))
                 if not isinstance(idx_to_get, int):
                     return res.failure(IndexingError(
                         node.pos_start, node.pos_end,
                         f'String index must be an int',
                         context
                     ))
-                if idx_to_get < len(value.components):
-                    value.components = value.components[idx_to_get]
+                if idx_to_get < len(value.value):
+                    value.value = value.value[idx_to_get]
                 else:
                     return res.failure(IndexingError(
                         node.pos_start, node.pos_end,
@@ -203,7 +206,7 @@ class Interpreter:
             value_attr = Number(value_attr)
             return res.success(value_attr)
         # idxes to get will have elements but value will no elements if value is a dict
-        return res.success(value.elements if hasattr(value, "elements") else value)
+        return res.success(value.elements if isinstance(value, List) else value)
 
     def visit_VarAssignNode(self, node, context):
         res = RTResult()
@@ -229,29 +232,28 @@ class Interpreter:
                 element_to_change = var_to_change
 
                 for for_idx, idx_to_change in enumerate(idxes_to_change):
-                    if not isinstance(element_to_change, List) or idx_to_change.tok.value > len(element_to_change.elements) - 1:
+                    if isinstance(element_to_change, List):
+                        if idx_to_change.tok.value > len(element_to_change.elements) - 1:
+                            return res.failure(IndexingError(
+                                node.pos_start, node.pos_end,
+                                'List index out of bounds',
+                                context
+                            ))
+                        if for_idx == len(idxes_to_change) - 1:
+                            element_to_change.elements[idx_to_change.tok.value] = value
+                        else:
+                            element_to_change = element_to_change.elements[idx_to_change.tok.value]
+                    elif isinstance(element_to_change, Dict) or isinstance(element_to_change.elements, Dict):
+                        if for_idx == len(idxes_to_change) - 1:
+                            element_to_change.key_pairs[idx_to_change.tok.value] = value
+                        else:
+                            element_to_change = element_to_change.key_pairs[idx_to_change.tok.value]
+                    else:
                         return res.failure(IndexingError(
                             node.pos_start, node.pos_end,
-                            'List index out of bounds',
+                            'Variable must be a list or dict in order to set a specific index',
                             context
                         ))
-
-                    if for_idx == len(idxes_to_change) - 1:
-                        element_to_change.elements[idx_to_change.tok.value] = value
-                    else:
-                        element_to_change = element_to_change.elements[idx_to_change.tok.value]
-            elif isinstance(var_to_change, Dict):
-                for for_idx, idx_to_change in enumerate(idxes_to_change):
-                    if for_idx == len(idxes_to_change) - 1:
-                        var_to_change.key_pairs[idx_to_change.tok.value] = value
-                    else:
-                        var_to_change = var_to_change.key_pairs[idx_to_change.tok.value]
-            else:
-                return res.failure(IndexingError(
-                    node.pos_start, node.pos_end,
-                    'Variable must be a list or dict in order to set a specific index',
-                    context
-                ))
 
             value = var_to_change
 

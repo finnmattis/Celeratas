@@ -161,7 +161,7 @@ class BuiltInFunction(BaseFunction):
                 exec_ctx
             ))
 
-        return RTResult().success(Number(len(input_.elements if isinstance(input_, List) else input_.components)))
+        return RTResult().success(Number(len(input_.elements if isinstance(input_, List) else input_.value)))
     execute_len.arg_names = ["input"]
 
     def execute_run(self, exec_ctx):

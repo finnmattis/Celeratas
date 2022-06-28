@@ -350,8 +350,8 @@ class Parser:
                     if res.error:
                         return res
 
-                res.register_advancement()
-                self.advance()
+                    res.register_advancement()
+                    self.advance()
 
             if self.current_tok.type == TT_DOT:
                 res.register_advancement()
