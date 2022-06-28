@@ -327,7 +327,7 @@ class Parser:
             self.advance()
             return res.success(StringNode(str_components, tok.pos_start, tok.pos_end))
 
-        elif tok.matches(TT_KEYWORD, 'True') or tok.matches(TT_KEYWORD, 'False'):
+        elif tok.matches(TT_KEYWORD, 'Verus') or tok.matches(TT_KEYWORD, 'Falsus'):
             res.register_advancement()
             self.advance()
             return res.success(BoolNode(tok))
@@ -651,7 +651,7 @@ class Parser:
     def try_expr(self):
         res = ParseResult()
 
-        if not self.current_tok.matches(TT_KEYWORD, 'try'):
+        if not self.current_tok.matches(TT_KEYWORD, 'tempta'):
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 f"Expected 'try'"

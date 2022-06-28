@@ -181,6 +181,14 @@ class Lexer:
                 dot_count += 1
             numeral_str += self.current_char
             self.advance()
+        # Check if numeral or identifier
+        if self.current_char != " ":
+            # Return the identifier
+            identifier, error = self.make_identifier(numeral_str)
+            # Need this extra code because the position of the pos start of the identifier will be behind the pos start of the numeral
+            if error:
+                return "", error
+            return Token(TT_IDENTIFIER, identifier.value, pos_start, identifier.pos_end), None
         # Convert String to Int or Float
         numeral_final = toNum(numeral_str)
 
@@ -281,8 +289,8 @@ class Lexer:
         self.advance()
         return Token(TT_STRING, str_components, pos_start, self.pos), None
 
-    def make_identifier(self):
-        id_str = ''
+    def make_identifier(self, start_value=""):
+        id_str = start_value
         pos_start = self.pos.copy()
 
         while self.current_char and self.current_char in LETTERS_DIGITS + '_':

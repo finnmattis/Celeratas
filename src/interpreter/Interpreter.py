@@ -59,7 +59,7 @@ class Interpreter:
 
     def visit_BoolNode(self, node, context):
         return RTResult().success(
-            Bool(True if node.tok.value == "True" else False).set_context(
+            Bool(node.tok.value == "Verus").set_context(
                 context).set_pos(node.pos_start, node.pos_end)
         )
 
