@@ -93,18 +93,18 @@ class Number(Value):
 
     def anded_by(self, other):
         if isinstance(other, Number) or isinstance(other, Numeral):
-            return Bool(self.value and other.value).set_context(self.context), None
+            return Number(self.value and other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def ored_by(self, other):
         if isinstance(other, Number) or isinstance(other, Numeral):
-            return Bool(self.value or other.value).set_context(self.context), None
+            return Number(self.value or other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def notted(self):
-        return Bool(True if self.value == 0 else False).set_context(self.context), None
+        return Bool(self.value == 0).set_context(self.context), None
 
     def copy(self):
         copy = Number(self.value)

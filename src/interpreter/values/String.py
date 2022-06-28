@@ -66,6 +66,21 @@ class String(Value):
         else:
             return None, Value.illegal_operation(self, other)
 
+    def anded_by(self, other):
+        if isinstance(other, String):
+            return String(self.value and other.value), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def ored_by(self, other):
+        if isinstance(other, String):
+            return String(self.value or other.value), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
+    def notted(self):
+        return Bool(len(self.value) == 0), None
+
     def is_true(self):
         return len(self.value) > 0
 
