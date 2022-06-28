@@ -40,9 +40,8 @@ TT_NEWLINE = 'NEWLINE'
 TT_EOF = 'EOF'
 
 KEYWORDS = [
-    'True',
-    'False',
-    'sino',
+    'Verus',
+    'Falsus',
     'et',
     'aut',
     'non',
@@ -51,7 +50,6 @@ KEYWORDS = [
     'alioquin',
     'tempta',
     'praeter',
-    'tam',
     'pro',
     'ad',
     'gradus',

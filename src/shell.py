@@ -82,22 +82,27 @@ class Shell:
     #######################################
 
     def help_menu(self):
-        print("\nWhat do you need help with?\n\n1: Keywords\n2: Syntax\n3: Built-In Functions\n")
         while True:
-            help_num = input()
-            if help_num in ["1", "2", "3"]:
-                break
+            print(
+                "\nWhat do you need help with?\n\n1: Keywords\n2: Syntax\n3: Built-In Functions\n4: Leave\n")
+            while True:
+                help_num = input()
+                if help_num in ["1", "2", "3", "4"]:
+                    break
+                else:
+                    print("\nPlease only type 1, 2, 3, or 4\n")
+
+            if help_num == "1":
+                print('\nVerus -> True\nFalsus -> False\net -> and\naut -> or\nnon -> not\nsi -> if\nalioquinsi -> elif\nalioquin -> else\ntempta -> try\npraeter -> except\npro -> for')
+                print('ad -> to\ngradus -> step\ndum -> while\nopus -> task\nfinis -> end\nredi -> return\ncontinua -> continue\nconfringe -> break')
+            elif help_num == "2":
+                with open("src/helper/grammar.txt", "r") as grammar:
+                    print(f"\n{grammar.read()}")
+            elif help_num == "3":
+                print('\nscribe(value_to_print) -> print\ninitus() -> input\npurgo() -> clear\nest_numerus(value_to_check) -> is_number\nest_filum(value_to_check) -> is_string\nest_album(value_to_check) -> is_list')
+                print('est_opus(value_to_check) -> is_function\nadde(value_to_add) -> append\nremove(value_to_remove) -> pop\nextende(list_to_extend) -> extend\nlongitudo(value_to_check) -> length\ncurre(file_to_run) -> run')
             else:
-                print("\nPlease only type 1, 2, or 3\n")
-        if help_num == "1":
-            print('\nsino -> var\net -> and\naut -> or\nnon -> not\nsi -> if\nalioquinsi -> elif\nalioquin -> else\npro -> for')
-            print('ad -> to\ngradus -> step\ndum -> while\nopus -> task\nfinis -> end\nredi -> return\ncontinua -> continue\nconfringe -> break')
-        elif help_num == "2":
-            with open("helper/grammar.txt", "r") as grammar:
-                print(grammar.read())
-        elif help_num == "3":
-            print('\nscribe(value_to_print) -> print\ninitus() -> input\npurgo() -> clear\nest_numerus(value_to_check) -> is_number\nest_filum(value_to_check) -> is_string\nest_album(value_to_check) -> is_list')
-            print('est_opus(value_to_check) -> is_function\nadde(value_to_add) -> append\nremove(value_to_remove) -> pop\nextende(list_to_extend) -> extend\nlongitudo(value_to_check) -> length\ncurre(file_to_run) -> run')
+                break
 
     #######################################
     # GET RESULT FUNCTION
