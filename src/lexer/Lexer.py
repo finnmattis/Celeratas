@@ -188,7 +188,7 @@ class Lexer:
             # Need this extra code because the position of the pos start of the identifier will be behind the pos start of the numeral
             if error:
                 return "", error
-            return Token(TT_IDENTIFIER, identifier.value, pos_start, identifier.pos_end), None
+            return Token(identifier.type, identifier.value, pos_start, identifier.pos_end), None
         # Convert String to Int or Float
         numeral_final = toNum(numeral_str)
 
