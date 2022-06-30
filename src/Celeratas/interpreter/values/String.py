@@ -2,9 +2,9 @@
 # IMPORTS
 #######################################
 
-from interpreter.values.Value import Value
-from interpreter.values import Bool, Number
-from parser.nodes import StringNode
+from .Value import Value
+from .Bool import Bool 
+from .Number import Number
 
 #######################################
 # STRING
@@ -20,13 +20,13 @@ class String(Value):
 
     def added_to(self, other):
         if isinstance(other, String):
-            return String(StringNode(self.node.str_components + other.node.str_components, self.pos_start, other.pos_end), self.value + other.value, self.length + other.length).set_context(self.context), None
+            return String(self.value + other.value, self.length + other.length).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 
     def multed_by(self, other):
         if isinstance(other, Number):
-            return String(StringNode(self.node.str_components * other.value, self.pos_start, other.pos_end), self.value * other.value, self.length * other.value).set_context(self.context), None
+            return String(self.value * other.value, self.length * other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)
 

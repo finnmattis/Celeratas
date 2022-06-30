@@ -4,8 +4,8 @@
 
 import math
 
-from interpreter.values.Number import Number
-from interpreter.values.functions.BuiltInFunction import BuiltInFunction
+from .values.Number import Number
+from .values.functions.BuiltInFunction import BuiltInFunction
 
 #######################################
 # CONSTANTS

@@ -2,7 +2,7 @@
 # IMPORTS
 #######################################
 
-from interpreter.values.Value import Value
+from .Value import Value
 
 #######################################
 # DICT

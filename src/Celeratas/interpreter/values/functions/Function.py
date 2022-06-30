@@ -1,5 +1,5 @@
-from interpreter.values.functions.BaseFunction import BaseFunction
-from interpreter.RTResult import RTResult
+from .BaseFunction import BaseFunction
+from Celeratas.interpreter.RTResult import RTResult
 
 
 class Function(BaseFunction):

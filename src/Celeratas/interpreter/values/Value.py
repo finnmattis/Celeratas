@@ -2,8 +2,8 @@
 # IMPORTS
 #######################################
 
-from helper.errors import TypingError
-from interpreter.RTResult import RTResult
+from Celeratas.helper.errors import TypingError
+from Celeratas.interpreter.RTResult import RTResult
 
 #######################################
 # VALUE

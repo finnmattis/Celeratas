@@ -2,11 +2,12 @@
 # IMPORTS
 #######################################
 
-from helper.tokens import *
-from helper import IndexingError, NamingError, AttrError, RTError, TypingError
+from Celeratas.helper.tokens import *
+from Celeratas.helper.errors import IndexingError, NamingError, AttrError, RTError, TypingError
 
-from interpreter.values import *
-from interpreter.constants import *
+from .values import *
+from .constants import *
+from .RTResult import RTResult
 
 
 #######################################

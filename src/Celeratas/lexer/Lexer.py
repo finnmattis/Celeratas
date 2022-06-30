@@ -2,13 +2,13 @@
 # IMPORTS
 #######################################
 
+from Celeratas.helper.convert_roman import toNum
+from Celeratas.helper.errors import InvalidNumeral, IllegalCharError, ExpectedItemError, IndentError
+from Celeratas.helper.tokens import *
 
-from helper import toNum, InvalidNumeral, IllegalCharError, ExpectedItemError, IndentError
-from helper.tokens import *
-
-from lexer.constants import *
-from lexer.Position import Position
-from lexer.Token import Token
+from .constants import *
+from .Position import Position
+from .Token import Token
 
 #######################################
 # LEXER

@@ -4,10 +4,10 @@
 
 import os
 
-from helper.errors import IndexingError, RTError, TypingError
-from interpreter.RTResult import RTResult
-from interpreter.values.functions.BaseFunction import BaseFunction
-from interpreter.values import Number, String, List
+from Celeratas.helper.errors import IndexingError, RTError, TypingError
+from Celeratas.interpreter.RTResult import RTResult
+from .BaseFunction import BaseFunction
+from Celeratas.interpreter.values import Number, String, List
 
 #####################################
 # BUILT IN FUNCTIONS
@@ -187,7 +187,7 @@ class BuiltInFunction(BaseFunction):
             ))
 
         # Need the import here to avoid circular import
-        from shell import run_script
+        from Celeratas.shell import run_script
         _, error = run_script(fn, script)
 
         if error:

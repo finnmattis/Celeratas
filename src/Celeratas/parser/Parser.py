@@ -2,11 +2,11 @@
 # IMPORTS
 #######################################
 
-from helper.tokens import *
-from helper import ExpectedItemError, InvalidSyntaxError, IndentError
+from Celeratas.helper.tokens import *
+from Celeratas.helper.errors import ExpectedItemError, InvalidSyntaxError, IndentError
 
-from parser.nodes import *
-from parser.ParseResult import ParseResult
+from .nodes import *
+from .ParseResult import ParseResult
 
 #######################################
 # PARSER

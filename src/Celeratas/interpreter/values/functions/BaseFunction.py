@@ -1,8 +1,8 @@
-from helper.errors import TypingError
-from interpreter.values.Value import Value
-from interpreter.Context import Context
-from interpreter.RTResult import RTResult
-from interpreter.SymbolTable import SymbolTable
+from Celeratas.helper.errors import TypingError
+from Celeratas.interpreter.values.Value import Value
+from Celeratas.interpreter.Context import Context
+from Celeratas.interpreter.RTResult import RTResult
+from Celeratas.interpreter.SymbolTable import SymbolTable
 
 
 class BaseFunction(Value):

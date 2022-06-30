@@ -7,9 +7,12 @@
 import sys
 from datetime import datetime
 
-from lexer import Lexer
-from parser import Parser
-from interpreter import *
+from .lexer.Lexer import Lexer
+from .parser.Parser import Parser
+from .interpreter.Interpreter import Interpreter
+from .interpreter.SymbolTable import SymbolTable
+from .interpreter.Context import Context
+from .interpreter.values import Number, BuiltInFunction
 
 #######################################
 # GLOBAL SYMBOL TABLE
@@ -179,5 +182,5 @@ class Shell:
             print("Keyboard Interrupt")
 
 
-if __name__ == '__main__':
+def main():
     Shell = Shell()
