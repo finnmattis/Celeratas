@@ -3,9 +3,11 @@
 #######################################
 
 import pytest
-from lexer import Lexer
-from parser import Parser
-from interpreter import *
+from Celeratas.lexer.Lexer import Lexer
+from Celeratas.parser.Parser import Parser
+from Celeratas.interpreter.Interpreter import Interpreter
+from Celeratas.interpreter.Context import Context
+from Celeratas.interpreter.SymbolTable import SymbolTable
 
 #######################################
 # TESTS

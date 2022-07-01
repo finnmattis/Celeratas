@@ -2,17 +2,15 @@
 # IMPORTS
 #######################################
 
-from ast import Num
-from urllib.parse import ParseResult
 import pytest
 
-from helper.tokens import *
+from Celeratas.helper.tokens import *
 
-from lexer import Lexer
-from lexer.Position import Position
-from lexer.Token import Token
-from parser import Parser
-from parser.nodes import *
+from Celeratas.lexer.Lexer import Lexer
+from Celeratas.lexer.Position import Position
+from Celeratas.lexer.Token import Token
+from Celeratas.parser.Parser import Parser
+from Celeratas.parser.nodes import *
 
 #######################################
 # TESTS

@@ -11,4 +11,6 @@
 .coverage
 
 #BUILDING
-src/Celeratas.egg-info/
+build/
+dist/
+*.egg-info/

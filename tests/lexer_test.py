@@ -3,8 +3,8 @@
 #######################################
 
 import pytest
-from lexer import Lexer
-from helper.tokens import *
+from Celeratas.lexer.Lexer import Lexer
+from Celeratas.helper.tokens import *
 
 #######################################
 # TESTS
