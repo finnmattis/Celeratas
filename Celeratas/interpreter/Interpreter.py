@@ -129,7 +129,7 @@ class Interpreter:
                 if not isinstance(idx_to_get, int):
                     return res.failure(IndexingError(
                         node.pos_start, node.pos_end,
-                        f'List index must be an int',
+                        'List index must be an int',
                         context
                     ))
                 # If first statement is false, second will not evaluate
@@ -166,7 +166,7 @@ class Interpreter:
                 if not isinstance(idx_to_get, int):
                     return res.failure(IndexingError(
                         node.pos_start, node.pos_end,
-                        f'String index must be an int',
+                        'String index must be an int',
                         context
                     ))
                 if idx_to_get < len(value.value):
@@ -188,7 +188,7 @@ class Interpreter:
                 value = value.elements
 
             value_attr = value.attributes.get(attr_to_get, None)
-            if value_attr == None:
+            if value_attr is None:
                 return res.failure(AttrError(
                     node.pos_start, node.pos_end,
                     f"'{var_name}' does not have the attribute '{attr_to_get}'",
@@ -260,7 +260,7 @@ class Interpreter:
                 error = None
                 old_value = context.symbol_table.get(var_name)
 
-                if old_value == None:
+                if old_value is None:
                     return res.failure(NamingError(
                         node.pos_start, node.pos_end,
                         f"'{var_name}' is not defined",
@@ -350,7 +350,7 @@ class Interpreter:
             if res.should_return():
                 return res
 
-            if condition_value == None:
+            if condition_value is None:
                 return res.failure(RTError(
                     node.pos_start, node.pos_end,
                     'Conditional can not be evaluated',
@@ -383,7 +383,8 @@ class Interpreter:
                 context
             ))
 
-        if try_body.error and node.except_body and (not node.except_name or node.except_name.value == "Exception" or try_body.error.error_name == node.except_name.value):
+        should_except = not node.except_name or node.except_name.value == "Exception" or try_body.error.error_name == node.except_name.value
+        if try_body.error and node.except_body and should_except:
             if node.except_as:
                 context.symbol_table.set(
                     node.except_as.value, String(try_body.error.details))
@@ -394,7 +395,7 @@ class Interpreter:
 
             if node.except_as:
                 context.symbol_table.remove(node.except_as.value)
-        elif try_body.error == None:
+        elif try_body.error is None:
             try_body = res.register(try_body)
             if res.error:
                 return res
@@ -420,7 +421,7 @@ class Interpreter:
         else:
             step_value = Number(1)
 
-        if start_value == None:
+        if start_value is None:
             return res.failure(RTError(
                 node.start_value_node.pos_start, node.start_value_node.pos_end,
                 'Expression does not have a value',
@@ -430,16 +431,18 @@ class Interpreter:
         i = start_value.value
 
         if step_value.value >= 0:
-            def condition(): return i < end_value.value
+            def condition():
+                return i < end_value.value
         else:
-            def condition(): return i > end_value.value
+            def condition():
+                return i > end_value.value
 
         while condition():
             context.symbol_table.set(node.var_name_tok.value, Number(i))
             i += step_value.value
 
             value = res.register(self.visit(node.body_node, context))
-            if res.should_return() and res.loop_should_continue == False and res.loop_should_break == False:
+            if res.should_return() and res.loop_should_continue and res.loop_should_break:
                 return res
 
             if res.loop_should_continue:
@@ -467,7 +470,7 @@ class Interpreter:
             if res.should_return():
                 return res
 
-            if condition_value == None:
+            if condition_value is None:
                 return res.failure(RTError(
                     node.condition_node.pos_start, node.condition_node.pos_end,
                     'Conditional can not be evaluated',
@@ -478,7 +481,7 @@ class Interpreter:
                 break
 
             value = res.register(self.visit(node.body_node, context))
-            if res.should_return() and res.loop_should_continue == False and res.loop_should_break == False:
+            if res.should_return() and res.loop_should_continue and res.loop_should_break:
                 return res
 
             if res.loop_should_continue:
@@ -526,7 +529,7 @@ class Interpreter:
         return_value = res.register(value_to_call.execute(args))
         if res.should_return():
             return res
-        if return_value == None:
+        if return_value is None:
             return res.success(None)
 
         return_value = return_value.copy().set_pos(

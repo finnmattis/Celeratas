@@ -34,7 +34,7 @@ class Lexer:
         self.start_of_statement = True
         # Start of statements is before character other than space/tab - After this is false, tabs and spaces are ignored by make_spaces() method
         # Grammatical char is set to True is anything other than space/tab is read - This var updates start of statements at the end of while loop
-        while self.current_char != None:
+        while self.current_char:
             grammatical_char = True
             if self.current_char in ' \t':
                 new_toks, error = self.make_space(tokens)
@@ -132,7 +132,7 @@ class Lexer:
                 return [], IllegalCharError(pos_start, self.pos, "'" + char + "'")
 
             # When Grammatical Token is read, tabs/spaces from this point on will be ignored
-            if self.start_of_statement == True and grammatical_char == True:
+            if self.start_of_statement and grammatical_char:
                 self.start_of_statement = False
 
         tokens.append(Token(TT_EOF, pos_start=self.pos))
@@ -143,7 +143,7 @@ class Lexer:
         if self.start_of_statement:
             if self.current_char == ' ':
                 # Check tab style
-                if not self.tab_style in ["", "space"]:
+                if self.tab_style not in ["", "space"]:
                     return [], IndentError(pos_start, self.pos, "Inconsistent indentation")
                 # Check if next 3 chars are also space
                 for _ in range(3):
@@ -159,7 +159,7 @@ class Lexer:
                     Token(TT_TAB, pos_start=pos_start, pos_end=self.pos))
             elif self.current_char == '\t':
                 # Check tab style
-                if not self.tab_style in ["", "tab"]:
+                if self.tab_style not in ["", "tab"]:
                     return [], IndentError(pos_start, self.pos, "Inconsistent indentation")
 
                 self.advance()
@@ -174,7 +174,7 @@ class Lexer:
         dot_count = 0
         pos_start = self.pos.copy()
 
-        while self.current_char != None and self.current_char in ROMAN_NUMERAL_CHARS + '.':
+        while self.current_char and self.current_char in ROMAN_NUMERAL_CHARS + '.':
             if self.current_char == '.':
                 if dot_count == 1:
                     break
@@ -192,7 +192,7 @@ class Lexer:
         # Convert String to Int or Float
         numeral_final = toNum(numeral_str)
 
-        if numeral_final == None:
+        if numeral_final is None:
             return None, InvalidNumeral(pos_start, self.pos, f"{numeral_str} is not a valid numeral")
 
         return Token(TT_NUMERAL, numeral_final, pos_start, self.pos), None
@@ -202,7 +202,7 @@ class Lexer:
         dot_count = 0
         pos_start = self.pos.copy()
 
-        while self.current_char != None and self.current_char in DIGITS + '.':
+        while self.current_char and self.current_char in DIGITS + '.':
             if self.current_char == '.':
                 if dot_count == 1:
                     break
@@ -236,8 +236,8 @@ class Lexer:
         while self.current_char != string_char:
             if escape_character:
                 # If the escape character is not in the lookup, it simply adds the character
-                string += escape_characters.get(self.current_char,
-                                                self.current_char)
+                cur_str += escape_characters.get(self.current_char,
+                                                 self.current_char)
                 escape_character = False
             elif self.current_char == '\\':
                 # This affect the next iteration
@@ -260,7 +260,7 @@ class Lexer:
                     to_lex += self.current_char
                     self.advance()
 
-                    if self.current_char == None or self.current_char in "{\n":
+                    if self.current_char is None or self.current_char in "{\n":
                         return None, ExpectedItemError(pos_after_brace, self.pos, "Expected '}'")
 
                 # Lex to_lex and return the error if it exists
@@ -280,7 +280,7 @@ class Lexer:
                 cur_str += self.current_char
 
             self.advance()
-            if self.current_char == None:
+            if self.current_char is None:
                 return None, IllegalCharError(pos_start, self.pos, "Unexpected end to string")
 
         if cur_str != "":
@@ -357,7 +357,7 @@ class Lexer:
     def skip_comment(self):
         self.advance()
 
-        # Exclusive incase it reachs the EOF and self.current_char == None
+        # Exclusive incase it reachs the EOF and self.current_char is None
         while self.current_char and self.current_char not in ';\n':
             self.advance()
 

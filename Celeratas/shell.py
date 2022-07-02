@@ -94,14 +94,18 @@ class Shell:
                     print("\nPlease only type 1, 2, 3, or 4\n")
 
             if help_num == "1":
-                print('\nVerus -> True\nFalsus -> False\net -> and\naut -> or\nnon -> not\nsi -> if\nalioquinsi -> elif\nalioquin -> else\ntempta -> try\npraeter -> except\tam -> as\nnpro -> for')
-                print('ad -> to\ngradus -> step\ndum -> while\nopus -> task\nfinis -> end\nredi -> return\ncontinua -> continue\nconfringe -> break')
+                print('\nVerus -> True\nFalsus -> False\net -> and\naut -> or\nnon -> not\nsi -> if')
+                print('alioquinsi -> elif\nalioquin -> else\ntempta -> try\npraeter -> except\tam -> as\nnpro -> for')
+                print('ad -> to\ngradus -> step\ndum -> while\nopus -> task\nfinis -> end\nredi -> return')
+                print('continua -> continue\nconfringe -> break')
             elif help_num == "2":
                 with open("src/helper/grammar.txt", "r") as grammar:
                     print(f"\n{grammar.read()}")
             elif help_num == "3":
-                print('\nscribe(value_to_print) -> print\ninitus() -> input\npurgo() -> clear\nest_numerus(value_to_check) -> is_number\nest_filum(value_to_check) -> is_string\nest_album(value_to_check) -> is_list')
-                print('est_opus(value_to_check) -> is_function\nadde(value_to_add) -> append\nremove(value_to_remove) -> pop\nextende(list_to_extend) -> extend\nlongitudo(value_to_check) -> length\ncurre(file_to_run) -> run')
+                print('\nscribe(value_to_print) -> print\ninitus() -> input\npurgo() -> clear\nest_numerus(value_to_check) -> is_number')
+                print('est_filum(value_to_check) -> is_string\nest_album(value_to_check) -> is_list\nest_opus(value_to_check) -> is_function')
+                print('adde(value_to_add) -> append\nremove(value_to_remove) -> pop\nextende(list_to_extend) -> extend\nlongitudo(value_to_check) -> length')
+                print('curre(file_to_run) -> run')
             else:
                 break
 
@@ -112,7 +116,7 @@ class Shell:
     def get_result(self, fn, script, interactive):
         result, error = run_script(fn, script)
 
-        if hasattr(error, "interactive") and error.interactive == True:
+        if hasattr(error, "interactive") and error.interactive:
             return True
         elif error:
             print(error.as_string())
@@ -178,7 +182,3 @@ class Shell:
         except KeyboardInterrupt:
             print("\r", end="")
             print("Keyboard Interrupt")
-
-
-def main():
-    Shell = Shell()

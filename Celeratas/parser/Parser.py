@@ -200,7 +200,7 @@ class Parser:
             if self.current_tok.type not in [TT_EQ, TT_PLUS_EQ, TT_MIN_EQ, TT_MUL_EQ, TT_DIV_EQ]:
                 self.reverse(res.advance_count)
             else:
-                if could_have_var_assign == False:
+                if not could_have_var_assign:
                     return res.failure(InvalidSyntaxError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
                         "Inappropriate Var Assign Node"
@@ -319,7 +319,7 @@ class Parser:
                 if self.current_tok.type != TT_RPAREN:
                     return res.failure(ExpectedItemError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
-                        f"Expected ',' or ')'"
+                        "Expected ',' or ')'"
                     ))
 
                 res.register_advancement()
@@ -464,7 +464,7 @@ class Parser:
         if self.current_tok.type != TT_LSQUARE:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected '['"
+                "Expected '['"
             ))
 
         res.register_advancement()
@@ -493,7 +493,7 @@ class Parser:
             if self.current_tok.type != TT_RSQUARE:
                 return res.failure(ExpectedItemError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
-                    f"Expected ',' or ']'"
+                    "Expected ',' or ']'"
                 ))
 
             res.register_advancement()
@@ -579,7 +579,7 @@ class Parser:
             else:
                 return res.failure(ExpectedItemError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
-                    f"Expected ':'"
+                    "Expected ':'"
                 ))
 
             if self.current_tok.type == TT_NEWLINE:
@@ -639,7 +639,7 @@ class Parser:
         if not self.current_tok.type == TT_COLON:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected ':'"
+                "Expected ':'"
             ))
 
         res.register_advancement()
@@ -688,7 +688,7 @@ class Parser:
         if not self.current_tok.matches(TT_KEYWORD, 'tempta'):
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected 'tempta'"
+                "Expected 'tempta'"
             ))
 
         res.register_advancement()
@@ -697,7 +697,7 @@ class Parser:
         if self.current_tok == TT_COLON:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected ':'"
+                "Expected ':'"
             ))
 
         res.register_advancement()
@@ -737,7 +737,7 @@ class Parser:
                     if self.current_tok.type != TT_IDENTIFIER:
                         return res.failure(ExpectedItemError(
                             self.current_tok.pos_start, self.current_tok.pos_end,
-                            f"Expected identifier"
+                            "Expected identifier"
                         ))
 
                     except_as = self.current_tok
@@ -749,7 +749,7 @@ class Parser:
                 if self.current_tok == TT_COLON:
                     return res.failure(ExpectedItemError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
-                        f"Expected ':'"
+                        "Expected ':'"
                     ))
 
                 self.advance()
@@ -782,7 +782,7 @@ class Parser:
         if not self.current_tok.matches(TT_KEYWORD, 'pro'):
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected 'pro'"
+                "Expected 'pro'"
             ))
 
         res.register_advancement()
@@ -791,7 +791,7 @@ class Parser:
         if self.current_tok.type != TT_IDENTIFIER:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected identifier"
+                "Expected identifier"
             ))
 
         var_name = self.current_tok
@@ -801,7 +801,7 @@ class Parser:
         if self.current_tok.type != TT_EQ:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected '='"
+                "Expected '='"
             ))
 
         res.register_advancement()
@@ -814,7 +814,7 @@ class Parser:
         if not self.current_tok.matches(TT_KEYWORD, 'ad'):
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected 'ad'"
+                "Expected 'ad'"
             ))
 
         res.register_advancement()
@@ -837,7 +837,7 @@ class Parser:
         if not self.current_tok.type == TT_COLON:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected ':'"
+                "Expected ':'"
             ))
 
         res.register_advancement()
@@ -874,7 +874,7 @@ class Parser:
         if not self.current_tok.matches(TT_KEYWORD, 'dum'):
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected 'dum'"
+                "Expected 'dum'"
             ))
 
         res.register_advancement()
@@ -887,7 +887,7 @@ class Parser:
         if not self.current_tok.type == TT_COLON:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected ':'"
+                "Expected ':'"
             ))
 
         res.register_advancement()
@@ -924,7 +924,7 @@ class Parser:
         if not self.current_tok.matches(TT_KEYWORD, 'opus'):
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected 'opus'"
+                "Expected 'opus'"
             ))
 
         res.register_advancement()
@@ -937,14 +937,14 @@ class Parser:
             if self.current_tok.type != TT_LPAREN:
                 return res.failure(ExpectedItemError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
-                    f"Expected '('"
+                    "Expected '('"
                 ))
         else:
             var_name_tok = None
             if self.current_tok.type != TT_LPAREN:
                 return res.failure(ExpectedItemError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
-                    f"Expected identifier or '('"
+                    "Expected identifier or '('"
                 ))
 
         res.register_advancement()
@@ -963,7 +963,7 @@ class Parser:
                 if self.current_tok.type != TT_IDENTIFIER:
                     return res.failure(ExpectedItemError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
-                        f"Expected identifier"
+                        "Expected identifier"
                     ))
 
                 arg_name_toks.append(self.current_tok)
@@ -973,13 +973,13 @@ class Parser:
             if self.current_tok.type != TT_RPAREN:
                 return res.failure(ExpectedItemError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
-                    f"Expected ',' or ')'"
+                    "Expected ',' or ')'"
                 ))
         else:
             if self.current_tok.type != TT_RPAREN:
                 return res.failure(ExpectedItemError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
-                    f"Expected identifier or ')'"
+                    "Expected identifier or ')'"
                 ))
 
         res.register_advancement()
@@ -1003,7 +1003,7 @@ class Parser:
         if self.current_tok.type != TT_COLON:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected '->' or ':'"
+                "Expected '->' or ':'"
             ))
 
         res.register_advancement()
@@ -1018,7 +1018,7 @@ class Parser:
         if self.current_tok.type != TT_NEWLINE:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected a newline"
+                "Expected a newline"
             ))
 
         res.register_advancement()
@@ -1044,7 +1044,7 @@ class Parser:
     ###################################
 
     def bin_op(self, func_a, ops, func_b=None):
-        if func_b == None:
+        if func_b is None:
             func_b = func_a
 
         res = ParseResult()

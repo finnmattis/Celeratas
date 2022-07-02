@@ -70,7 +70,7 @@ def test_lexer(test_input, expected):
     lexer = Lexer("<std_in>", test_input)
     tokens, error = lexer.make_tokens()
 
-    assert error == None
+    assert error is None
     expected.append(TT_EOF)
 
     assert tokens[0].type == expected[0]

@@ -3,7 +3,7 @@
 #######################################
 
 from .Value import Value
-from .Bool import Bool 
+from .Bool import Bool
 from .Number import Number
 
 #######################################

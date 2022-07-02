@@ -120,7 +120,7 @@ class BuiltInFunction(BaseFunction):
 
         try:
             element = list_.elements.pop(index.value)
-        except:
+        except IndexError:
             return RTResult().failure(IndexingError(
                 self.pos_start, self.pos_end,
                 'Element at this index could not be removed from list because index is out of bounds',
@@ -179,7 +179,7 @@ class BuiltInFunction(BaseFunction):
         try:
             with open(fn, "r") as f:
                 script = f.read()
-        except Exception as e:
+        except Exception:
             return RTResult().failure(RTError(
                 self.pos_start, self.pos_end,
                 f"Failed to load script \"{fn}\"",
@@ -193,8 +193,7 @@ class BuiltInFunction(BaseFunction):
         if error:
             return RTResult().failure(TypingError(
                 self.pos_start, self.pos_end,
-                f"Failed to finish executing script \"{fn}\"\n" +
-                error.as_string(),
+                f"Failed to finish executing script \"{fn}\"\n" + error.as_string(),
                 exec_ctx
             ))
 

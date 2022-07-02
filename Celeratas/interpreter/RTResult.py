@@ -44,8 +44,5 @@ class RTResult:
     def should_return(self):
         # Note: this will allow you to continue and break outside the current function
         return (
-            self.error or
-            self.func_return_value or
-            self.loop_should_continue or
-            self.loop_should_break
+            self.error or self.func_return_value or self.loop_should_continue or self.loop_should_break
         )

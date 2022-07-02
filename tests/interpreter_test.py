@@ -2,7 +2,6 @@
 # IMPORTS
 #######################################
 
-import pytest
 from Celeratas.lexer.Lexer import Lexer
 from Celeratas.parser.Parser import Parser
 from Celeratas.interpreter.Interpreter import Interpreter
@@ -27,5 +26,5 @@ def interpreter_test_base(test_input):
     context.symbol_table = symbol_table
     result = interpreter.visit(ast.node, context)
 
-    assert result.error == None
+    assert result.error is None
     return result.value

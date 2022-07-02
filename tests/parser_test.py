@@ -27,7 +27,7 @@ def parser_test_base(test_input):
     parser = Parser(tokens)
     ast = parser.parse()
 
-    assert ast.error == None
+    assert ast.error is None
     return ast.node.element_nodes[0]
 
 
@@ -119,9 +119,9 @@ def test_parser_var_access(test_input, expected):
 #         assert out_idx.tok.value == exp_out_idx.tok.value
 
 
-@pytest.mark.parametrize("test_input,expected", [
-    ("si 1 == 1:;    1", [])
-])
-def test_parser_if(test_input, expected):
-    ast = parser_test_base(test_input)
-    case = ast.cases[0]
+# @pytest.mark.parametrize("test_input,expected", [
+#     ("si 1 == 1:;    1", [])
+# ])
+# def test_parser_if(test_input, expected):
+#     ast = parser_test_base(test_input)
+#     case = ast.cases[0]

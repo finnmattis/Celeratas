@@ -21,7 +21,7 @@ class Function(BaseFunction):
             return res
 
         value = res.register(interpreter.visit(self.body_node, exec_ctx))
-        if res.should_return() and res.func_return_value == None:
+        if res.should_return() and res.func_return_value is None:
             return res
 
         ret_value = (

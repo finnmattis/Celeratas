@@ -39,7 +39,7 @@ def toRoman(number):
                 int(before_dot)), toRoman(int(after_dot))
             return f"{before_dot}.{after_dot}"
     if number < 0:
-        number = toRoman(number*-1)
+        number = toRoman(number * -1)
         return f"-{number}"
 
     res = ''
@@ -62,7 +62,7 @@ def toNum(numeral):
     if "." in numeral:
         before_dot, after_dot = numeral.split(".")
         before_dot, after_dot = toNum(before_dot), toNum(after_dot)
-        if before_dot == None or after_dot == None:
+        if before_dot is None or after_dot is None:
             return None
         return float(f"{before_dot}.{after_dot}")
 
