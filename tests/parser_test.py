@@ -104,19 +104,19 @@ def test_parser_var_access(test_input, expected):
         assert out_idx.tok.value == exp_out_idx.tok.value
 
 
-@pytest.mark.parametrize("test_input,expected", [
-    ("x = 1", VarAssignNode(["x"],
-                            [NumberNode(Token(TT_INT, 1, basepos))], [], Token(TT_EQ, basepos), basepos, basepos)),
-    ("x[0] = 1", VarAssignNode(["x"],
-                               [NumberNode(Token(TT_INT, 1, basepos))], [NumberNode(Token(TT_INT, 1, basepos))], Token(TT_EQ, basepos), basepos, basepos)),
+# @pytest.mark.parametrize("test_input,expected", [
+#     ("x = 1", VarAssignNode(["x"],
+#                             [NumberNode(Token(TT_INT, 1, basepos))], [], Token(TT_EQ, basepos), basepos, basepos)),
+#     ("x[0] = 1", VarAssignNode(["x"],
+#                                [NumberNode(Token(TT_INT, 1, basepos))], [NumberNode(Token(TT_INT, 1, basepos))], Token(TT_EQ, basepos), basepos, basepos)),
 
-])
-def test_parser_var_assign(test_input, expected):
-    ast = parser_test_base(test_input)
-    assert ast.var_name_tok.value == expected.var_name_tok.value
-    assert ast.value_node.tok.value == expected.value_node.tok.value
-    for out_idx, exp_out_idx in zip(ast.idxes_to_change, expected.idxes_to_change):
-        assert out_idx.tok.value == exp_out_idx.tok.value
+# ])
+# def test_parser_var_assign(test_input, expected):
+#     ast = parser_test_base(test_input)
+#     assert ast.var_name_tok.value == expected.var_name_tok.value
+#     assert ast.value_node.tok.value == expected.value_node.tok.value
+#     for out_idx, exp_out_idx in zip(ast.idxes_to_change, expected.idxes_to_change):
+#         assert out_idx.tok.value == exp_out_idx.tok.value
 
 
 @pytest.mark.parametrize("test_input,expected", [
