@@ -202,77 +202,85 @@ class Interpreter:
 
     def visit_VarAssignNode(self, node, context):
         res = RTResult()
-        var_name = node.var_name_tok.value
         idxes_to_change = node.idxes_to_change
         assign_type = node.assign_type
 
-        value = res.register(self.visit(node.value_node, context))
-        if res.should_return():
-            return res
+        if len(node.var_names_to_set) != len(node.values_to_set):
+            return res.failure(TypingError(
+                node.pos_start, node.pos_end,
+                'Must have the same number of variables and values',
+                context
+            ))
 
-        if idxes_to_change:
-            if var_name not in context.symbol_table.symbols:
-                return res.failure(NamingError(
-                    node.pos_start, node.pos_end,
-                    f"'{var_name}' is not defined",
-                    context
-                ))
+        for var_name, value in zip(node.var_names_to_set, node.values_to_set):
+            value = res.register(self.visit(value, context))
+            if res.should_return():
+                return res
 
-            var_to_change = context.symbol_table.get(var_name)
+            if idxes_to_change:
+                if var_name not in context.symbol_table.symbols:
+                    return res.failure(NamingError(
+                        node.pos_start, node.pos_end,
+                        f"'{var_name}' is not defined",
+                        context
+                    ))
 
-            if isinstance(var_to_change, List):
-                element_to_change = var_to_change
+                var_to_change = context.symbol_table.get(var_name)
 
-                for for_idx, idx_to_change in enumerate(idxes_to_change):
-                    if isinstance(element_to_change, List):
-                        if idx_to_change.tok.value > len(element_to_change.elements) - 1:
+                if isinstance(var_to_change, List):
+                    element_to_change = var_to_change
+
+                    for for_idx, idx_to_change in enumerate(idxes_to_change):
+                        if isinstance(element_to_change, List):
+                            if idx_to_change.tok.value > len(element_to_change.elements) - 1:
+                                return res.failure(IndexingError(
+                                    node.pos_start, node.pos_end,
+                                    'List index out of bounds',
+                                    context
+                                ))
+                            if for_idx == len(idxes_to_change) - 1:
+                                element_to_change.elements[idx_to_change.tok.value] = value
+                            else:
+                                element_to_change = element_to_change.elements[idx_to_change.tok.value]
+                        elif isinstance(element_to_change, Dict) or isinstance(element_to_change.elements, Dict):
+                            if for_idx == len(idxes_to_change) - 1:
+                                element_to_change.key_pairs[idx_to_change.tok.value] = value
+                            else:
+                                element_to_change = element_to_change.key_pairs[idx_to_change.tok.value]
+                        else:
                             return res.failure(IndexingError(
                                 node.pos_start, node.pos_end,
-                                'List index out of bounds',
+                                'Variable must be a list or dict in order to set a specific index',
                                 context
                             ))
-                        if for_idx == len(idxes_to_change) - 1:
-                            element_to_change.elements[idx_to_change.tok.value] = value
-                        else:
-                            element_to_change = element_to_change.elements[idx_to_change.tok.value]
-                    elif isinstance(element_to_change, Dict) or isinstance(element_to_change.elements, Dict):
-                        if for_idx == len(idxes_to_change) - 1:
-                            element_to_change.key_pairs[idx_to_change.tok.value] = value
-                        else:
-                            element_to_change = element_to_change.key_pairs[idx_to_change.tok.value]
-                    else:
-                        return res.failure(IndexingError(
-                            node.pos_start, node.pos_end,
-                            'Variable must be a list or dict in order to set a specific index',
-                            context
-                        ))
 
-            value = var_to_change
+                value = var_to_change
 
-        if assign_type.type != "EQ":
-            error = None
-            old_value = context.symbol_table.get(var_name)
+            if assign_type.type != "EQ":
+                error = None
+                old_value = context.symbol_table.get(var_name)
 
-            if old_value == None:
-                return res.failure(NamingError(
-                    node.pos_start, node.pos_end,
-                    f"'{var_name}' is not defined",
-                    context
-                ))
+                if old_value == None:
+                    return res.failure(NamingError(
+                        node.pos_start, node.pos_end,
+                        f"'{var_name}' is not defined",
+                        context
+                    ))
 
-            if assign_type.type == "PLUS_EQ":
-                value, error = old_value.added_to(value)
-            elif assign_type.type == "MIN_EQ":
-                value, error = old_value.subbed_by(value)
-            elif assign_type.type == "MUL_EQ":
-                value, error = old_value.multed_by(value)
-            elif assign_type.type == "DIV_EQ":
-                value, error = old_value.dived_by(value)
+                if assign_type.type == "PLUS_EQ":
+                    value, error = old_value.added_to(value)
+                elif assign_type.type == "MIN_EQ":
+                    value, error = old_value.subbed_by(value)
+                elif assign_type.type == "MUL_EQ":
+                    value, error = old_value.multed_by(value)
+                elif assign_type.type == "DIV_EQ":
+                    value, error = old_value.dived_by(value)
 
-            if error:
-                return res.failure(error)
+                if error:
+                    return res.failure(error)
 
-        context.symbol_table.set(var_name, value)
+            context.symbol_table.set(var_name, value)
+
         return res.success(None)
 
     def visit_BinOpNode(self, node, context):

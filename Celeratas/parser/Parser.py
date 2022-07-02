@@ -162,10 +162,27 @@ class Parser:
         res = ParseResult()
 
         if self.current_tok.type == TT_IDENTIFIER:
-            var_name = self.current_tok
+            var_names_to_set = []
             idxes_to_change = []
-            res.register_advancement()
-            self.advance()
+            pos_start = self.current_tok.pos_start.copy()
+
+            while True:
+                var_names_to_set.append(self.current_tok.value)
+
+                res.register_advancement()
+                self.advance()
+
+                if not self.current_tok.type == TT_COMMA:
+                    break
+
+                res.register_advancement()
+                self.advance()
+
+                if self.current_tok.type != TT_IDENTIFIER:
+                    return res.failure(ExpectedItemError(
+                        self.current_tok.pos_start, self.current_tok.pos_end,
+                        "Expected identifier"
+                    ))
 
             while self.current_tok.type == TT_LSQUARE:
                 res.register_advancement()
@@ -194,11 +211,22 @@ class Parser:
                 res.register_advancement()
                 self.advance()
 
-                expr = res.register(self.expr(could_have_var_assign=False))
-                if res.error:
-                    return res
+                values = []
 
-                return res.success(VarAssignNode(var_name, expr, idxes_to_change, assign_type))
+                while True:
+                    values.append(res.register(
+                        self.expr(could_have_var_assign=False)))
+
+                    if res.error:
+                        return res
+
+                    if not self.current_tok.type == TT_COMMA:
+                        break
+
+                    res.register_advancement()
+                    self.advance()
+
+                return res.success(VarAssignNode(var_names_to_set, values, idxes_to_change, assign_type, pos_start, pos_end=values[-1].pos_end))
 
         node = res.register(self.bin_op(
             self.comp_expr, ((TT_KEYWORD, 'et'), (TT_KEYWORD, 'aut'))))

@@ -69,14 +69,14 @@ class VarAccessNode:
 
 
 class VarAssignNode:
-    def __init__(self, var_name_tok, value_node, idxes_to_change, assign_type):
-        self.var_name_tok = var_name_tok
-        self.value_node = value_node
+    def __init__(self, var_names_to_set, values_to_set, idxes_to_change, assign_type, pos_start, pos_end):
+        self.var_names_to_set = var_names_to_set
+        self.values_to_set = values_to_set
         self.idxes_to_change = idxes_to_change
         self.assign_type = assign_type
 
-        self.pos_start = self.var_name_tok.pos_start
-        self.pos_end = self.value_node.pos_end
+        self.pos_start = pos_start
+        self.pos_end = pos_end
 
 
 class BinOpNode:
