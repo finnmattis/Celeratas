@@ -63,7 +63,7 @@ class Bool(Value):
             return None, Value.illegal_operation(self, other)
 
     def ored_by(self, other):
-        if isinstance(Bool):
+        if isinstance(other, Bool):
             return Bool(self.value or other.value).set_context(self.context), None
         else:
             return None, Value.illegal_operation(self, other)

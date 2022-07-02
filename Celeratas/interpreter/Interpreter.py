@@ -27,13 +27,13 @@ class Interpreter:
 
     def visit_NumberNode(self, node, context):
         return RTResult().success(
-            Number(node.tok.value).set_context(
+            Number(node.value).set_context(
                 context).set_pos(node.pos_start, node.pos_end)
         )
 
     def visit_NumeralNode(self, node, context):
         return RTResult().success(
-            Numeral(node.tok.value).set_context(
+            Numeral(node.value).set_context(
                 context).set_pos(node.pos_start, node.pos_end)
         )
 
@@ -59,7 +59,7 @@ class Interpreter:
 
     def visit_BoolNode(self, node, context):
         return RTResult().success(
-            Bool(node.tok.value == "Verus").set_context(
+            Bool(node.value == "Verus").set_context(
                 context).set_pos(node.pos_start, node.pos_end)
         )
 
@@ -104,15 +104,15 @@ class Interpreter:
 
     def visit_VarAccessNode(self, node, context):
         res = RTResult()
-        var_name = node.var_name_tok.value
-        value = context.symbol_table.get(var_name)
+        var_name_to_get = node.var_name_to_get
+        value = context.symbol_table.get(var_name_to_get)
         idxes_to_get = node.idxes_to_get
         attr_to_get = node.attr_to_get
 
         if not value:
             return res.failure(NamingError(
                 node.pos_start, node.pos_end,
-                f"'{var_name}' is not defined",
+                f"'{var_name_to_get}' is not defined",
                 context
             ))
 
@@ -190,7 +190,7 @@ class Interpreter:
             if value_attr is None:
                 return res.failure(AttrError(
                     node.pos_start, node.pos_end,
-                    f"'{var_name}' does not have the attribute '{attr_to_get}'",
+                    f"'{var_name_to_get}' does not have the attribute '{attr_to_get}'",
                     context
                 ))
 
@@ -437,7 +437,7 @@ class Interpreter:
                 return i > end_value.value
 
         while condition():
-            context.symbol_table.set(node.var_name_tok.value, Number(i))
+            context.symbol_table.set(node.var_name, Number(i))
             i += step_value.value
 
             value = res.register(self.visit(node.body_node, context))
@@ -452,7 +452,7 @@ class Interpreter:
 
             elements.append(value)
 
-        context.symbol_table.remove(node.var_name_tok.value)
+        context.symbol_table.remove(node.var_name)
         return res.success(
             None if node.should_return_null else
             List(elements).set_context(context).set_pos(
