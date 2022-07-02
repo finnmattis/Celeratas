@@ -4,9 +4,9 @@
 
 from Celeratas.helper.convert_roman import toNum
 from Celeratas.helper.errors import InvalidNumeral, IllegalCharError, ExpectedItemError, IndentError
-from Celeratas.helper.tokens import *
+import Celeratas.helper.tokens as toks
 
-from .constants import *
+import Celeratas.lexer.constants as constants
 from .Position import Position
 from .Token import Token
 
@@ -47,28 +47,28 @@ class Lexer:
                 self.start_of_statement = True
                 grammatical_char = False
             elif self.current_char in ';\n':
-                tokens.append(Token(TT_NEWLINE, pos_start=self.pos))
+                tokens.append(Token(toks.TT_NEWLINE, pos_start=self.pos))
                 self.advance()
                 self.start_of_statement = True
                 grammatical_char = False
-            elif self.current_char in ROMAN_NUMERAL_CHARS:
+            elif self.current_char in constants.ROMAN_NUMERAL_CHARS:
                 token, error = self.make_numeral()
                 if error:
                     return [], error
                 tokens.append(token)
-            elif self.current_char in LETTERS + "_":
+            elif self.current_char in constants.LETTERS + "_":
                 token, error = self.make_identifier()
                 if error:
                     return [], error
                 tokens.append(token)
             elif self.current_char == ".":
-                tokens.append(Token(TT_DOT, pos_start=self.pos))
+                tokens.append(Token(toks.TT_DOT, pos_start=self.pos))
                 self.advance()
-            elif self.current_char in DIGITS:
+            elif self.current_char in constants.DIGITS:
                 tokens.append(self.make_number())
             elif self.current_char == '"' or self.current_char == "'":
                 # Need the first clause incase the code starts with a quote
-                if len(tokens) > 0 and tokens[-1].matches(TT_IDENTIFIER, 'f'):
+                if len(tokens) > 0 and tokens[-1].matches(toks.TT_IDENTIFIER, 'f'):
                     tokens.pop()
                     token, error = self.make_string(fstring=True)
                 else:
@@ -88,25 +88,25 @@ class Lexer:
                 tokens.append(self.make_div())
                 self.advance()
             elif self.current_char == '^':
-                tokens.append(Token(TT_POW, pos_start=self.pos))
+                tokens.append(Token(toks.TT_POW, pos_start=self.pos))
                 self.advance()
             elif self.current_char == '(':
-                tokens.append(Token(TT_LPAREN, pos_start=self.pos))
+                tokens.append(Token(toks.TT_LPAREN, pos_start=self.pos))
                 self.advance()
             elif self.current_char == ')':
-                tokens.append(Token(TT_RPAREN, pos_start=self.pos))
+                tokens.append(Token(toks.TT_RPAREN, pos_start=self.pos))
                 self.advance()
             elif self.current_char == '[':
-                tokens.append(Token(TT_LSQUARE, pos_start=self.pos))
+                tokens.append(Token(toks.TT_LSQUARE, pos_start=self.pos))
                 self.advance()
             elif self.current_char == ']':
-                tokens.append(Token(TT_RSQUARE, pos_start=self.pos))
+                tokens.append(Token(toks.TT_RSQUARE, pos_start=self.pos))
                 self.advance()
             elif self.current_char == '{':
-                tokens.append(Token(TT_LBRACE, pos_start=self.pos))
+                tokens.append(Token(toks.TT_LBRACE, pos_start=self.pos))
                 self.advance()
             elif self.current_char == '}':
-                tokens.append(Token(TT_RBRACE, pos_start=self.pos))
+                tokens.append(Token(toks.TT_RBRACE, pos_start=self.pos))
                 self.advance()
             elif self.current_char == '!':
                 token, error = self.make_not_equals()
@@ -120,10 +120,10 @@ class Lexer:
             elif self.current_char == '>':
                 tokens.append(self.make_greater_than())
             elif self.current_char == ':':
-                tokens.append(Token(TT_COLON, pos_start=self.pos))
+                tokens.append(Token(toks.TT_COLON, pos_start=self.pos))
                 self.advance()
             elif self.current_char == ',':
-                tokens.append(Token(TT_COMMA, pos_start=self.pos))
+                tokens.append(Token(toks.TT_COMMA, pos_start=self.pos))
                 self.advance()
             else:
                 pos_start = self.pos.copy()
@@ -135,7 +135,7 @@ class Lexer:
             if self.start_of_statement and grammatical_char:
                 self.start_of_statement = False
 
-        tokens.append(Token(TT_EOF, pos_start=self.pos))
+        tokens.append(Token(toks.TT_EOF, pos_start=self.pos))
         return tokens, None
 
     def make_space(self, tokens):
@@ -156,7 +156,7 @@ class Lexer:
                 self.advance()
                 self.tab_style = "space"
                 tokens.append(
-                    Token(TT_TAB, pos_start=pos_start, pos_end=self.pos))
+                    Token(toks.TT_TAB, pos_start=pos_start, pos_end=self.pos))
             elif self.current_char == '\t':
                 # Check tab style
                 if self.tab_style not in ["", "tab"]:
@@ -164,7 +164,7 @@ class Lexer:
 
                 self.advance()
                 self.tab_style = "tab"
-                tokens.append(Token(TT_TAB, pos_start=self.pos))
+                tokens.append(Token(toks.TT_TAB, pos_start=self.pos))
         else:
             self.advance()
         return tokens, None
@@ -174,7 +174,7 @@ class Lexer:
         dot_count = 0
         pos_start = self.pos.copy()
 
-        while self.current_char and self.current_char in ROMAN_NUMERAL_CHARS + '.':
+        while self.current_char and self.current_char in constants.ROMAN_NUMERAL_CHARS + '.':
             if self.current_char == '.':
                 if dot_count == 1:
                     break
@@ -195,14 +195,14 @@ class Lexer:
         if numeral_final is None:
             return None, InvalidNumeral(pos_start, self.pos, f"{numeral_str} is not a valid numeral")
 
-        return Token(TT_NUMERAL, numeral_final, pos_start, self.pos), None
+        return Token(toks.TT_NUMERAL, numeral_final, pos_start, self.pos), None
 
     def make_number(self):
         num_str = ''
         dot_count = 0
         pos_start = self.pos.copy()
 
-        while self.current_char and self.current_char in DIGITS + '.':
+        while self.current_char and self.current_char in constants.DIGITS + '.':
             if self.current_char == '.':
                 if dot_count == 1:
                     break
@@ -211,9 +211,9 @@ class Lexer:
             self.advance()
 
         if dot_count == 0:
-            return Token(TT_INT, int(num_str), pos_start, self.pos)
+            return Token(toks.TT_INT, int(num_str), pos_start, self.pos)
         else:
-            return Token(TT_FLOAT, float(num_str), pos_start, self.pos)
+            return Token(toks.TT_FLOAT, float(num_str), pos_start, self.pos)
 
     def make_string(self, fstring):
         pos_start = self.pos.copy()
@@ -271,7 +271,7 @@ class Lexer:
 
                 # Check if there is a string in tokens
                 for token in tokens:
-                    if token.type == TT_STRING:
+                    if token.type == toks.TT_STRING:
                         return None, IllegalCharError(pos_after_brace, self.pos, "Unexpected string")
 
                 # Add the tokens to str_components
@@ -287,30 +287,30 @@ class Lexer:
             str_components.append(cur_str)
 
         self.advance()
-        return Token(TT_STRING, str_components, pos_start, self.pos), None
+        return Token(toks.TT_STRING, str_components, pos_start, self.pos), None
 
     def make_identifier(self, start_value=""):
         id_str = start_value
         pos_start = self.pos.copy()
 
-        while self.current_char and self.current_char in LETTERS_DIGITS + '_':
+        while self.current_char and self.current_char in constants.LETTERS_DIGITS + '_':
             id_str += self.current_char
             self.advance()
 
-        tok_type = TT_KEYWORD if id_str in KEYWORDS else TT_IDENTIFIER
+        tok_type = toks.TT_KEYWORD if id_str in toks.KEYWORDS else toks.TT_IDENTIFIER
         return Token(tok_type, id_str, pos_start, self.pos), None
 
     def make_minus(self):
-        tok_type = TT_MINUS
+        tok_type = toks.TT_MINUS
         pos_start = self.pos.copy()
         self.advance()
 
         if self.current_char == '>':
             self.advance()
-            tok_type = TT_ARROW
+            tok_type = toks.TT_ARROW
         elif self.current_char == '=':
             self.advance()
-            tok_type = TT_MIN_EQ
+            tok_type = toks.TT_MIN_EQ
 
         return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
 
@@ -320,7 +320,7 @@ class Lexer:
 
         if self.current_char == '=':
             self.advance()
-            return Token(TT_NE, pos_start=pos_start, pos_end=self.pos), None
+            return Token(toks.TT_NE, pos_start=pos_start, pos_end=self.pos), None
 
         self.advance()
         return None, ExpectedItemError(pos_start, self.pos, "'=' (after '!')")
@@ -337,22 +337,22 @@ class Lexer:
         return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
 
     def make_plus(self):
-        return(self.make_mult_toks(TT_PLUS, TT_PLUS_EQ, "="))
+        return(self.make_mult_toks(toks.TT_PLUS, toks.TT_PLUS_EQ, "="))
 
     def make_mul(self):
-        return(self.make_mult_toks(TT_MUL, TT_MUL_EQ, "="))
+        return(self.make_mult_toks(toks.TT_MUL, toks.TT_MUL_EQ, "="))
 
     def make_div(self):
-        return(self.make_mult_toks(TT_DIV, TT_DIV_EQ, "="))
+        return(self.make_mult_toks(toks.TT_DIV, toks.TT_DIV_EQ, "="))
 
     def make_equals(self):
-        return self.make_mult_toks(TT_EQ, TT_EE, "=")
+        return self.make_mult_toks(toks.TT_EQ, toks.TT_EE, "=")
 
     def make_less_than(self):
-        return self.make_mult_toks(TT_LT, TT_LTE, "=")
+        return self.make_mult_toks(toks.TT_LT, toks.TT_LTE, "=")
 
     def make_greater_than(self):
-        return self.make_mult_toks(TT_GT, TT_GTE, "=")
+        return self.make_mult_toks(toks.TT_GT, toks.TT_GTE, "=")
 
     def skip_comment(self):
         self.advance()

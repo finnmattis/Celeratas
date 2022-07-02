@@ -4,13 +4,13 @@
 
 import pytest
 
-from Celeratas.helper.tokens import *
+import Celeratas.helper.tokens as toks
 
 from Celeratas.lexer.Lexer import Lexer
 from Celeratas.lexer.Position import Position
 from Celeratas.lexer.Token import Token
 from Celeratas.parser.Parser import Parser
-from Celeratas.parser.nodes import *
+from Celeratas.parser.nodes import NumberNode, NumeralNode, StringNode, ListNode, VarAccessNode, BinOpNode, UnaryOpNode
 
 #######################################
 # TESTS
@@ -32,8 +32,8 @@ def parser_test_base(test_input):
 
 
 @pytest.mark.parametrize("test_input,expected", [
-    ("1", NumberNode(Token(TT_INT, 1, basepos))),
-    ("IV", NumeralNode(Token(TT_NUMERAL, 4, basepos))),
+    ("1", NumberNode(Token(toks.TT_INT, 1, basepos))),
+    ("IV", NumeralNode(Token(toks.TT_NUMERAL, 4, basepos))),
     pytest.param("\"x", [], marks=pytest.mark.xfail),
 ])
 def test_parser_numbers(test_input, expected):
@@ -44,7 +44,7 @@ def test_parser_numbers(test_input, expected):
 @pytest.mark.parametrize("test_input,expected", [
     ("\"x\"", StringNode(["x"], basepos, basepos)),
     ("f\"{1}\"", StringNode(
-        [NumberNode(Token(TT_INT, 1, basepos))], basepos, basepos))
+        [NumberNode(Token(toks.TT_INT, 1, basepos))], basepos, basepos))
 ])
 def test_parser_strings(test_input, expected):
     ast = parser_test_base(test_input)
@@ -56,10 +56,10 @@ def test_parser_strings(test_input, expected):
 
 
 @pytest.mark.parametrize("test_input,expected", [
-    (("-1", UnaryOpNode(Token(TT_MINUS, pos_start=basepos),
-     NumberNode(Token(TT_INT, 1, basepos))))),
-    (("+1", UnaryOpNode(Token(TT_PLUS, pos_start=basepos),
-     NumberNode(Token(TT_INT, 1, basepos)))))
+    (("-1", UnaryOpNode(Token(toks.TT_MINUS, pos_start=basepos),
+     NumberNode(Token(toks.TT_INT, 1, basepos))))),
+    (("+1", UnaryOpNode(Token(toks.TT_PLUS, pos_start=basepos),
+     NumberNode(Token(toks.TT_INT, 1, basepos)))))
 ])
 def test_parser_un_op(test_input, expected):
     ast = parser_test_base(test_input)
@@ -68,8 +68,8 @@ def test_parser_un_op(test_input, expected):
 
 
 @pytest.mark.parametrize("test_input,expected", [
-    ("1+1", BinOpNode(NumberNode(Token(TT_INT, 1, basepos)),
-     Token(TT_PLUS, pos_start=basepos), NumberNode(Token(TT_INT, 1, basepos)))),
+    ("1+1", BinOpNode(NumberNode(Token(toks.TT_INT, 1, basepos)),
+     Token(toks.TT_PLUS, pos_start=basepos), NumberNode(Token(toks.TT_INT, 1, basepos)))),
 ])
 def test_parser_bin_op(test_input, expected):
     ast = parser_test_base(test_input)
@@ -80,8 +80,8 @@ def test_parser_bin_op(test_input, expected):
 
 
 @pytest.mark.parametrize("test_input,expected", [
-    ("[1, 2, 3]", ListNode(element_nodes=[NumberNode(Token(TT_INT, 1, basepos)), NumberNode(
-        Token(TT_INT, 2, basepos)), NumberNode(Token(TT_INT, 3, basepos))], pos_start=basepos, pos_end=basepos)),
+    ("[1, 2, 3]", ListNode(element_nodes=[NumberNode(Token(toks.TT_INT, 1, basepos)), NumberNode(
+        Token(toks.TT_INT, 2, basepos)), NumberNode(Token(toks.TT_INT, 3, basepos))], pos_start=basepos, pos_end=basepos)),
     pytest.param("[x = 10]", [], marks=pytest.mark.xfail),
 ])
 def test_parser_list(test_input, expected):
@@ -91,11 +91,11 @@ def test_parser_list(test_input, expected):
 
 
 @pytest.mark.parametrize("test_input,expected", [
-    ("x", VarAccessNode(Token(TT_IDENTIFIER, "x", basepos,), [], None)),
-    ("x[0]", VarAccessNode(Token(TT_IDENTIFIER, "x", basepos),
-                           [NumberNode(Token(TT_INT, 0, basepos))], None)),
-    ("x[0][0]", VarAccessNode(Token(TT_IDENTIFIER, "x", basepos),
-                              [NumberNode(Token(TT_INT, 0, basepos)), NumberNode(Token(TT_INT, 0, basepos))], None)),
+    ("x", VarAccessNode(Token(toks.TT_IDENTIFIER, "x", basepos,), [], None)),
+    ("x[0]", VarAccessNode(Token(toks.TT_IDENTIFIER, "x", basepos),
+                           [NumberNode(Token(toks.TT_INT, 0, basepos))], None)),
+    ("x[0][0]", VarAccessNode(Token(toks.TT_IDENTIFIER, "x", basepos),
+                              [NumberNode(Token(toks.TT_INT, 0, basepos)), NumberNode(Token(toks.TT_INT, 0, basepos))], None)),
 ])
 def test_parser_var_access(test_input, expected):
     ast = parser_test_base(test_input)
@@ -106,9 +106,10 @@ def test_parser_var_access(test_input, expected):
 
 # @pytest.mark.parametrize("test_input,expected", [
 #     ("x = 1", VarAssignNode(["x"],
-#                             [NumberNode(Token(TT_INT, 1, basepos))], [], Token(TT_EQ, basepos), basepos, basepos)),
+#                             [NumberNode(Token(toks.TT_INT, 1, basepos))], [], Token(toks.TT_EQ, basepos), basepos, basepos)),
 #     ("x[0] = 1", VarAssignNode(["x"],
-#                                [NumberNode(Token(TT_INT, 1, basepos))], [NumberNode(Token(TT_INT, 1, basepos))], Token(TT_EQ, basepos), basepos, basepos)),
+#                                [NumberNode(Token(toks.TT_INT, 1, basepos))],
+# Space for flake8 lol[NumberNode(Token(toks.TT_INT, 1, basepos))], Token(toks.TT_EQ, basepos), basepos, basepos)),
 
 # ])
 # def test_parser_var_assign(test_input, expected):

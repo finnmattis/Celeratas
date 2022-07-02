@@ -2,11 +2,10 @@
 # IMPORTS
 #######################################
 
-from Celeratas.helper.tokens import *
+import Celeratas.helper.tokens as toks
 from Celeratas.helper.errors import IndexingError, NamingError, AttrError, RTError, TypingError
 
-from .values import *
-from .constants import *
+from .values import Bool, Dict, List, Number, Numeral, String, Function
 from .RTResult import RTResult
 
 
@@ -292,31 +291,31 @@ class Interpreter:
         if res.should_return():
             return res
 
-        if node.op_tok.type == TT_PLUS:
+        if node.op_tok.type == toks.TT_PLUS:
             result, error = left.added_to(right)
-        elif node.op_tok.type == TT_MINUS:
+        elif node.op_tok.type == toks.TT_MINUS:
             result, error = left.subbed_by(right)
-        elif node.op_tok.type == TT_MUL:
+        elif node.op_tok.type == toks.TT_MUL:
             result, error = left.multed_by(right)
-        elif node.op_tok.type == TT_DIV:
+        elif node.op_tok.type == toks.TT_DIV:
             result, error = left.dived_by(right)
-        elif node.op_tok.type == TT_POW:
+        elif node.op_tok.type == toks.TT_POW:
             result, error = left.powed_by(right)
-        elif node.op_tok.type == TT_EE:
+        elif node.op_tok.type == toks.TT_EE:
             result, error = left.get_comparison_eq(right)
-        elif node.op_tok.type == TT_NE:
+        elif node.op_tok.type == toks.TT_NE:
             result, error = left.get_comparison_ne(right)
-        elif node.op_tok.type == TT_LT:
+        elif node.op_tok.type == toks.TT_LT:
             result, error = left.get_comparison_lt(right)
-        elif node.op_tok.type == TT_GT:
+        elif node.op_tok.type == toks.TT_GT:
             result, error = left.get_comparison_gt(right)
-        elif node.op_tok.type == TT_LTE:
+        elif node.op_tok.type == toks.TT_LTE:
             result, error = left.get_comparison_lte(right)
-        elif node.op_tok.type == TT_GTE:
+        elif node.op_tok.type == toks.TT_GTE:
             result, error = left.get_comparison_gte(right)
-        elif node.op_tok.matches(TT_KEYWORD, 'et'):
+        elif node.op_tok.matches(toks.TT_KEYWORD, 'et'):
             result, error = left.anded_by(right)
-        elif node.op_tok.matches(TT_KEYWORD, 'aut'):
+        elif node.op_tok.matches(toks.TT_KEYWORD, 'aut'):
             result, error = left.ored_by(right)
 
         if error:
@@ -332,9 +331,9 @@ class Interpreter:
 
         error = None
 
-        if node.op_tok.type == TT_MINUS:
+        if node.op_tok.type == toks.TT_MINUS:
             number, error = number.multed_by(Number(-1))
-        elif node.op_tok.matches(TT_KEYWORD, 'non'):
+        elif node.op_tok.matches(toks.TT_KEYWORD, 'non'):
             number, error = number.notted()
 
         if error:

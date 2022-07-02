@@ -2,10 +2,11 @@
 # IMPORTS
 #######################################
 
-from Celeratas.helper.tokens import *
+import Celeratas.helper.tokens as toks
 from Celeratas.helper.errors import ExpectedItemError, InvalidSyntaxError, IndentError
 
-from .nodes import *
+from .nodes import NumberNode, NumeralNode, StringNode, BoolNode, ListNode, DictNode, VarAccessNode, VarAssignNode, BinOpNode, UnaryOpNode, IfNode
+from .nodes import TryNode, ForNode, WhileNode, FuncDefNode, CallNode, ReturnNode, ContinueNode, BreakNode
 from .ParseResult import ParseResult
 
 #######################################
@@ -37,7 +38,7 @@ class Parser:
     def parse(self):
         res = self.statements()
 
-        if not res.error and self.current_tok.type != TT_EOF:
+        if not res.error and self.current_tok.type != toks.TT_EOF:
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Token cannot appear after previous tokens"
@@ -50,7 +51,7 @@ class Parser:
 
         # Check Tab count from tokens
         while True:
-            if self.current_tok.type == TT_TAB:
+            if self.current_tok.type == toks.TT_TAB:
                 res.register_advancement()
                 self.advance()
                 tab_count += 1
@@ -71,7 +72,7 @@ class Parser:
         statements = []
         pos_start = self.current_tok.pos_start.copy()
 
-        while self.current_tok.type == TT_NEWLINE:
+        while self.current_tok.type == toks.TT_NEWLINE:
             res.register_advancement()
             self.advance()
 
@@ -95,7 +96,7 @@ class Parser:
 
         while True:
             newline_count = 0
-            while self.current_tok.type == TT_NEWLINE:
+            while self.current_tok.type == toks.TT_NEWLINE:
                 res.register_advancement()
                 self.advance()
                 newline_count += 1
@@ -131,7 +132,7 @@ class Parser:
         res = ParseResult()
         pos_start = self.current_tok.pos_start.copy()
 
-        if self.current_tok.matches(TT_KEYWORD, 'redi'):
+        if self.current_tok.matches(toks.TT_KEYWORD, 'redi'):
             res.register_advancement()
             self.advance()
 
@@ -140,12 +141,12 @@ class Parser:
                 self.reverse(res.to_reverse_count)
             return res.success(ReturnNode(expr, pos_start, self.current_tok.pos_start.copy()))
 
-        if self.current_tok.matches(TT_KEYWORD, 'continua'):
+        if self.current_tok.matches(toks.TT_KEYWORD, 'continua'):
             res.register_advancement()
             self.advance()
             return res.success(ContinueNode(pos_start, self.current_tok.pos_start.copy()))
 
-        if self.current_tok.matches(TT_KEYWORD, 'confringe'):
+        if self.current_tok.matches(toks.TT_KEYWORD, 'confringe'):
             res.register_advancement()
             self.advance()
             return res.success(BreakNode(pos_start, self.current_tok.pos_start.copy()))
@@ -161,7 +162,7 @@ class Parser:
     def expr(self, could_have_var_assign=True):
         res = ParseResult()
 
-        if self.current_tok.type == TT_IDENTIFIER:
+        if self.current_tok.type == toks.TT_IDENTIFIER:
             var_names_to_set = []
             idxes_to_change = []
             pos_start = self.current_tok.pos_start.copy()
@@ -172,24 +173,24 @@ class Parser:
                 res.register_advancement()
                 self.advance()
 
-                if not self.current_tok.type == TT_COMMA:
+                if not self.current_tok.type == toks.TT_COMMA:
                     break
 
                 res.register_advancement()
                 self.advance()
 
-                if self.current_tok.type != TT_IDENTIFIER:
+                if self.current_tok.type != toks.TT_IDENTIFIER:
                     return res.failure(ExpectedItemError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
                         "Expected identifier"
                     ))
 
-            while self.current_tok.type == TT_LSQUARE:
+            while self.current_tok.type == toks.TT_LSQUARE:
                 res.register_advancement()
                 self.advance()
 
                 idxes_to_change.append(res.register(self.bin_op(
-                    self.comp_expr, ((TT_KEYWORD, 'et'), (TT_KEYWORD, 'aut')))))
+                    self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut')))))
 
                 if res.error:
                     return res
@@ -197,7 +198,7 @@ class Parser:
                 res.register_advancement()
                 self.advance()
 
-            if self.current_tok.type not in [TT_EQ, TT_PLUS_EQ, TT_MIN_EQ, TT_MUL_EQ, TT_DIV_EQ]:
+            if self.current_tok.type not in [toks.TT_EQ, toks.TT_PLUS_EQ, toks.TT_MIN_EQ, toks.TT_MUL_EQ, toks.TT_DIV_EQ]:
                 self.reverse(res.advance_count)
             else:
                 if not could_have_var_assign:
@@ -220,7 +221,7 @@ class Parser:
                     if res.error:
                         return res
 
-                    if not self.current_tok.type == TT_COMMA:
+                    if not self.current_tok.type == toks.TT_COMMA:
                         break
 
                     res.register_advancement()
@@ -229,7 +230,7 @@ class Parser:
                 return res.success(VarAssignNode(var_names_to_set, values, idxes_to_change, assign_type, pos_start, pos_end=values[-1].pos_end))
 
         node = res.register(self.bin_op(
-            self.comp_expr, ((TT_KEYWORD, 'et'), (TT_KEYWORD, 'aut'))))
+            self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut'))))
 
         if res.error:
             return res.failure(ExpectedItemError(
@@ -242,7 +243,7 @@ class Parser:
     def comp_expr(self):
         res = ParseResult()
 
-        if self.current_tok.matches(TT_KEYWORD, 'non'):
+        if self.current_tok.matches(toks.TT_KEYWORD, 'non'):
             op_tok = self.current_tok
             res.register_advancement()
             self.advance()
@@ -253,7 +254,7 @@ class Parser:
             return res.success(UnaryOpNode(op_tok, node))
 
         node = res.register(self.bin_op(
-            self.arith_expr, (TT_EE, TT_NE, TT_LT, TT_GT, TT_LTE, TT_GTE)))
+            self.arith_expr, (toks.TT_EE, toks.TT_NE, toks.TT_LT, toks.TT_GT, toks.TT_LTE, toks.TT_GTE)))
 
         if res.error:
             return res.failure(ExpectedItemError(
@@ -264,16 +265,16 @@ class Parser:
         return res.success(node)
 
     def arith_expr(self):
-        return self.bin_op(self.term, (TT_PLUS, TT_MINUS))
+        return self.bin_op(self.term, (toks.TT_PLUS, toks.TT_MINUS))
 
     def term(self):
-        return self.bin_op(self.factor, (TT_MUL, TT_DIV))
+        return self.bin_op(self.factor, (toks.TT_MUL, toks.TT_DIV))
 
     def factor(self):
         res = ParseResult()
         tok = self.current_tok
 
-        if tok.type in (TT_PLUS, TT_MINUS):
+        if tok.type in (toks.TT_PLUS, toks.TT_MINUS):
             res.register_advancement()
             self.advance()
             factor = res.register(self.factor())
@@ -284,7 +285,7 @@ class Parser:
         return self.power()
 
     def power(self):
-        return self.bin_op(self.call, (TT_POW, ), self.factor)
+        return self.bin_op(self.call, (toks.TT_POW, ), self.factor)
 
     def call(self):
         res = ParseResult()
@@ -292,12 +293,12 @@ class Parser:
         if res.error:
             return res
 
-        if self.current_tok.type == TT_LPAREN:
+        if self.current_tok.type == toks.TT_LPAREN:
             res.register_advancement()
             self.advance()
             arg_nodes = []
 
-            if self.current_tok.type == TT_RPAREN:
+            if self.current_tok.type == toks.TT_RPAREN:
                 res.register_advancement()
                 self.advance()
             else:
@@ -308,7 +309,7 @@ class Parser:
                         "Expected ')' or expression"
                     ))
 
-                while self.current_tok.type == TT_COMMA:
+                while self.current_tok.type == toks.TT_COMMA:
                     res.register_advancement()
                     self.advance()
 
@@ -316,7 +317,7 @@ class Parser:
                     if res.error:
                         return res
 
-                if self.current_tok.type != TT_RPAREN:
+                if self.current_tok.type != toks.TT_RPAREN:
                     return res.failure(ExpectedItemError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
                         "Expected ',' or ')'"
@@ -331,17 +332,17 @@ class Parser:
         res = ParseResult()
         tok = self.current_tok
 
-        if tok.type == TT_NUMERAL:
+        if tok.type == toks.TT_NUMERAL:
             res.register_advancement()
             self.advance()
             return res.success(NumeralNode(tok))
 
-        if tok.type in (TT_INT, TT_FLOAT):
+        if tok.type in (toks.TT_INT, toks.TT_FLOAT):
             res.register_advancement()
             self.advance()
             return res.success(NumberNode(tok))
 
-        elif tok.type == TT_STRING:
+        elif tok.type == toks.TT_STRING:
             str_components = tok.value
             for val in str_components:
                 if isinstance(val, list):
@@ -355,25 +356,25 @@ class Parser:
             self.advance()
             return res.success(StringNode(str_components, tok.pos_start, tok.pos_end))
 
-        elif tok.matches(TT_KEYWORD, 'Verus') or tok.matches(TT_KEYWORD, 'Falsus'):
+        elif tok.matches(toks.TT_KEYWORD, 'Verus') or tok.matches(toks.TT_KEYWORD, 'Falsus'):
             res.register_advancement()
             self.advance()
             return res.success(BoolNode(tok))
 
-        elif tok.type == TT_IDENTIFIER:
+        elif tok.type == toks.TT_IDENTIFIER:
             res.register_advancement()
             self.advance()
             var_name = tok
             idxes_to_get = []
             attr_to_get = None
 
-            if self.current_tok.type == TT_LSQUARE:
-                while self.current_tok.type == TT_LSQUARE:
+            if self.current_tok.type == toks.TT_LSQUARE:
+                while self.current_tok.type == toks.TT_LSQUARE:
                     res.register_advancement()
                     self.advance()
 
                     idxes_to_get.append(res.register(self.bin_op(
-                        self.comp_expr, ((TT_KEYWORD, 'et'), (TT_KEYWORD, 'aut')))))
+                        self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut')))))
 
                     if res.error:
                         return res
@@ -381,11 +382,11 @@ class Parser:
                     res.register_advancement()
                     self.advance()
 
-            if self.current_tok.type == TT_DOT:
+            if self.current_tok.type == toks.TT_DOT:
                 res.register_advancement()
                 self.advance()
 
-                if self.current_tok.type != TT_IDENTIFIER:
+                if self.current_tok.type != toks.TT_IDENTIFIER:
                     return res.failure(ExpectedItemError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
                         "Expected Identifier"
@@ -397,13 +398,13 @@ class Parser:
 
             return res.success(VarAccessNode(var_name, idxes_to_get, attr_to_get))
 
-        elif tok.type == TT_LPAREN:
+        elif tok.type == toks.TT_LPAREN:
             res.register_advancement()
             self.advance()
             expr = res.register(self.expr())
             if res.error:
                 return res
-            if self.current_tok.type == TT_RPAREN:
+            if self.current_tok.type == toks.TT_RPAREN:
                 res.register_advancement()
                 self.advance()
                 return res.success(expr)
@@ -413,39 +414,39 @@ class Parser:
                     "Expected ')'"
                 ))
 
-        elif tok.type == TT_LSQUARE:
+        elif tok.type == toks.TT_LSQUARE:
             list_expr = res.register(self.list_expr())
             if res.error:
                 return res
             return res.success(list_expr)
-        elif tok.type == TT_LBRACE:
+        elif tok.type == toks.TT_LBRACE:
             dict_expr = res.register(self.dict_expr())
             if res.error:
                 return res
             return res.success(dict_expr)
-        elif tok.matches(TT_KEYWORD, 'si'):
+        elif tok.matches(toks.TT_KEYWORD, 'si'):
             if_expr = res.register(self.if_expr())
             if res.error:
                 return res
             return res.success(if_expr)
-        elif tok.matches(TT_KEYWORD, 'tempta'):
+        elif tok.matches(toks.TT_KEYWORD, 'tempta'):
             try_expr = res.register(self.try_expr())
             if res.error:
                 return res
             return res.success(try_expr)
-        elif tok.matches(TT_KEYWORD, 'pro'):
+        elif tok.matches(toks.TT_KEYWORD, 'pro'):
             for_expr = res.register(self.for_expr())
             if res.error:
                 return res
             return res.success(for_expr)
 
-        elif tok.matches(TT_KEYWORD, 'dum'):
+        elif tok.matches(toks.TT_KEYWORD, 'dum'):
             while_expr = res.register(self.while_expr())
             if res.error:
                 return res
             return res.success(while_expr)
 
-        elif tok.matches(TT_KEYWORD, 'opus'):
+        elif tok.matches(toks.TT_KEYWORD, 'opus'):
             func_def = res.register(self.func_def())
             if res.error:
                 return res
@@ -461,7 +462,7 @@ class Parser:
         element_nodes = []
         pos_start = self.current_tok.pos_start.copy()
 
-        if self.current_tok.type != TT_LSQUARE:
+        if self.current_tok.type != toks.TT_LSQUARE:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected '['"
@@ -470,7 +471,7 @@ class Parser:
         res.register_advancement()
         self.advance()
 
-        if self.current_tok.type == TT_RSQUARE:
+        if self.current_tok.type == toks.TT_RSQUARE:
             res.register_advancement()
             self.advance()
         else:
@@ -482,7 +483,7 @@ class Parser:
                     "Expected ']' or expression"
                 ))
 
-            while self.current_tok.type == TT_COMMA:
+            while self.current_tok.type == toks.TT_COMMA:
                 res.register_advancement()
                 self.advance()
 
@@ -490,7 +491,7 @@ class Parser:
                 if res.error:
                     return res
 
-            if self.current_tok.type != TT_RSQUARE:
+            if self.current_tok.type != toks.TT_RSQUARE:
                 return res.failure(ExpectedItemError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
                     "Expected ',' or ']'"
@@ -510,7 +511,7 @@ class Parser:
         key_pairs = {}
         pos_start = self.current_tok.pos_start.copy()
 
-        if self.current_tok.type != TT_LBRACE:
+        if self.current_tok.type != toks.TT_LBRACE:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected '{'"
@@ -519,7 +520,7 @@ class Parser:
         res.register_advancement()
         self.advance()
 
-        if self.current_tok.type == TT_RBRACE:
+        if self.current_tok.type == toks.TT_RBRACE:
             res.register_advancement()
             self.advance()
         else:
@@ -528,7 +529,7 @@ class Parser:
                 if res.error:
                     return res
 
-                if self.current_tok.type != TT_COLON:
+                if self.current_tok.type != toks.TT_COLON:
                     return res.failure(ExpectedItemError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
                         "Expected ':'"
@@ -543,7 +544,7 @@ class Parser:
 
                 key_pairs[key] = value
 
-                if self.current_tok.type != TT_COMMA:
+                if self.current_tok.type != toks.TT_COMMA:
                     break
 
                 res.register_advancement()
@@ -569,11 +570,11 @@ class Parser:
         res = ParseResult()
         else_case = None
 
-        if self.current_tok.matches(TT_KEYWORD, 'alioquin'):
+        if self.current_tok.matches(toks.TT_KEYWORD, 'alioquin'):
             res.register_advancement()
             self.advance()
 
-            if self.current_tok.type == TT_COLON:
+            if self.current_tok.type == toks.TT_COLON:
                 res.register_advancement()
                 self.advance()
             else:
@@ -582,7 +583,7 @@ class Parser:
                     "Expected ':'"
                 ))
 
-            if self.current_tok.type == TT_NEWLINE:
+            if self.current_tok.type == toks.TT_NEWLINE:
                 res.register_advancement()
                 self.advance()
 
@@ -606,7 +607,7 @@ class Parser:
         res = ParseResult()
         cases, else_case = [], None
 
-        if self.current_tok.matches(TT_KEYWORD, 'alioquinsi'):
+        if self.current_tok.matches(toks.TT_KEYWORD, 'alioquinsi'):
             all_cases = res.register(self.if_expr_b())
             if res.error:
                 return res
@@ -623,7 +624,7 @@ class Parser:
         cases = []
         else_case = None
 
-        if not self.current_tok.matches(TT_KEYWORD, case_keyword):
+        if not self.current_tok.matches(toks.TT_KEYWORD, case_keyword):
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 f"Expected '{case_keyword}'"
@@ -636,7 +637,7 @@ class Parser:
         if res.error:
             return res
 
-        if not self.current_tok.type == TT_COLON:
+        if not self.current_tok.type == toks.TT_COLON:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected ':'"
@@ -645,13 +646,13 @@ class Parser:
         res.register_advancement()
         self.advance()
 
-        if self.current_tok.type == TT_EOF:
+        if self.current_tok.type == toks.TT_EOF:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected statement", interactive=True
             ))
 
-        if self.current_tok.type == TT_NEWLINE:
+        if self.current_tok.type == toks.TT_NEWLINE:
             res.register_advancement()
             self.advance()
 
@@ -685,7 +686,7 @@ class Parser:
     def try_expr(self):
         res = ParseResult()
 
-        if not self.current_tok.matches(TT_KEYWORD, 'tempta'):
+        if not self.current_tok.matches(toks.TT_KEYWORD, 'tempta'):
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected 'tempta'"
@@ -694,7 +695,7 @@ class Parser:
         res.register_advancement()
         self.advance()
 
-        if self.current_tok == TT_COLON:
+        if self.current_tok == toks.TT_COLON:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected ':'"
@@ -703,13 +704,13 @@ class Parser:
         res.register_advancement()
         self.advance()
 
-        if self.current_tok.type == TT_EOF:
+        if self.current_tok.type == toks.TT_EOF:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected statement", interactive=True
             ))
 
-        if self.current_tok.type == TT_NEWLINE:
+        if self.current_tok.type == toks.TT_NEWLINE:
             res.register_advancement()
             self.advance()
 
@@ -719,22 +720,22 @@ class Parser:
             if res.error:
                 return res
 
-            if self.current_tok.matches(TT_KEYWORD, "praeter"):
+            if self.current_tok.matches(toks.TT_KEYWORD, "praeter"):
                 self.advance()
                 res.register_advancement()
 
-                if self.current_tok.type == TT_IDENTIFIER:
+                if self.current_tok.type == toks.TT_IDENTIFIER:
                     except_name = self.current_tok
                     res.register_advancement()
                     self.advance()
                 else:
                     except_name = None
 
-                if self.current_tok.matches(TT_KEYWORD, "tam"):
+                if self.current_tok.matches(toks.TT_KEYWORD, "tam"):
                     res.register_advancement()
                     self.advance()
 
-                    if self.current_tok.type != TT_IDENTIFIER:
+                    if self.current_tok.type != toks.TT_IDENTIFIER:
                         return res.failure(ExpectedItemError(
                             self.current_tok.pos_start, self.current_tok.pos_end,
                             "Expected identifier"
@@ -746,7 +747,7 @@ class Parser:
                 else:
                     except_as = None
 
-                if self.current_tok == TT_COLON:
+                if self.current_tok == toks.TT_COLON:
                     return res.failure(ExpectedItemError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
                         "Expected ':'"
@@ -779,7 +780,7 @@ class Parser:
     def for_expr(self):
         res = ParseResult()
 
-        if not self.current_tok.matches(TT_KEYWORD, 'pro'):
+        if not self.current_tok.matches(toks.TT_KEYWORD, 'pro'):
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected 'pro'"
@@ -788,7 +789,7 @@ class Parser:
         res.register_advancement()
         self.advance()
 
-        if self.current_tok.type != TT_IDENTIFIER:
+        if self.current_tok.type != toks.TT_IDENTIFIER:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected identifier"
@@ -798,7 +799,7 @@ class Parser:
         res.register_advancement()
         self.advance()
 
-        if self.current_tok.type != TT_EQ:
+        if self.current_tok.type != toks.TT_EQ:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected '='"
@@ -811,7 +812,7 @@ class Parser:
         if res.error:
             return res
 
-        if not self.current_tok.matches(TT_KEYWORD, 'ad'):
+        if not self.current_tok.matches(toks.TT_KEYWORD, 'ad'):
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected 'ad'"
@@ -824,7 +825,7 @@ class Parser:
         if res.error:
             return res
 
-        if self.current_tok.matches(TT_KEYWORD, 'gradus'):
+        if self.current_tok.matches(toks.TT_KEYWORD, 'gradus'):
             res.register_advancement()
             self.advance()
 
@@ -834,7 +835,7 @@ class Parser:
         else:
             step_value = None
 
-        if not self.current_tok.type == TT_COLON:
+        if not self.current_tok.type == toks.TT_COLON:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected ':'"
@@ -843,13 +844,13 @@ class Parser:
         res.register_advancement()
         self.advance()
 
-        if self.current_tok.type == TT_EOF:
+        if self.current_tok.type == toks.TT_EOF:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected statement", interactive=True
             ))
 
-        if self.current_tok.type == TT_NEWLINE:
+        if self.current_tok.type == toks.TT_NEWLINE:
             res.register_advancement()
             self.advance()
 
@@ -871,7 +872,7 @@ class Parser:
     def while_expr(self):
         res = ParseResult()
 
-        if not self.current_tok.matches(TT_KEYWORD, 'dum'):
+        if not self.current_tok.matches(toks.TT_KEYWORD, 'dum'):
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected 'dum'"
@@ -884,7 +885,7 @@ class Parser:
         if res.error:
             return res
 
-        if not self.current_tok.type == TT_COLON:
+        if not self.current_tok.type == toks.TT_COLON:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected ':'"
@@ -893,13 +894,13 @@ class Parser:
         res.register_advancement()
         self.advance()
 
-        if self.current_tok.type == TT_EOF:
+        if self.current_tok.type == toks.TT_EOF:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected statement", interactive=True
             ))
 
-        if self.current_tok.type == TT_NEWLINE:
+        if self.current_tok.type == toks.TT_NEWLINE:
             res.register_advancement()
             self.advance()
 
@@ -921,7 +922,7 @@ class Parser:
     def func_def(self):
         res = ParseResult()
 
-        if not self.current_tok.matches(TT_KEYWORD, 'opus'):
+        if not self.current_tok.matches(toks.TT_KEYWORD, 'opus'):
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected 'opus'"
@@ -930,18 +931,18 @@ class Parser:
         res.register_advancement()
         self.advance()
 
-        if self.current_tok.type == TT_IDENTIFIER:
+        if self.current_tok.type == toks.TT_IDENTIFIER:
             var_name_tok = self.current_tok
             res.register_advancement()
             self.advance()
-            if self.current_tok.type != TT_LPAREN:
+            if self.current_tok.type != toks.TT_LPAREN:
                 return res.failure(ExpectedItemError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
                     "Expected '('"
                 ))
         else:
             var_name_tok = None
-            if self.current_tok.type != TT_LPAREN:
+            if self.current_tok.type != toks.TT_LPAREN:
                 return res.failure(ExpectedItemError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
                     "Expected identifier or '('"
@@ -951,16 +952,16 @@ class Parser:
         self.advance()
         arg_name_toks = []
 
-        if self.current_tok.type == TT_IDENTIFIER:
+        if self.current_tok.type == toks.TT_IDENTIFIER:
             arg_name_toks.append(self.current_tok)
             res.register_advancement()
             self.advance()
 
-            while self.current_tok.type == TT_COMMA:
+            while self.current_tok.type == toks.TT_COMMA:
                 res.register_advancement()
                 self.advance()
 
-                if self.current_tok.type != TT_IDENTIFIER:
+                if self.current_tok.type != toks.TT_IDENTIFIER:
                     return res.failure(ExpectedItemError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
                         "Expected identifier"
@@ -970,13 +971,13 @@ class Parser:
                 res.register_advancement()
                 self.advance()
 
-            if self.current_tok.type != TT_RPAREN:
+            if self.current_tok.type != toks.TT_RPAREN:
                 return res.failure(ExpectedItemError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
                     "Expected ',' or ')'"
                 ))
         else:
-            if self.current_tok.type != TT_RPAREN:
+            if self.current_tok.type != toks.TT_RPAREN:
                 return res.failure(ExpectedItemError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
                     "Expected identifier or ')'"
@@ -985,7 +986,7 @@ class Parser:
         res.register_advancement()
         self.advance()
 
-        if self.current_tok.type == TT_ARROW:
+        if self.current_tok.type == toks.TT_ARROW:
             res.register_advancement()
             self.advance()
 
@@ -1000,7 +1001,7 @@ class Parser:
                 True
             ))
 
-        if self.current_tok.type != TT_COLON:
+        if self.current_tok.type != toks.TT_COLON:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected '->' or ':'"
@@ -1009,13 +1010,13 @@ class Parser:
         res.register_advancement()
         self.advance()
 
-        if self.current_tok.type == TT_EOF:
+        if self.current_tok.type == toks.TT_EOF:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected statement", interactive=True
             ))
 
-        if self.current_tok.type != TT_NEWLINE:
+        if self.current_tok.type != toks.TT_NEWLINE:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
                 "Expected a newline"

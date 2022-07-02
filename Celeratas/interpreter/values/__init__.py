@@ -1,6 +1,6 @@
-from .Bool import *
-from .Dict import *
-from .List import *
-from .Number import *
-from .String import *
-from .functions import *
+from .Bool import Bool
+from .Dict import Dict
+from .List import List
+from .Number import Number, Numeral
+from .String import String
+from .functions.Function import Function

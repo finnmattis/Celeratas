@@ -10,27 +10,27 @@ from .parser.Parser import Parser
 from .interpreter.Interpreter import Interpreter
 from .interpreter.SymbolTable import SymbolTable
 from .interpreter.Context import Context
-from .interpreter.values import Number, BuiltInFunction
+import Celeratas.interpreter.constants as constants
 
 #######################################
 # GLOBAL SYMBOL TABLE
 #######################################
 
 global_symbol_table = SymbolTable()
-global_symbol_table.set("nil", Number.null)
-global_symbol_table.set("pi", Number.math_PI)
-global_symbol_table.set("scribe", BuiltInFunction.print)
-global_symbol_table.set("initus", BuiltInFunction.input)
-global_symbol_table.set("purgo", BuiltInFunction.clear)
-global_symbol_table.set("est_numerus", BuiltInFunction.is_number)
-global_symbol_table.set("est_filum", BuiltInFunction.is_string)
-global_symbol_table.set("est_album", BuiltInFunction.is_list)
-global_symbol_table.set("est_opus", BuiltInFunction.is_function)
-global_symbol_table.set("adde", BuiltInFunction.append)
-global_symbol_table.set("remove", BuiltInFunction.pop)
-global_symbol_table.set("extende", BuiltInFunction.extend)
-global_symbol_table.set("longitudo", BuiltInFunction.len)
-global_symbol_table.set("curre", BuiltInFunction.run)
+global_symbol_table.set("nil", constants.Number.null)
+global_symbol_table.set("pi", constants.Number.math_PI)
+global_symbol_table.set("scribe", constants.BuiltInFunction.print)
+global_symbol_table.set("initus", constants.BuiltInFunction.input)
+global_symbol_table.set("purgo", constants.BuiltInFunction.clear)
+global_symbol_table.set("est_numerus", constants.BuiltInFunction.is_number)
+global_symbol_table.set("est_filum", constants.BuiltInFunction.is_string)
+global_symbol_table.set("est_album", constants.BuiltInFunction.is_list)
+global_symbol_table.set("est_opus", constants.BuiltInFunction.is_function)
+global_symbol_table.set("adde", constants.BuiltInFunction.append)
+global_symbol_table.set("remove", constants.BuiltInFunction.pop)
+global_symbol_table.set("extende", constants.BuiltInFunction.extend)
+global_symbol_table.set("longitudo", constants.BuiltInFunction.len)
+global_symbol_table.set("curre", constants.BuiltInFunction.run)
 #######################################
 # RUN SCRIPT FUNCTION
 #######################################
