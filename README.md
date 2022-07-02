@@ -2,6 +2,10 @@
 
 The Latin Programming Language
 
+![Tests](https://github.com/planto73/Celeratas/actions/workflows/tests.yml/badge.svg)
+![Last Commit](https://img.shields.io/github/last-commit/planto73/Celeratas)
+![Version](https://img.shields.io/github/v/release/planto73/Celeratas)
+
 ## Description
 
 Built from python, Celeratas uses a custom ident-oriented syntax that features latin keywords. Although some of the text is written in latin, there is an English help menu with translations for all of the keywords.
