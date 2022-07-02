@@ -106,24 +106,16 @@ def test_parser_var_access(test_input, expected):
 
 
 @pytest.mark.parametrize("test_input,expected", [
-    ("x = 1", VarAssignNode(["x"], [NumberNode(1, basepos, basepos)], [], Token(toks.TT_EQ, basepos), basepos, basepos)),
-    ("x[0] = 1", VarAssignNode(["x"], [NumberNode(1, basepos, basepos)], [NumberNode(0, basepos, basepos)], Token(toks.TT_EQ, basepos), basepos, basepos)),
+    ("x = 1", VarAssignNode([["x", []]], [NumberNode(1, basepos, basepos)], Token(toks.TT_EQ, basepos), basepos, basepos)),
+    ("x[0] = 1", VarAssignNode([["x", [NumberNode(0, basepos, basepos)]]], [NumberNode(1, basepos, basepos)], Token(toks.TT_EQ, basepos), basepos, basepos)),
 
 ])
 def test_parser_var_assign(test_input, expected):
     ast = parser_test_base(test_input)
-    for i, e in zip(ast.var_names_to_set, expected.var_names_to_set):
-        assert i == e
+
+    assert ast.vars_to_set[0][0] == expected.vars_to_set[0][0]
+    for i, e in zip(ast.vars_to_set[0][1], expected.vars_to_set[0][1]):
+        assert i.value == e.value
     for i, e in zip(ast.values_to_set, expected.values_to_set):
         assert i.value == e.value
-    for i, e in zip(ast.idxes_to_change, expected.idxes_to_change):
-        assert i.value == e.value
     assert ast.assign_type.type == expected.assign_type.type
-
-
-# @pytest.mark.parametrize("test_input,expected", [
-#     ("si 1 == 1:;    1", [])
-# ])
-# def test_parser_if(test_input, expected):
-#     ast = parser_test_base(test_input)
-#     case = ast.cases[0]

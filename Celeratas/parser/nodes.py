@@ -6,7 +6,7 @@ class NumberNode:
         self.pos_end = pos_end
 
     def __repr__(self):
-        return f'{self.tok}'
+        return f'{self.value}'
 
 
 class NumeralNode:
@@ -69,10 +69,9 @@ class VarAccessNode:
 
 
 class VarAssignNode:
-    def __init__(self, var_names_to_set, values_to_set, idxes_to_change, assign_type, pos_start, pos_end):
-        self.var_names_to_set = var_names_to_set
+    def __init__(self, vars_to_set, values_to_set, assign_type, pos_start, pos_end):
+        self.vars_to_set = vars_to_set
         self.values_to_set = values_to_set
-        self.idxes_to_change = idxes_to_change
         self.assign_type = assign_type
 
         self.pos_start = pos_start

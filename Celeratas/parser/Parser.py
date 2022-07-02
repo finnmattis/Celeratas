@@ -163,15 +163,30 @@ class Parser:
         res = ParseResult()
 
         if self.current_tok.type == toks.TT_IDENTIFIER:
-            var_names_to_set = []
-            idxes_to_change = []
+            vars_to_set = []
             pos_start = self.current_tok.pos_start.copy()
 
             while True:
-                var_names_to_set.append(self.current_tok.value)
+                var_name = self.current_tok.value
+                idxes_to_change = []
 
                 res.register_advancement()
                 self.advance()
+
+                while self.current_tok.type == toks.TT_LSQUARE:
+                    res.register_advancement()
+                    self.advance()
+
+                    idxes_to_change.append(res.register(self.bin_op(
+                        self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut')))))
+
+                    if res.error:
+                        return res
+
+                    res.register_advancement()
+                    self.advance()
+
+                vars_to_set.append([var_name, idxes_to_change])
 
                 if not self.current_tok.type == toks.TT_COMMA:
                     break
@@ -184,19 +199,6 @@ class Parser:
                         self.current_tok.pos_start, self.current_tok.pos_end,
                         "Expected identifier"
                     ))
-
-            while self.current_tok.type == toks.TT_LSQUARE:
-                res.register_advancement()
-                self.advance()
-
-                idxes_to_change.append(res.register(self.bin_op(
-                    self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut')))))
-
-                if res.error:
-                    return res
-
-                res.register_advancement()
-                self.advance()
 
             if self.current_tok.type not in [toks.TT_EQ, toks.TT_PLUS_EQ, toks.TT_MIN_EQ, toks.TT_MUL_EQ, toks.TT_DIV_EQ]:
                 self.reverse(res.advance_count)
@@ -227,7 +229,7 @@ class Parser:
                     res.register_advancement()
                     self.advance()
 
-                return res.success(VarAssignNode(var_names_to_set, values, idxes_to_change, assign_type, pos_start, pos_end=values[-1].pos_end))
+                return res.success(VarAssignNode(vars_to_set, values, assign_type, pos_start, pos_end=values[-1].pos_end))
 
         node = res.register(self.bin_op(
             self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut'))))

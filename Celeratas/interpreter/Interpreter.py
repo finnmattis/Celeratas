@@ -201,18 +201,20 @@ class Interpreter:
 
     def visit_VarAssignNode(self, node, context):
         res = RTResult()
-        idxes_to_change = node.idxes_to_change
         assign_type = node.assign_type
 
-        if len(node.var_names_to_set) != len(node.values_to_set):
+        if len(node.vars_to_set) != len(node.values_to_set):
             return res.failure(TypingError(
                 node.pos_start, node.pos_end,
                 'Must have the same number of variables and values',
                 context
             ))
 
-        for var_name, value in zip(node.var_names_to_set, node.values_to_set):
+        for var, value in zip(node.vars_to_set, node.values_to_set):
             value = res.register(self.visit(value, context))
+            var_name = var[0]
+            idxes_to_change = var[1]
+
             if res.should_return():
                 return res
 
@@ -231,21 +233,21 @@ class Interpreter:
 
                     for for_idx, idx_to_change in enumerate(idxes_to_change):
                         if isinstance(element_to_change, List):
-                            if idx_to_change.tok.value > len(element_to_change.elements) - 1:
+                            if idx_to_change.value > len(element_to_change.elements) - 1:
                                 return res.failure(IndexingError(
                                     node.pos_start, node.pos_end,
                                     'List index out of bounds',
                                     context
                                 ))
                             if for_idx == len(idxes_to_change) - 1:
-                                element_to_change.elements[idx_to_change.tok.value] = value
+                                element_to_change.elements[idx_to_change.value] = value
                             else:
-                                element_to_change = element_to_change.elements[idx_to_change.tok.value]
+                                element_to_change = element_to_change.elements[idx_to_change.value]
                         elif isinstance(element_to_change, Dict) or isinstance(element_to_change.elements, Dict):
                             if for_idx == len(idxes_to_change) - 1:
-                                element_to_change.key_pairs[idx_to_change.tok.value] = value
+                                element_to_change.key_pairs[idx_to_change.value] = value
                             else:
-                                element_to_change = element_to_change.key_pairs[idx_to_change.tok.value]
+                                element_to_change = element_to_change.key_pairs[idx_to_change.value]
                         else:
                             return res.failure(IndexingError(
                                 node.pos_start, node.pos_end,
