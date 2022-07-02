@@ -181,8 +181,8 @@ class Lexer:
                 dot_count += 1
             numeral_str += self.current_char
             self.advance()
-        # Check if numeral or identifier
-        if self.current_char != " ":
+        # Check if identifier
+        if self.current_char and self.current_char != " ":
             # Return the identifier
             identifier, error = self.make_identifier(numeral_str)
             # Need this extra code because the position of the pos start of the identifier will be behind the pos start of the numeral

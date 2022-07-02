@@ -35,7 +35,7 @@ global_symbol_table.set("curre", BuiltInFunction.run)
 # RUN SCRIPT FUNCTION
 #######################################
 
-# Function Out oo class because curre() needs to access it
+# Function Out of class because curre() needs to access it
 
 
 def run_script(fn, text):

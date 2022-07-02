@@ -105,10 +105,10 @@ def test_parser_var_access(test_input, expected):
 
 
 @pytest.mark.parametrize("test_input,expected", [
-    ("x = 1", VarAssignNode(Token(TT_IDENTIFIER, "x", basepos),
-                            NumberNode(Token(TT_INT, 1, basepos)), [], Token(TT_EQ, basepos))),
-    ("x[0] = 1", VarAssignNode(Token(TT_IDENTIFIER, "x", basepos),
-                               NumberNode(Token(TT_INT, 1, basepos)), [NumberNode(Token(TT_INT, 0, basepos))], Token(TT_EQ, basepos))),
+    ("x = 1", VarAssignNode(["x"],
+                            [NumberNode(Token(TT_INT, 1, basepos))], [], Token(TT_EQ, basepos), basepos, basepos)),
+    ("x[0] = 1", VarAssignNode(["x"],
+                               [NumberNode(Token(TT_INT, 1, basepos))], [NumberNode(Token(TT_INT, 1, basepos))], Token(TT_EQ, basepos), basepos, basepos)),
 
 ])
 def test_parser_var_assign(test_input, expected):
