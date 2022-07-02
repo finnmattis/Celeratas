@@ -15,29 +15,41 @@ Built from python, Celeratas uses a custom ident-oriented syntax that features l
 
 ### Installing
 
--   Clone the Git Repository
+-   Open the terminal and type:
+
+```
+pip3 install Celeratas
+```
 
 ### Executing program
 
--   Run shell.py with your python interpreter
--   Type auxilium to get started
+-   In order to open the Celeratas interactive shell, run the Celeratas package as a script. Open the terminal and type:
 
 ```
-python3 shell.py
+python3 -m Celeratas
+```
+
+-   From there, you can type 'auxilium' (meaning help) to learn about the basics of the language.
+
+```
 auxilium
 ```
 
-## Authors
+-   If you want to read from a file instead, add the file name as an argument.
 
-Contributors names and contact info
+```
+python3 -m Celeratas file_you_want_to_read.clr
+```
+
+## Author
 
 Finn Mattis
 
 ## Version History
 
--   0.1
-    -   Initial Release
+-   1.0.0
+    -   The initial release of Celeratas! Integers, Floats, Roman Numerals, Bools, Strings, Arrays, Hash Maps, Variables, Conditionals, Loops, Try-excepts, Functions, and more!
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE.md file for details
+This project is licensed under the MIT License - see the LICENSE file for details

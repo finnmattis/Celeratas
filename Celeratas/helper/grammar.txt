@@ -7,7 +7,7 @@ statement: KEYWORD:redi{return} expr?
 		 : KEYWORD:confringe{break}
 		 : expr
 
-expr: IDENTIFIER EQ expr
+expr: IDENTIFIER (IDENTIFIER TOKEN:COMMA)* (TOKEN:LSQUARE IDENTIFIER (IDENTIFIER, TOKEN:COMMA)* TOKEN:RSQUARE)* (TOKEN:EQ || TOKEN:PLUSEQ || TOKEN:MIN_EQ || TOKEN:MUL_EQ || TOKEN:DIV_EQ ) expr
     : comp-expr ((KEYWORD:et{and}|KEYWORD:aut{or}) comp-expr)*
 
 comp-expr: non{not} comp-expr
@@ -24,7 +24,7 @@ power: call (POW factor)*
 
 call: atom (LPAREN (expr (COMMA expr)*)? RPAREN)?
 
-atom: INT|FLOAT|STRING|IDENTIFIER([idx])?(.attribute)?
+atom: INT|FLOAT|STRING|IDENTIFIER([idx])*(.attribute)?
     : LPAREN expr RPAREN
     : list-expr
     : if-expr
@@ -56,7 +56,7 @@ except-expr: KEYWORD:praeter(except) (Exception)? (as name)? TOKEN:COLON
            statement
            | NEWLINE statements
 
-for-expr: KEYWORD:pro{for} IDENTIFIER EQ expr KEYWORD:ad{to} expr 
+for-expr: KEYWORD:pro{for} IDENTIFIER TOKEN:EQ expr KEYWORD:ad{to} expr 
         (KEYWORD:gradus{step} expr)? TOKEN:COLON
         statement
         | (NEWLINE statements)
