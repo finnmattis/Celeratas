@@ -943,7 +943,7 @@ class Parser:
         self.advance()
 
         if self.current_tok.type == toks.TT_IDENTIFIER:
-            var_name_tok = self.current_tok
+            var_name_tok = self.current_tok.value
             res.register_advancement()
             self.advance()
             if self.current_tok.type != toks.TT_LPAREN:
@@ -964,7 +964,7 @@ class Parser:
         arg_name_toks = []
 
         if self.current_tok.type == toks.TT_IDENTIFIER:
-            arg_name_toks.append(self.current_tok)
+            arg_name_toks.append(self.current_tok.value)
             res.register_advancement()
             self.advance()
 
@@ -978,7 +978,7 @@ class Parser:
                         "Expected identifier"
                     ))
 
-                arg_name_toks.append(self.current_tok)
+                arg_name_toks.append(self.current_tok.value)
                 res.register_advancement()
                 self.advance()
 
@@ -1009,7 +1009,9 @@ class Parser:
                 var_name_tok,
                 arg_name_toks,
                 body,
-                True
+                True,
+                pos_start,
+                body.pos_end
             ))
 
         if self.current_tok.type != toks.TT_COLON:

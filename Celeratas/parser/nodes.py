@@ -17,7 +17,7 @@ class NumeralNode:
         self.pos_end = pos_end
 
     def __repr__(self):
-        return self.tok.value
+        return self.value
 
 
 class StringNode:
@@ -39,7 +39,7 @@ class BoolNode:
         self.pos_end = pos_end
 
     def __repr__(self):
-        return self.tok.value
+        return self.value
 
 
 class ListNode:
@@ -147,9 +147,9 @@ class WhileNode:
 
 
 class FuncDefNode:
-    def __init__(self, var_name_tok, arg_name_toks, body_node, should_auto_return, pos_start, pos_end):
-        self.var_name_tok = var_name_tok
-        self.arg_name_toks = arg_name_toks
+    def __init__(self, func_name, args, body_node, should_auto_return, pos_start, pos_end):
+        self.func_name = func_name
+        self.args = args
         self.body_node = body_node
         self.should_auto_return = should_auto_return
 

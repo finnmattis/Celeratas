@@ -502,13 +502,13 @@ class Interpreter:
     def visit_FuncDefNode(self, node, context):
         res = RTResult()
 
-        func_name = node.var_name_tok.value if node.var_name_tok else None
+        func_name = node.func_name if node.func_name else None
         body_node = node.body_node
-        arg_names = [arg_name.value for arg_name in node.arg_name_toks]
+        arg_names = [arg_name for arg_name in node.args]
         func_value = Function(func_name, body_node, arg_names, node.should_auto_return).set_context(
             context).set_pos(node.pos_start, node.pos_end)
 
-        if node.var_name_tok:
+        if node.func_name:
             context.symbol_table.set(func_name, func_value)
 
         return res.success(func_value)

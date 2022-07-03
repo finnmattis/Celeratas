@@ -3,14 +3,15 @@
 #######################################
 
 import pytest
-from Celeratas.lexer.Lexer import Lexer
+
 import Celeratas.helper.tokens as toks
+
+from Celeratas.lexer.Lexer import Lexer
+from Celeratas.lexer.Token import Token
 
 #######################################
 # TESTS
 #######################################
-
-# TODO f-string test
 
 
 @pytest.mark.parametrize("test_input,expected", [
@@ -33,6 +34,7 @@ import Celeratas.helper.tokens as toks
     ("#.;x", [toks.TT_IDENTIFIER, "x"]),
     # Test strings:
     ("\"x\"", [toks.TT_STRING, ["x"]]),
+    ("f\"x{1}x\"", [toks.TT_STRING, ["x", [Token(toks.TT_INT, 1), Token(toks.TT_EOF)], "x"]]),
     # Test identifiers:
     ("x", [toks.TT_IDENTIFIER, "x"]),
     # Test ints and floats
@@ -69,10 +71,19 @@ import Celeratas.helper.tokens as toks
 def test_lexer(test_input, expected):
     lexer = Lexer("<std_in>", test_input)
     tokens, error = lexer.make_tokens()
+    token = tokens[0]
 
     assert error is None
     expected.append(toks.TT_EOF)
+    assert token.type == expected[0]
 
-    assert tokens[0].type == expected[0]
-    if tokens[0].value:
-        assert tokens[0].value == expected[1]
+    if len(test_input) > 0 and test_input[0] == "f":
+        assert token.value[0] == expected[1][0]
+        assert token.value[2] == expected[1][2]
+
+        for i, e in zip(token.value[1], expected[1][1]):
+            assert i.type == e.type
+            assert i.value == e.value
+
+    elif token.value:
+        assert token.value == expected[1]
