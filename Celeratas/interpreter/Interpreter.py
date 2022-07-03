@@ -374,7 +374,6 @@ class Interpreter:
 
     def visit_TryNode(self, node, context):
         res = RTResult()
-        elements = []
         try_body = self.visit(node.try_body, context)
 
         if node.except_name and node.except_name.value not in ["Exception", "TypeError", "NameError", "IndexError", "ZeroDivisionError"]:

@@ -161,16 +161,22 @@ body = ListNode([NumberNode(1, basepos, basepos)], basepos, basepos)
 
 
 @ pytest.mark.parametrize("test_input,expected", [
-    ("tempta:;    1", TryNode(body, None, None, None, basepos, basepos)),
-    ("tempta:;    1;praeter:;    1", TryNode(body, body, None, None, basepos, basepos)),
-    ("tempta:;    1;praeter Exception:;    1", TryNode(body, body, Token(toks.TT_IDENTIFIER, "Exception"), None, basepos, basepos)),
-    ("tempta:;    1;praeter Exception tam e:;    1;", TryNode(body, body, Token(toks.TT_IDENTIFIER, "Exception"), Token(toks.TT_IDENTIFIER, "e"), basepos, basepos)),
+    ("tempta:    1", TryNode(NumberNode(1, basepos, basepos), None, None, None, False, basepos, basepos)),
+    ("tempta:;    1", TryNode(body, None, None, None, True, basepos, basepos)),
+    ("tempta:;    1;praeter:;    1", TryNode(body, body, None, None, True, basepos, basepos)),
+    ("tempta:;    1;praeter Exception:;    1", TryNode(body, body, Token(toks.TT_IDENTIFIER, "Exception"), None, True, basepos, basepos)),
+    ("tempta:;    1;praeter Exception tam e:;    1;", TryNode(body, body, Token(toks.TT_IDENTIFIER, "Exception"), Token(toks.TT_IDENTIFIER, "e"), True, basepos, basepos)),
 ])
 def test_parser_try_node(test_input, expected):
     ast = parser_test_base(test_input)
 
-    for i, e in zip(ast.try_body.element_nodes, expected.try_body.element_nodes):
-        assert i.value == e.value
+    assert ast.should_return_null == expected.should_return_null
+
+    if ast.should_return_null:
+        for i, e in zip(ast.try_body.element_nodes, expected.try_body.element_nodes):
+            assert i.value == e.value
+    else:
+        assert ast.try_body.value == expected.try_body.value
 
     if ast.except_body:
         for i, e in zip(ast.except_body.element_nodes, expected.except_body.element_nodes):
