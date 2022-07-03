@@ -113,11 +113,12 @@ class IfNode:
 
 
 class TryNode:
-    def __init__(self, try_body, except_body, except_name, except_as, pos_start, pos_end):
+    def __init__(self, try_body, except_body, except_name, except_as, should_return_null, pos_start, pos_end):
         self.try_body = try_body
         self.except_body = except_body
         self.except_name = except_name
         self.except_as = except_as
+        self.should_return_null = should_return_null
 
         self.pos_start = pos_start
         self.pos_end = pos_end

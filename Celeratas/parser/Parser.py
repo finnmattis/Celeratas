@@ -728,6 +728,8 @@ class Parser:
             if res.error:
                 return res
 
+            should_return_null = True
+
             if self.current_tok.matches(toks.TT_KEYWORD, "praeter"):
                 self.advance()
                 res.register_advancement()
@@ -782,8 +784,9 @@ class Parser:
             except_body = None
             except_name = None
             except_as = None
+            should_return_null = False
 
-        return res.success(TryNode(try_body, except_body, except_name, except_as, pos_start, except_body.pos_end if except_body else try_body.pos_end))
+        return res.success(TryNode(try_body, except_body, except_name, except_as, should_return_null, pos_start, except_body.pos_end if except_body else try_body.pos_end))
 
     def for_expr(self):
         res = ParseResult()

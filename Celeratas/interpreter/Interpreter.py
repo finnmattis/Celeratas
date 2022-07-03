@@ -228,32 +228,31 @@ class Interpreter:
 
                 var_to_change = context.symbol_table.get(var_name)
 
-                if isinstance(var_to_change, List):
-                    element_to_change = var_to_change
+                element_to_change = var_to_change
 
-                    for for_idx, idx_to_change in enumerate(idxes_to_change):
-                        if isinstance(element_to_change, List):
-                            if idx_to_change.value > len(element_to_change.elements) - 1:
-                                return res.failure(IndexingError(
-                                    node.pos_start, node.pos_end,
-                                    'List index out of bounds',
-                                    context
-                                ))
-                            if for_idx == len(idxes_to_change) - 1:
-                                element_to_change.elements[idx_to_change.value] = value
-                            else:
-                                element_to_change = element_to_change.elements[idx_to_change.value]
-                        elif isinstance(element_to_change, Dict) or isinstance(element_to_change.elements, Dict):
-                            if for_idx == len(idxes_to_change) - 1:
-                                element_to_change.key_pairs[idx_to_change.value] = value
-                            else:
-                                element_to_change = element_to_change.key_pairs[idx_to_change.value]
-                        else:
+                for for_idx, idx_to_change in enumerate(idxes_to_change):
+                    if isinstance(element_to_change, List):
+                        if idx_to_change.value > len(element_to_change.elements) - 1:
                             return res.failure(IndexingError(
                                 node.pos_start, node.pos_end,
-                                'Variable must be a list or dict in order to set a specific index',
+                                'List index out of bounds',
                                 context
                             ))
+                        if for_idx == len(idxes_to_change) - 1:
+                            element_to_change.elements[idx_to_change.value] = value
+                        else:
+                            element_to_change = element_to_change.elements[idx_to_change.value]
+                    elif isinstance(element_to_change, Dict) or (hasattr(element_to_change, "elements") and isinstance(element_to_change.elements, Dict)):
+                        if for_idx == len(idxes_to_change) - 1:
+                            element_to_change.key_pairs[idx_to_change.value] = value
+                        else:
+                            element_to_change = element_to_change.key_pairs[idx_to_change.value]
+                    else:
+                        return res.failure(IndexingError(
+                            node.pos_start, node.pos_end,
+                            f'Variable must be a list or dict not \'{type(element_to_change).__name__}\' in order to set a specific index',
+                            context
+                        ))
 
                 value = var_to_change
 
@@ -375,6 +374,7 @@ class Interpreter:
 
     def visit_TryNode(self, node, context):
         res = RTResult()
+        elements = []
         try_body = self.visit(node.try_body, context)
 
         if node.except_name and node.except_name.value not in ["Exception", "TypeError", "NameError", "IndexError", "ZeroDivisionError"]:
@@ -400,7 +400,8 @@ class Interpreter:
             try_body = res.register(try_body)
             if res.error:
                 return res
-        return res.success(None)
+
+        return res.success(None if node.should_return_null else try_body)
 
     def visit_ForNode(self, node, context):
         res = RTResult()
