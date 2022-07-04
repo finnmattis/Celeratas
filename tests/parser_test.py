@@ -296,17 +296,26 @@ def test_parser_call(test_input, expected):
             assert i.value == e.value
 
 
-@ pytest.mark.parametrize("test_input,expected", [
-    ("redi 1", ReturnNode(NumberNode(1, basepos, basepos), basepos, basepos)),
-    ("continua", ContinueNode(basepos, basepos)),
-    ("confringe", BreakNode(basepos, basepos)),
+@ pytest.mark.parametrize("test_input,expected,should_fail", [
+    ("opus x():;    redi 1", FuncDefNode("x", [], ListNode([ReturnNode(NumberNode(1, basepos, basepos), basepos, basepos)], basepos, basepos), False, basepos, basepos), False),
+    ("redi 1", ReturnNode(NumberNode(1, basepos, basepos), basepos, basepos), True),
+    ("dum 1:;    continua", WhileNode(NumberNode(1, basepos, basepos), ListNode([ContinueNode(basepos, basepos)], basepos, basepos), True, basepos, basepos), False),
+    ("continua", ContinueNode(basepos, basepos), True),
+    ("dum 1:;    confringe", WhileNode(NumberNode(1, basepos, basepos), ListNode([BreakNode(basepos, basepos)], basepos, basepos), True, basepos, basepos), False),
+    ("confringe", BreakNode(basepos, basepos), True),
 ])
-def test_parser_misc_nodes(test_input, expected):
-    res = parser_test_base(test_input)
+def test_parser_misc_nodes(test_input, expected, should_fail):
+    res = parser_test_base(test_input, should_fail)
+    if not should_fail:
+        if isinstance(expected, FuncDefNode):
+            for i, e in enumerate(expected.body_node.element_nodes):
+                i = res.body_node.element_nodes[i]
+                assert i.node_to_return.value == e.node_to_return.value
 
-    if isinstance(expected, ReturnNode):
-        assert res.node_to_return.value == expected.node_to_return.value
-    if isinstance(expected, ContinueNode):
-        assert isinstance(res, ContinueNode)
-    if isinstance(expected, BreakNode):
-        assert isinstance(res, BreakNode)
+        if isinstance(expected, ReturnNode):
+            assert isinstance(res, ReturnNode)
+            assert res.node_to_return.value == expected.node_to_return.value
+        if isinstance(expected, ContinueNode):
+            assert isinstance(res, ContinueNode)
+        if isinstance(expected, BreakNode):
+            assert isinstance(res, BreakNode)

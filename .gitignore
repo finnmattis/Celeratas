@@ -11,6 +11,7 @@
 __pycache__
 .coverage
 .tox
+test.clr
 
 #BUILDING
 build/
