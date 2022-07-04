@@ -168,7 +168,8 @@ def test_parser_if_node(test_input, expected):
         assert i[2] == e[2]
 
         if e[2]:
-            for i1, e2 in zip(i[1].element_nodes, e[1].element_nodes):
+            for i1, e2 in enumerate(e[1].element_nodes):
+                i1 = i[1].element_nodes[i1]
                 assert i1.value == e2.value
         else:
             assert i[1].value == e[1].value
