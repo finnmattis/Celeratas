@@ -476,12 +476,6 @@ class Parser:
         element_nodes = []
         pos_start = self.current_tok.pos_start.copy()
 
-        if self.current_tok.type != toks.TT_LSQUARE:
-            return res.failure(ExpectedItemError(
-                self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected '['"
-            ))
-
         res.register_advancement()
         self.advance()
 
@@ -524,12 +518,6 @@ class Parser:
         res = ParseResult()
         key_pairs = {}
         pos_start = self.current_tok.pos_start.copy()
-
-        if self.current_tok.type != toks.TT_LBRACE:
-            return res.failure(ExpectedItemError(
-                self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected '{'"
-            ))
 
         res.register_advancement()
         self.advance()
@@ -638,12 +626,6 @@ class Parser:
         cases = []
         else_case = None
 
-        if not self.current_tok.matches(toks.TT_KEYWORD, case_keyword):
-            return res.failure(ExpectedItemError(
-                self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected '{case_keyword}'"
-            ))
-
         res.register_advancement()
         self.advance()
 
@@ -700,12 +682,6 @@ class Parser:
     def try_expr(self):
         res = ParseResult()
         pos_start = self.current_tok.pos_start.copy()
-
-        if not self.current_tok.matches(toks.TT_KEYWORD, 'tempta'):
-            return res.failure(ExpectedItemError(
-                self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected 'tempta'"
-            ))
 
         res.register_advancement()
         self.advance()
@@ -799,12 +775,6 @@ class Parser:
         res = ParseResult()
         pos_start = self.current_tok.pos_start.copy()
 
-        if not self.current_tok.matches(toks.TT_KEYWORD, 'pro'):
-            return res.failure(ExpectedItemError(
-                self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected 'pro'"
-            ))
-
         res.register_advancement()
         self.advance()
 
@@ -891,12 +861,6 @@ class Parser:
     def while_expr(self):
         res = ParseResult()
         pos_start = self.current_tok.pos_start.copy()
-
-        if not self.current_tok.matches(toks.TT_KEYWORD, 'dum'):
-            return res.failure(ExpectedItemError(
-                self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected 'dum'"
-            ))
 
         res.register_advancement()
         self.advance()
