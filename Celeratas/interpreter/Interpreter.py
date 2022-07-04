@@ -107,7 +107,7 @@ class Interpreter:
         var_name_to_get = node.var_name_to_get
         value = context.symbol_table.get(var_name_to_get)
         idxes_to_get = node.idxes_to_get
-        attr_to_get = node.attr_to_get
+        attrs_to_get = node.attrs_to_get
 
         if not value:
             return res.failure(NamingError(
@@ -161,7 +161,6 @@ class Interpreter:
                         context
                     ))
             elif isinstance(value, String):
-                print(hasattr(value, "elements"))
                 if not isinstance(idx_to_get, int):
                     return res.failure(IndexingError(
                         node.pos_start, node.pos_end,
@@ -182,8 +181,9 @@ class Interpreter:
                     'Can only get idx of list, dict, or string',
                     context
                 ))
-        if attr_to_get:
-            if hasattr(value, "elements"):
+
+        for attr_to_get in attrs_to_get:
+            if hasattr(value, "elements") and not isinstance(value, List):
                 value = value.elements
 
             value_attr = value.attributes.get(attr_to_get, None)
@@ -194,8 +194,7 @@ class Interpreter:
                     context
                 ))
 
-            value_attr = Number(value_attr)
-            return res.success(value_attr)
+            value = value_attr
         # idxes to get will have elements but value will no elements if value is a dict
         return res.success(value.elements if isinstance(value, List) else value)
 

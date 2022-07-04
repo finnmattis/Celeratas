@@ -16,7 +16,7 @@ class String(Value):
         super().__init__()
         self.value = value
 
-        self.attributes = {"length": len(value)}
+        self.attributes = {"length": Number(len(value))}
 
     def added_to(self, other):
         if isinstance(other, String):

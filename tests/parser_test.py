@@ -91,16 +91,19 @@ def test_parser_list(test_input, expected):
 
 
 @pytest.mark.parametrize("test_input,expected", [
-    ("x", VarAccessNode("x", [], None, basepos, basepos)),
-    ("x[0]", VarAccessNode("x", [NumberNode(0, basepos, basepos)], None, basepos, basepos)),
-    ("x[0][0]", VarAccessNode("x", [NumberNode(0, basepos, basepos), NumberNode(0, basepos, basepos)], None, basepos, basepos)),
-    ("x.attr", VarAccessNode("x", [], "attr", basepos, basepos)),
-    ("x[0].attr", VarAccessNode("x", [NumberNode(0, basepos, basepos)], "attr", basepos, basepos)),
+    ("x", VarAccessNode("x", [], [], basepos, basepos)),
+    ("x[0]", VarAccessNode("x", [NumberNode(0, basepos, basepos)], [], basepos, basepos)),
+    ("x[0][0]", VarAccessNode("x", [NumberNode(0, basepos, basepos), NumberNode(0, basepos, basepos)], [], basepos, basepos)),
+    ("x.attr", VarAccessNode("x", [], ["attr"], basepos, basepos)),
+    ("x[0].attr", VarAccessNode("x", [NumberNode(0, basepos, basepos)], ["attr"], basepos, basepos)),
+    ("x[0].attr.attr", VarAccessNode("x", [NumberNode(0, basepos, basepos)], ["attr", "attr"], basepos, basepos)),
 ])
 def test_parser_var_access(test_input, expected):
     ast = parser_test_base(test_input)
     assert ast.var_name_to_get == expected.var_name_to_get
-    assert ast.attr_to_get == expected.attr_to_get
+    for idx, e in enumerate(expected.attrs_to_get):
+        assert ast.attrs_to_get[idx] == e
+
     for out_idx, exp_out_idx in zip(ast.idxes_to_get, expected.idxes_to_get):
         assert out_idx.value == exp_out_idx.value
 

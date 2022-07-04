@@ -371,7 +371,7 @@ class Parser:
             pos_start = tok.pos_start
             pos_end = tok.pos_end
             idxes_to_get = []
-            attr_to_get = None
+            attrs_to_get = []
 
             if self.current_tok.type == toks.TT_LSQUARE:
                 while self.current_tok.type == toks.TT_LSQUARE:
@@ -388,7 +388,7 @@ class Parser:
                     res.register_advancement()
                     self.advance()
 
-            if self.current_tok.type == toks.TT_DOT:
+            while self.current_tok.type == toks.TT_DOT:
                 res.register_advancement()
                 self.advance()
 
@@ -398,12 +398,13 @@ class Parser:
                         "Expected Identifier"
                     ))
 
-                attr_to_get = self.current_tok.value
+                attrs_to_get.append(self.current_tok.value)
                 pos_end = self.current_tok.pos_end
+
                 res.register_advancement()
                 self.advance()
 
-            return res.success(VarAccessNode(var_name, idxes_to_get, attr_to_get, pos_start, pos_end))
+            return res.success(VarAccessNode(var_name, idxes_to_get, attrs_to_get, pos_start, pos_end))
 
         elif tok.matches(toks.TT_KEYWORD, 'opus') or tok.type == toks.TT_LPAREN:
             func_def = self.func_def()

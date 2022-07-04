@@ -59,10 +59,10 @@ class DictNode:
 
 
 class VarAccessNode:
-    def __init__(self, var_name_to_get, idxes_to_get, attr_to_get, pos_start, pos_end):
+    def __init__(self, var_name_to_get, idxes_to_get, attrs_to_get, pos_start, pos_end):
         self.var_name_to_get = var_name_to_get
         self.idxes_to_get = idxes_to_get
-        self.attr_to_get = attr_to_get
+        self.attrs_to_get = attrs_to_get
 
         self.pos_start = pos_start
         self.pos_end = pos_end
