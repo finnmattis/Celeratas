@@ -1,3 +1,11 @@
+import importlib_metadata
+from .shell import Shell
+
+
+def main():
+    shell = Shell()
+
+
 __all__ = (
     "__title__",
     "__summary__",
@@ -11,7 +19,6 @@ __all__ = (
 
 __copyright__ = "Copyright 2022 Finn Mattis"
 
-import importlib_metadata
 
 metadata = importlib_metadata.metadata("Celeratas")
 
