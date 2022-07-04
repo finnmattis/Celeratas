@@ -118,6 +118,14 @@ class Interpreter:
 
         value = value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
 
+        # Check if it is not here before loop because it won't check a value that is from an index
+        if not isinstance(value, List) and not isinstance(value, Dict) and not isinstance(value, String):
+            return res.failure(IndexingError(
+                node.pos_start, node.pos_end,
+                "Can only get idx of list, dict, or string",
+                context
+            ))
+
         for idx_to_get in idxes_to_get:
             idx_to_get = res.register(self.visit(idx_to_get, context))
             idx_to_get = idx_to_get.value
@@ -178,7 +186,7 @@ class Interpreter:
             else:
                 return res.failure(TypingError(
                     node.pos_start, node.pos_end,
-                    'Can only get idx of list, dict, or string',
+                    'Index out of bounds',
                     context
                 ))
 

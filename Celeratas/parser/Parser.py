@@ -383,46 +383,10 @@ class Parser:
             return res.success(BoolNode(tok.value, tok.pos_start, tok.pos_end))
 
         elif tok.type == toks.TT_IDENTIFIER:
-            res.register_advancement()
-            self.advance()
-            var_name = tok.value
-            pos_start = tok.pos_start
-            pos_end = tok.pos_end
-            idxes_to_get = []
-            attrs_to_get = []
-
-            if self.current_tok.type == toks.TT_LSQUARE:
-                while self.current_tok.type == toks.TT_LSQUARE:
-                    res.register_advancement()
-                    self.advance()
-
-                    idxes_to_get.append(res.register(self.bin_op(in_loop, in_func,
-                                                                 self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut')))))
-
-                    if res.error:
-                        return res
-
-                    pos_end = self.current_tok.pos_end
-                    res.register_advancement()
-                    self.advance()
-
-            while self.current_tok.type == toks.TT_DOT:
-                res.register_advancement()
-                self.advance()
-
-                if self.current_tok.type != toks.TT_IDENTIFIER:
-                    return res.failure(ExpectedItemError(
-                        self.current_tok.pos_start, self.current_tok.pos_end,
-                        "Expected Identifier"
-                    ))
-
-                attrs_to_get.append(self.current_tok.value)
-                pos_end = self.current_tok.pos_end
-
-                res.register_advancement()
-                self.advance()
-
-            return res.success(VarAccessNode(var_name, idxes_to_get, attrs_to_get, pos_start, pos_end))
+            var_access = res.register(self.var_access_expr(in_loop, in_func))
+            if res.error:
+                return res
+            return res.success(var_access)
 
         elif tok.matches(toks.TT_KEYWORD, 'opus') or tok.type == toks.TT_LPAREN:
             func_def = self.func_def(in_loop, in_func)
@@ -488,6 +452,51 @@ class Parser:
             tok.pos_start, tok.pos_end,
             "Expected expression"
         ))
+
+    def var_access_expr(self, in_loop, in_func):
+        res = ParseResult()
+
+        var_name = self.current_tok.value
+        pos_start = self.current_tok.pos_start
+        pos_end = self.current_tok.pos_end
+        idxes_to_get = []
+        attrs_to_get = []
+
+        res.register_advancement()
+        self.advance()
+
+        if self.current_tok.type == toks.TT_LSQUARE:
+            while self.current_tok.type == toks.TT_LSQUARE:
+                res.register_advancement()
+                self.advance()
+
+                idxes_to_get.append(res.register(self.bin_op(in_loop, in_func,
+                                                             self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut')))))
+
+                if res.error:
+                    return res
+
+                pos_end = self.current_tok.pos_end
+                res.register_advancement()
+                self.advance()
+
+        while self.current_tok.type == toks.TT_DOT:
+            res.register_advancement()
+            self.advance()
+
+            if self.current_tok.type != toks.TT_IDENTIFIER:
+                return res.failure(ExpectedItemError(
+                    self.current_tok.pos_start, self.current_tok.pos_end,
+                    "Expected Identifier"
+                ))
+
+            attrs_to_get.append(self.current_tok.value)
+            pos_end = self.current_tok.pos_end
+
+            res.register_advancement()
+            self.advance()
+
+        return res.success(VarAccessNode(var_name, idxes_to_get, attrs_to_get, pos_start, pos_end))
 
     def list_expr(self, in_loop, in_func):
         res = ParseResult()
