@@ -14,76 +14,82 @@ from Celeratas.lexer.Token import Token
 #######################################
 
 
-@pytest.mark.parametrize("test_input,expected", [
+@pytest.mark.parametrize("test_input,expected,should_fail", [
     # Should be nothing
-    ("", []),
+    ("", [], False),
     # Should throw error for improper tab - Tabs must either be 4 spaces or a tab unicode character
-    pytest.param(" ", [], marks=pytest.mark.xfail),
+    (" ", [], True),
     # Should skip empty space bc it is after first grammatical char
-    ("x ", [toks.TT_IDENTIFIER, "x"]),
-    ("x\t", [toks.TT_IDENTIFIER, "x"]),
+    ("x ", [toks.TT_IDENTIFIER, "x"], False),
+    ("x\t", [toks.TT_IDENTIFIER, "x"], False),
     # Should create a tab
-    ("\t", [toks.TT_TAB]),
-    ("    ", [toks.TT_TAB]),
+    ("\t", [toks.TT_TAB], False),
+    ("    ", [toks.TT_TAB], False),
     # Check for invalid chars
-    pytest.param(".", [], marks=pytest.mark.xfail),
+    ("~", [], True),
     # Check for newlines
-    (";", [toks.TT_NEWLINE]),
-    ("\n", [toks.TT_NEWLINE]),
+    (";", [toks.TT_NEWLINE], False),
+    ("\n", [toks.TT_NEWLINE], False),
     # Test comments:
-    ("#.;x", [toks.TT_IDENTIFIER, "x"]),
+    ("#.;x", [toks.TT_IDENTIFIER, "x"], False),
     # Test strings:
-    ("\"x\"", [toks.TT_STRING, ["x"]]),
-    ("f\"x{1}x\"", [toks.TT_STRING, ["x", [Token(toks.TT_INT, 1), Token(toks.TT_EOF)], "x"]]),
+    ("\"x\"", [toks.TT_STRING, ["x"]], False),
+    ("f\"x{1}x\"", [toks.TT_STRING, ["x", [Token(toks.TT_INT, 1), Token(toks.TT_EOF)], "x"]], False),
+    ("\"x", [], True),
     # Test identifiers:
-    ("x", [toks.TT_IDENTIFIER, "x"]),
+    ("x", [toks.TT_IDENTIFIER, "x"], False),
     # Test ints and floats
-    ("1", [toks.TT_INT, 1]),
-    ("1.0", [toks.TT_FLOAT, 1.0]),
+    ("1", [toks.TT_INT, 1], False),
+    ("1.0", [toks.TT_FLOAT, 1.0], False),
     # Test numerals - dont test invalid numerals because that is the fault of convert roman not the lexer
-    ("IV", [toks.TT_NUMERAL, 4]),
+    ("IV", [toks.TT_NUMERAL, 4], False),
     # Test Comparison Ops
-    ("==", [toks.TT_EE]),
-    ("!=", [toks.TT_NE]),
-    (">", [toks.TT_GT]),
-    ("<", [toks.TT_LT]),
-    (">=", [toks.TT_GTE]),
-    ("<=", [toks.TT_LTE]),
+    ("==", [toks.TT_EE], False),
+    ("!=", [toks.TT_NE], False),
+    (">", [toks.TT_GT], False),
+    ("<", [toks.TT_LT], False),
+    (">=", [toks.TT_GTE], False),
+    ("<=", [toks.TT_LTE], False),
     # Test Binary Operators
-    ("+", [toks.TT_PLUS]),
-    ("-", [toks.TT_MINUS]),
-    ("*", [toks.TT_MUL]),
-    ("/", [toks.TT_DIV]),
-    ("^", [toks.TT_POW]),
+    ("+", [toks.TT_PLUS], False),
+    ("-", [toks.TT_MINUS], False),
+    ("*", [toks.TT_MUL], False),
+    ("/", [toks.TT_DIV], False),
+    ("^", [toks.TT_POW], False),
     # Test Parens
-    ("(", [toks.TT_LPAREN]),
-    (")", [toks.TT_RPAREN]),
-    ("[", [toks.TT_LSQUARE]),
-    ("]", [toks.TT_RSQUARE]),
-    ("{", [toks.TT_LBRACE]),
-    ("}", [toks.TT_RBRACE]),
+    ("(", [toks.TT_LPAREN], False),
+    (")", [toks.TT_RPAREN], False),
+    ("[", [toks.TT_LSQUARE], False),
+    ("]", [toks.TT_RSQUARE], False),
+    ("{", [toks.TT_LBRACE], False),
+    ("}", [toks.TT_RBRACE], False),
     # Test Misc
-    ("=", [toks.TT_EQ]),
-    (":", [toks.TT_COLON]),
-    (",", [toks.TT_COMMA]),
-    ("=>", [toks.TT_ARROW])
+    ("=", [toks.TT_EQ], False),
+    (":", [toks.TT_COLON], False),
+    (",", [toks.TT_COMMA], False),
+    ("=>", [toks.TT_ARROW], False)
 ])
-def test_lexer(test_input, expected):
+def test_lexer(test_input, expected, should_fail):
     lexer = Lexer("<std_in>", test_input)
     tokens, error = lexer.make_tokens()
-    token = tokens[0]
 
-    assert error is None
-    expected.append(toks.TT_EOF)
-    assert token.type == expected[0]
+    if should_fail:
+        assert error
+    else:
+        assert not error
 
-    if len(test_input) > 0 and test_input[0] == "f":
-        assert token.value[0] == expected[1][0]
-        assert token.value[2] == expected[1][2]
+        token = tokens[0]
 
-        for i, e in zip(token.value[1], expected[1][1]):
-            assert i.type == e.type
-            assert i.value == e.value
+        expected.append(toks.TT_EOF)
+        assert token.type == expected[0]
 
-    elif token.value:
-        assert token.value == expected[1]
+        if len(test_input) > 0 and test_input[0] == "f":
+            assert token.value[0] == expected[1][0]
+            assert token.value[2] == expected[1][2]
+
+            for i, e in zip(token.value[1], expected[1][1]):
+                assert i.type == e.type
+                assert i.value == e.value
+
+        elif token.value:
+            assert token.value == expected[1]
