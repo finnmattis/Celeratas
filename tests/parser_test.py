@@ -231,10 +231,10 @@ def test_parser_while_node(test_input, expected):
 
 
 @pytest.mark.parametrize("test_input,expected", [
-    ("opus () -> 1", FuncDefNode(None, [], NumberNode(1, basepos, basepos), True, basepos, basepos)),
-    ("opus (x) -> 1", FuncDefNode(None, ["x"], NumberNode(1, basepos, basepos), True, basepos, basepos)),
-    ("opus (x,x) -> 1", FuncDefNode(None, ["x", "x"], NumberNode(1, basepos, basepos), True, basepos, basepos)),
-    ("opus x(x) -> 1", FuncDefNode("x", ["x"], NumberNode(1, basepos, basepos), True, basepos, basepos)),
+    ("() => 1", FuncDefNode(None, [], NumberNode(1, basepos, basepos), True, basepos, basepos)),
+    ("(x) => 1", FuncDefNode(None, ["x"], NumberNode(1, basepos, basepos), True, basepos, basepos)),
+    ("(x,x) => 1", FuncDefNode(None, ["x", "x"], NumberNode(1, basepos, basepos), True, basepos, basepos)),
+    ("(x) => 1", FuncDefNode(None, ["x"], NumberNode(1, basepos, basepos), True, basepos, basepos)),
     ("opus x(x):;    1", FuncDefNode("x", ["x"], body, False, basepos, basepos))
 ])
 def test_parser_func_def(test_input, expected):

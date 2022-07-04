@@ -66,7 +66,7 @@ from Celeratas.lexer.Token import Token
     ("=", [toks.TT_EQ]),
     (":", [toks.TT_COLON]),
     (",", [toks.TT_COMMA]),
-    ("->", [toks.TT_ARROW])
+    ("=>", [toks.TT_ARROW])
 ])
 def test_lexer(test_input, expected):
     lexer = Lexer("<std_in>", test_input)

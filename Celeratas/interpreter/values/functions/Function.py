@@ -11,7 +11,7 @@ class Function(BaseFunction):
 
     def execute(self, args):
         res = RTResult()
-        from interpreter.Interpreter import Interpreter
+        from Celeratas.interpreter.Interpreter import Interpreter
         interpreter = Interpreter()
         exec_ctx = self.generate_new_context()
 

@@ -405,7 +405,19 @@ class Parser:
 
             return res.success(VarAccessNode(var_name, idxes_to_get, attr_to_get, pos_start, pos_end))
 
-        elif tok.type == toks.TT_LPAREN:
+        elif tok.matches(toks.TT_KEYWORD, 'opus') or tok.type == toks.TT_LPAREN:
+            func_def = self.func_def()
+            # If LPAREN, then func will check if it's a anonymous function and return the number of advances if it is not, the code below will then reverse the operation
+            if isinstance(func_def, int):
+                self.reverse(func_def)
+            elif res.error:
+                return res
+            else:
+                func_def = res.register(func_def)
+                return res.success(func_def)
+
+        # Order of operations
+        if tok.type == toks.TT_LPAREN:
             res.register_advancement()
             self.advance()
             expr = res.register(self.expr())
@@ -452,12 +464,6 @@ class Parser:
             if res.error:
                 return res
             return res.success(while_expr)
-
-        elif tok.matches(toks.TT_KEYWORD, 'opus'):
-            func_def = res.register(self.func_def())
-            if res.error:
-                return res
-            return res.success(func_def)
 
         return res.failure(ExpectedItemError(
             tok.pos_start, tok.pos_end,
@@ -932,40 +938,13 @@ class Parser:
 
         return res.success(WhileNode(condition, body, False, pos_start, body.pos_end))
 
-    def func_def(self):
+    def _register_args(self):
         res = ParseResult()
-        pos_start = self.current_tok.pos_start.copy()
-
-        if not self.current_tok.matches(toks.TT_KEYWORD, 'opus'):
-            return res.failure(ExpectedItemError(
-                self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected 'opus'"
-            ))
 
         res.register_advancement()
         self.advance()
 
-        if self.current_tok.type == toks.TT_IDENTIFIER:
-            var_name_tok = self.current_tok.value
-            res.register_advancement()
-            self.advance()
-            if self.current_tok.type != toks.TT_LPAREN:
-                return res.failure(ExpectedItemError(
-                    self.current_tok.pos_start, self.current_tok.pos_end,
-                    "Expected '('"
-                ))
-        else:
-            var_name_tok = None
-            if self.current_tok.type != toks.TT_LPAREN:
-                return res.failure(ExpectedItemError(
-                    self.current_tok.pos_start, self.current_tok.pos_end,
-                    "Expected identifier or '('"
-                ))
-
-        res.register_advancement()
-        self.advance()
         arg_name_toks = []
-
         if self.current_tok.type == toks.TT_IDENTIFIER:
             arg_name_toks.append(self.current_tok.value)
             res.register_advancement()
@@ -999,8 +978,26 @@ class Parser:
 
         res.register_advancement()
         self.advance()
+        return res.success(arg_name_toks)
 
-        if self.current_tok.type == toks.TT_ARROW:
+    def func_def(self):
+        # Need helper function because anynomous and full-fledged functions are handled differently
+        # Call this function when current token is '('
+
+        res = ParseResult()
+        pos_start = self.current_tok.pos_start.copy()
+
+        # Anonymous function
+        if self.current_tok.type == toks.TT_LPAREN:
+            arg_name_toks = res.register(self._register_args())
+
+            # Need to divide advance count by 2 for weird inner function reasons
+            if res.error:
+                return res.advance_count
+
+            if self.current_tok.type != toks.TT_ARROW:
+                return res.advance_count
+
             res.register_advancement()
             self.advance()
 
@@ -1009,7 +1006,7 @@ class Parser:
                 return res
 
             return res.success(FuncDefNode(
-                var_name_tok,
+                None,
                 arg_name_toks,
                 body,
                 True,
@@ -1017,10 +1014,35 @@ class Parser:
                 body.pos_end
             ))
 
+        # Advance here past opus keyword
+
+        res.register_advancement()
+        self.advance()
+
+        if self.current_tok.type != toks.TT_IDENTIFIER:
+            return res.failure(ExpectedItemError(
+                self.current_tok.pos_start, self.current_tok.pos_end,
+                "Expected identifier"
+            ))
+
+        var_name_tok = self.current_tok.value
+        res.register_advancement()
+        self.advance()
+
+        if self.current_tok.type != toks.TT_LPAREN:
+            return res.failure(ExpectedItemError(
+                self.current_tok.pos_start, self.current_tok.pos_end,
+                "Expected '('"
+            ))
+
+        arg_name_toks = res.register(self._register_args())
+        if res.error:
+            return res
+
         if self.current_tok.type != toks.TT_COLON:
             return res.failure(ExpectedItemError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected '->' or ':'"
+                "Expected ':'"
             ))
 
         res.register_advancement()

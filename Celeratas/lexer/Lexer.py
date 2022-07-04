@@ -300,20 +300,6 @@ class Lexer:
         tok_type = toks.TT_KEYWORD if id_str in toks.KEYWORDS else toks.TT_IDENTIFIER
         return Token(tok_type, id_str, pos_start, self.pos), None
 
-    def make_minus(self):
-        tok_type = toks.TT_MINUS
-        pos_start = self.pos.copy()
-        self.advance()
-
-        if self.current_char == '>':
-            self.advance()
-            tok_type = toks.TT_ARROW
-        elif self.current_char == '=':
-            self.advance()
-            tok_type = toks.TT_MIN_EQ
-
-        return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
-
     def make_not_equals(self):
         pos_start = self.pos.copy()
         self.advance()
@@ -323,7 +309,21 @@ class Lexer:
             return Token(toks.TT_NE, pos_start=pos_start, pos_end=self.pos), None
 
         self.advance()
-        return None, ExpectedItemError(pos_start, self.pos, "'=' (after '!')")
+        return None, ExpectedItemError(pos_start, self.pos, "Expected '=' after '!'")
+
+    def make_equals(self):
+        tok_type = toks.TT_EQ
+        pos_start = self.pos.copy()
+        self.advance()
+
+        if self.current_char == '>':
+            self.advance()
+            tok_type = toks.TT_ARROW
+        elif self.current_char == '=':
+            self.advance()
+            tok_type = toks.TT_EE
+
+        return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
 
     def make_mult_toks(self, tok_type_1, tok_type_2, switch_factor):
         tok_type = tok_type_1
@@ -339,14 +339,14 @@ class Lexer:
     def make_plus(self):
         return(self.make_mult_toks(toks.TT_PLUS, toks.TT_PLUS_EQ, "="))
 
+    def make_minus(self):
+        return self.make_mult_toks(toks.TT_MINUS, toks.TT_MIN_EQ, "=")
+
     def make_mul(self):
         return(self.make_mult_toks(toks.TT_MUL, toks.TT_MUL_EQ, "="))
 
     def make_div(self):
         return(self.make_mult_toks(toks.TT_DIV, toks.TT_DIV_EQ, "="))
-
-    def make_equals(self):
-        return self.make_mult_toks(toks.TT_EQ, toks.TT_EE, "=")
 
     def make_less_than(self):
         return self.make_mult_toks(toks.TT_LT, toks.TT_LTE, "=")
