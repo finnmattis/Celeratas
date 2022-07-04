@@ -177,7 +177,7 @@ class Parser:
             ))
         return res.success(expr)
 
-    def expr(self, in_loop, in_func, could_have_var_assign=True):
+    def expr(self, in_loop, in_func):
         res = ParseResult()
 
         if self.current_tok.type == toks.TT_IDENTIFIER:
@@ -221,12 +221,6 @@ class Parser:
             if self.current_tok.type not in [toks.TT_EQ, toks.TT_PLUS_EQ, toks.TT_MIN_EQ, toks.TT_MUL_EQ, toks.TT_DIV_EQ]:
                 self.reverse(res.advance_count)
             else:
-                if not could_have_var_assign:
-                    return res.failure(InvalidSyntaxError(
-                        self.current_tok.pos_start, self.current_tok.pos_end,
-                        "Inappropriate Var Assign Node"
-                    ))
-
                 assign_type = self.current_tok
 
                 res.register_advancement()
@@ -236,7 +230,8 @@ class Parser:
 
                 while True:
                     values.append(res.register(
-                        self.expr(in_loop, in_func, could_have_var_assign=False)))
+                        self.bin_op(in_loop, in_func,
+                                    self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut')))))
 
                     if res.error:
                         return res
@@ -511,7 +506,8 @@ class Parser:
             self.advance()
         else:
             element_nodes.append(res.register(
-                self.expr(in_loop, in_func, could_have_var_assign=False)))
+                self.bin_op(in_loop, in_func,
+                            self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut')))))
             if res.error:
                 return res.failure(ExpectedItemError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
@@ -554,7 +550,8 @@ class Parser:
             self.advance()
         else:
             while True:
-                key = res.register(self.expr(in_loop, in_func, could_have_var_assign=False))
+                key = res.register(self.bin_op(in_loop, in_func,
+                                               self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut'))))
                 if res.error:
                     return res
 
@@ -567,7 +564,8 @@ class Parser:
                 res.register_advancement()
                 self.advance()
 
-                value = res.register(self.expr(in_loop, in_func, could_have_var_assign=False))
+                value = res.register(self.bin_op(in_loop, in_func,
+                                                 self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut'))))
                 if res.error:
                     return res
 
@@ -830,7 +828,8 @@ class Parser:
         res.register_advancement()
         self.advance()
 
-        start_value = res.register(self.expr(in_loop=True, in_func=in_func))
+        start_value = res.register(self.bin_op(True, in_func,
+                                               self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut'))))
         if res.error:
             return res
 
@@ -843,7 +842,8 @@ class Parser:
         res.register_advancement()
         self.advance()
 
-        end_value = res.register(self.expr(in_loop=True, in_func=in_func))
+        end_value = res.register(self.bin_op(True, in_func,
+                                             self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut'))))
         if res.error:
             return res
 
@@ -851,7 +851,8 @@ class Parser:
             res.register_advancement()
             self.advance()
 
-            step_value = res.register(self.expr(in_loop=True, in_func=in_func))
+            step_value = res.register(self.bin_op(True, in_func,
+                                                  self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut'))))
             if res.error:
                 return res
         else:
