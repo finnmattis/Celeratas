@@ -46,7 +46,6 @@ class BaseFunction(Value):
         return res.success(None)
 
     def populate_args(self, func_args, input_args, exec_ctx):
-        print(input_args)
 
         for arg_idx, arg in enumerate(func_args):
             arg_name = arg[0]
