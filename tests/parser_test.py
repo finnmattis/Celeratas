@@ -159,7 +159,7 @@ def test_parser_var_assign(test_input, expected):
                                                                 basepos, basepos], (ListNode([NumberNode(1, basepos, basepos)], basepos, basepos), True), basepos, basepos)),
 
 ])
-def test_parser_if_node(test_input, expected):
+def test_parser_if(test_input, expected):
     res = parser_test_base(test_input)
 
     for i, e in enumerate(res.cases):
@@ -191,7 +191,7 @@ body = ListNode([NumberNode(1, basepos, basepos)], basepos, basepos)
     ("tempta:;    1;praeter Exception:;    1", TryNode(body, body, Token(toks.TT_IDENTIFIER, "Exception"), None, True, basepos, basepos)),
     ("tempta:;    1;praeter Exception tam e:;    1;", TryNode(body, body, Token(toks.TT_IDENTIFIER, "Exception"), Token(toks.TT_IDENTIFIER, "e"), True, basepos, basepos)),
 ])
-def test_parser_try_node(test_input, expected):
+def test_parser_try(test_input, expected):
     res = parser_test_base(test_input)
 
     assert res.should_return_null == expected.should_return_null
@@ -221,7 +221,7 @@ def test_parser_try_node(test_input, expected):
     ("pro i = 1 ad 1 gradus 1:;    1", ForNode("i", NumberNode(1, basepos, basepos), NumberNode(
         1, basepos, basepos), NumberNode(1, basepos, basepos), body, True, basepos, basepos))
 ])
-def test_parser_for_node(test_input, expected):
+def test_parser_for(test_input, expected):
     res = parser_test_base(test_input)
 
     assert res.var_name == expected.var_name
@@ -244,7 +244,7 @@ def test_parser_for_node(test_input, expected):
     ("dum 1: 1", WhileNode(NumberNode(1, basepos, basepos), NumberNode(1, basepos, basepos), False, basepos, basepos)),
     ("dum 1:;    1", WhileNode(NumberNode(1, basepos, basepos), body, True, basepos, basepos)),
 ])
-def test_parser_while_node(test_input, expected):
+def test_parser_while(test_input, expected):
     res = parser_test_base(test_input)
 
     assert res.condition_node.value == expected.condition_node.value
@@ -304,7 +304,7 @@ def test_parser_call(test_input, expected):
     ("dum 1:;    confringe", WhileNode(NumberNode(1, basepos, basepos), ListNode([BreakNode(basepos, basepos)], basepos, basepos), True, basepos, basepos), False),
     ("confringe", BreakNode(basepos, basepos), True),
 ])
-def test_parser_misc_nodes(test_input, expected, should_fail):
+def test_parser_misc(test_input, expected, should_fail):
     res = parser_test_base(test_input, should_fail)
     if not should_fail:
         if isinstance(expected, FuncDefNode):

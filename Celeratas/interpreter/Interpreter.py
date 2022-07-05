@@ -119,7 +119,7 @@ class Interpreter:
         value = value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
 
         # Check if it is not here before loop because it won't check a value that is from an index
-        if not isinstance(value, List) and not isinstance(value, Dict) and not isinstance(value, String):
+        if idxes_to_get and not isinstance(value, List) and not isinstance(value, Dict) and not isinstance(value, String):
             return res.failure(IndexingError(
                 node.pos_start, node.pos_end,
                 "Can only get idx of list, dict, or string",
