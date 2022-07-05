@@ -53,7 +53,7 @@ class BuiltInFunction(BaseFunction):
     def execute_print(self, exec_ctx):
         print(str(exec_ctx.symbol_table.get('value')))
         return RTResult().success(None)
-    execute_print.arg_names = ['value']
+    execute_print.arg_names = [('value', None)]
 
     def execute_input(self, exec_ctx):
         text = input()
@@ -68,23 +68,23 @@ class BuiltInFunction(BaseFunction):
     def execute_is_number(self, exec_ctx):
         is_number = isinstance(exec_ctx.symbol_table.get("value"), Number)
         return RTResult().success(Number.true if is_number else Number.false)
-    execute_is_number.arg_names = ["value"]
+    execute_is_number.arg_names = [('value', None)]
 
     def execute_is_string(self, exec_ctx):
         is_number = isinstance(exec_ctx.symbol_table.get("value"), String)
         return RTResult().success(Number.true if is_number else Number.false)
-    execute_is_string.arg_names = ["value"]
+    execute_is_string.arg_names = [("value", None)]
 
     def execute_is_list(self, exec_ctx):
         is_number = isinstance(exec_ctx.symbol_table.get("value"), List)
         return RTResult().success(Number.true if is_number else Number.false)
-    execute_is_list.arg_names = ["value"]
+    execute_is_list.arg_names = [("value", None)]
 
     def execute_is_function(self, exec_ctx):
         is_number = isinstance(
             exec_ctx.symbol_table.get("value"), BaseFunction)
         return RTResult().success(Number.true if is_number else Number.false)
-    execute_is_function.arg_names = ["value"]
+    execute_is_function.arg_names = [("value", None)]
 
     def execute_append(self, exec_ctx):
         list_ = exec_ctx.symbol_table.get("list")
@@ -99,7 +99,7 @@ class BuiltInFunction(BaseFunction):
 
         list_.elements.append(value)
         return RTResult().success(None)
-    execute_append.arg_names = ["list", "value"]
+    execute_append.arg_names = [("list", "value")]
 
     def execute_pop(self, exec_ctx):
         list_ = exec_ctx.symbol_table.get("list")
@@ -128,7 +128,7 @@ class BuiltInFunction(BaseFunction):
                 exec_ctx
             ))
         return RTResult().success(element)
-    execute_pop.arg_names = ["list", "index"]
+    execute_pop.arg_names = [("list", None), ("index", None)]
 
     def execute_extend(self, exec_ctx):
         listA = exec_ctx.symbol_table.get("listA")
@@ -150,7 +150,7 @@ class BuiltInFunction(BaseFunction):
 
         listA.elements.extend(listB.elements)
         return RTResult().success(None)
-    execute_extend.arg_names = ["listA", "listB"]
+    execute_extend.arg_names = [("listA", None), ("listB", None)]
 
     def execute_len(self, exec_ctx):
         input_ = exec_ctx.symbol_table.get("input")
@@ -163,7 +163,7 @@ class BuiltInFunction(BaseFunction):
             ))
 
         return RTResult().success(Number(len(input_.elements if isinstance(input_, List) else input_.value)))
-    execute_len.arg_names = ["input"]
+    execute_len.arg_names = [("input", None)]
 
     def execute_run(self, exec_ctx):
         fn = exec_ctx.symbol_table.get("fn")
@@ -199,4 +199,4 @@ class BuiltInFunction(BaseFunction):
             ))
 
         return RTResult().success(None)
-    execute_run.arg_names = ["fn"]
+    execute_run.arg_names = [("fn", None)]

@@ -510,8 +510,17 @@ class Interpreter:
 
         func_name = node.func_name if node.func_name else None
         body_node = node.body_node
-        arg_names = [arg_name for arg_name in node.args]
-        func_value = Function(func_name, body_node, arg_names, node.should_auto_return).set_context(
+        args = []
+        for arg_name, arg_value in node.args:
+            if arg_value is None:
+                args.append((arg_name, arg_value))
+            else:
+                arg_value = res.register(self.visit(arg_value, context))
+                if res.should_return():
+                    return res
+                args.append((arg_name, arg_value))
+
+        func_value = Function(func_name, body_node, args, node.should_auto_return).set_context(
             context).set_pos(node.pos_start, node.pos_end)
 
         if node.func_name:

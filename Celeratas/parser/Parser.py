@@ -328,6 +328,13 @@ class Parser:
                 while True:
                     if self.current_tok.type == toks.TT_IDENTIFIER:
                         arg_name = self.current_tok.value
+                        for prev_name in arg_nodes:
+                            if arg_name == prev_name:
+                                res.failure(InvalidSyntaxError(
+                                    self.current_tok.pos_start, self.current_tok.pos_end,
+                                    f"Duplicate argument '{arg_name}'"
+                                ))
+                                return res
                         self.advance()
 
                         if self.current_tok.type != toks.TT_EQ:
@@ -339,6 +346,8 @@ class Parser:
 
                             arg_value = res.register(self.bin_op(in_loop, in_func,
                                                                  self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut'))))
+                            if res.error:
+                                return res
 
                             arg_nodes[arg_name] = arg_value
                             keyword_arg = True
@@ -973,23 +982,48 @@ class Parser:
         res.register_advancement()
         self.advance()
 
-        arg_name_toks = []
+        args = []
+        key_word_arg = False
+
         if self.current_tok.type == toks.TT_IDENTIFIER:
-            arg_name_toks.append(self.current_tok.value)
-            res.register_advancement()
-            self.advance()
-
-            while self.current_tok.type == toks.TT_COMMA:
-                res.register_advancement()
-                self.advance()
-
+            while True:
                 if self.current_tok.type != toks.TT_IDENTIFIER:
                     return res.failure(ExpectedItemError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
                         "Expected identifier"
                     ))
 
-                arg_name_toks.append(self.current_tok.value)
+                arg_name = self.current_tok.value
+                for prev_arg_name, _ in args:
+                    if arg_name == prev_arg_name:
+                        return res.failure(InvalidSyntaxError(
+                            self.current_tok.pos_start, self.current_tok.pos_end,
+                            f"Duplicate argument '{arg_name}'"
+                        ))
+
+                res.register_advancement()
+                self.advance()
+
+                if self.current_tok.type == toks.TT_EQ:
+                    res.register_advancement()
+                    self.advance()
+                    arg_value = res.register(self.bin_op(False, False, self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut'))))
+                    if res.error:
+                        return res
+
+                    args.append((arg_name, arg_value))
+                    key_word_arg = True
+                else:
+                    if key_word_arg:
+                        return res.failure(InvalidSyntaxError(
+                            self.current_tok.pos_start, self.current_tok.pos_end,
+                            "Positional argument cannot follow keyword argument"
+                        ))
+
+                    args.append((arg_name, None))
+
+                if not self.current_tok.type == toks.TT_COMMA:
+                    break
                 res.register_advancement()
                 self.advance()
 
@@ -998,6 +1032,7 @@ class Parser:
                     self.current_tok.pos_start, self.current_tok.pos_end,
                     "Expected ',' or ')'"
                 ))
+
         else:
             if self.current_tok.type != toks.TT_RPAREN:
                 return res.failure(ExpectedItemError(
@@ -1007,7 +1042,7 @@ class Parser:
 
         res.register_advancement()
         self.advance()
-        return res.success(arg_name_toks)
+        return res.success(args)
 
     def func_def(self, in_loop, in_func):
         # Need helper function because anynomous and full-fledged functions are handled differently

@@ -23,36 +23,46 @@ class BaseFunction(Value):
         new_context.symbol_table = SymbolTable(new_context.parent.symbol_table)
         return new_context
 
-    def check_args(self, arg_names, args):
+    def check_args(self, func_args, input_args):
+
         res = RTResult()
 
-        if len(args) > len(arg_names):
+        if len(input_args) > len(func_args):
             return res.failure(TypingError(
                 self.pos_start, self.pos_end,
-                f"{len(args) - len(arg_names)} too many args passed into {self.name}()",
+                f"{len(input_args) - len(func_args)} too many args passed into {self.name}()",
                 self.context
             ))
 
-        if len(args) < len(arg_names):
+        pos_args = [i for i in func_args if i[1] is None]
+
+        if len(input_args) < len(pos_args):
             return res.failure(TypingError(
                 self.pos_start, self.pos_end,
-                f"{len(arg_names) - len(args)} too few args passed into {self}()",
+                f"{len(pos_args) - len(input_args)} too few args passed into {self}()",
                 self.context
             ))
 
         return res.success(None)
 
-    def populate_args(self, arg_names, args, exec_ctx):
-        for arg_name, arg_value in args.items():
-            if isinstance(arg_name, str):
+    def populate_args(self, func_args, input_args, exec_ctx):
+        print(input_args)
+
+        for arg_idx, arg in enumerate(func_args):
+            arg_name = arg[0]
+            arg_value = arg[1]
+
+            if arg_name in input_args:
+                input_arg_value = input_args[arg_name]
+                input_arg_value.set_context(exec_ctx)
+                exec_ctx.symbol_table.set(arg_name, input_arg_value)
+            elif arg_idx in input_args:
+                input_arg_value = input_args[arg_idx]
+                input_arg_value.set_context(exec_ctx)
+                exec_ctx.symbol_table.set(arg_name, input_arg_value)
+            else:
                 arg_value.set_context(exec_ctx)
                 exec_ctx.symbol_table.set(arg_name, arg_value)
-
-            if isinstance(arg_name, int):
-                arg_name = arg_names[arg_name]
-                exec_ctx.symbol_table.set(arg_name, arg_value)
-
-            exec_ctx.symbol_table.set(arg_name, arg_value)
 
     def check_and_populate_args(self, arg_names, args, exec_ctx):
         res = RTResult()

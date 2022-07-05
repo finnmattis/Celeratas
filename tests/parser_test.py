@@ -260,42 +260,52 @@ def test_parser_while(test_input, expected):
         assert res.body_node.value == expected.body_node.value
 
 
-@pytest.mark.parametrize("test_input,expected", [
-    ("() => 1", FuncDefNode(None, [], NumberNode(1, basepos, basepos), True, basepos, basepos)),
-    ("(x) => 1", FuncDefNode(None, ["x"], NumberNode(1, basepos, basepos), True, basepos, basepos)),
-    ("(x,x) => 1", FuncDefNode(None, ["x", "x"], NumberNode(1, basepos, basepos), True, basepos, basepos)),
-    ("(x) => 1", FuncDefNode(None, ["x"], NumberNode(1, basepos, basepos), True, basepos, basepos)),
-    ("opus x(x):;    1", FuncDefNode("x", ["x"], body, False, basepos, basepos))
+@pytest.mark.parametrize("test_input,expected,should_fail", [
+    ("() => 1", FuncDefNode(None, [], NumberNode(1, basepos, basepos), True, basepos, basepos), False),
+    ("(x) => 1", FuncDefNode(None, [("x", None)], NumberNode(1, basepos, basepos), True, basepos, basepos), False),
+    ("(x=1) => 1", FuncDefNode(None, [("x", NumberNode(1, basepos, basepos))], NumberNode(1, basepos, basepos), True, basepos, basepos), False),
+    ("(x1,x2) => 1", FuncDefNode(None, [("x1", None), ("x2", None)], NumberNode(1, basepos, basepos), True, basepos, basepos), False),
+    ("(x,x) => 1", [], True),
+    ("(x1,x2=1) => 1", FuncDefNode(None, [("x1", None), ("x2", NumberNode(1, basepos, basepos))], NumberNode(1, basepos, basepos), True, basepos, basepos), False),
+    ("(x1=1,x2) => 1", [], True),
+    ("(x) => 1", FuncDefNode(None, [("x", None)], NumberNode(1, basepos, basepos), True, basepos, basepos), False),
+    ("opus x(x):;    1", FuncDefNode("x", [("x", None)], body, False, basepos, basepos), False)
 ])
-def test_parser_func_def(test_input, expected):
-    res = parser_test_base(test_input)
+def test_parser_func_def(test_input, expected, should_fail):
+    res = parser_test_base(test_input, should_fail)
 
-    assert res.func_name == expected.func_name
-    assert res.should_auto_return == expected.should_auto_return
+    if not should_fail:
+        assert res.func_name == expected.func_name
+        assert res.should_auto_return == expected.should_auto_return
 
-    for i, e in enumerate(expected.args):
-        i = res.args[i]
-        assert i == e
+        for i, e in enumerate(expected.args):
+            i = res.args[i]
+            assert i[0] == e[0]
+            if e[1]:
+                assert i[1].value == e[1].value
 
-    if expected.should_auto_return:
-        assert res.body_node.value == expected.body_node.value
-    else:
-        for i, e in zip(res.body_node.element_nodes, expected.body_node.element_nodes):
-            assert i.value == e.value
+        if expected.should_auto_return:
+            assert res.body_node.value == expected.body_node.value
+        else:
+            for i, e in zip(res.body_node.element_nodes, expected.body_node.element_nodes):
+                assert i.value == e.value
 
 
-@pytest.mark.parametrize("test_input,expected", [
-    ("1()", CallNode(NumberNode(1, basepos, basepos), [], basepos, basepos)),
-    ("1(1)", CallNode(NumberNode(1, basepos, basepos), [NumberNode(1, basepos, basepos)], basepos, basepos))
+@pytest.mark.parametrize("test_input,expected,should_fail", [
+    ("1()", CallNode(NumberNode(1, basepos, basepos), {}, basepos, basepos), False),
+    ("1(1)", CallNode(NumberNode(1, basepos, basepos), {0: NumberNode(1, basepos, basepos)}, basepos, basepos), False),
+    ("1(1, 1)", CallNode(NumberNode(1, basepos, basepos), {0: NumberNode(1, basepos, basepos), 1: NumberNode(1, basepos, basepos)}, basepos, basepos), False),
+    ("1(x=1)", CallNode(NumberNode(1, basepos, basepos), {"x": NumberNode(1, basepos, basepos)}, basepos, basepos), False),
+    ("1(x, x=1)", CallNode(NumberNode(1, basepos, basepos), {"x": NumberNode(1, basepos, basepos)}, basepos, basepos), False),
+    ("1(x=1, x)", [], True)
 ])
-def test_parser_call(test_input, expected):
-    res = parser_test_base(test_input)
+def test_parser_call(test_input, expected, should_fail):
+    res = parser_test_base(test_input, should_fail)
 
-    assert res.node_to_call.value == expected.node_to_call.value
-    if res.arg_nodes:
-        for i, e in enumerate(expected.arg_nodes):
-            i = res.arg_nodes[i]
-            assert i.value == e.value
+    if not should_fail:
+        assert res.node_to_call.value == expected.node_to_call.value
+        for key, value in expected.arg_nodes.items():
+            assert value.value == res.arg_nodes[key].value
 
 
 @ pytest.mark.parametrize("test_input,expected,should_fail", [
