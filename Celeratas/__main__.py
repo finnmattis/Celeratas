@@ -1,2 +1,2 @@
 from .shell import Shell
-shell = Shell()
+Shell()

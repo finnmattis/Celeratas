@@ -182,3 +182,9 @@ class Shell:
         except KeyboardInterrupt:
             print("\r", end="")
             print("Keyboard Interrupt")
+
+# For entry point:
+
+
+def start():
+    Shell()
