@@ -27,10 +27,10 @@ pip3 install Celeratas
 
 ### Executing program
 
--   In order to open the Celeratas interactive shell, run the Celeratas package as a script. Open the terminal and type:
+-   In order to open the Celeratas interactive shell, type the following into the terminal:
 
 ```
-python3 -m Celeratas
+celer
 ```
 
 -   From there, you can type 'auxilium' (meaning help) to learn about the basics of the language.
@@ -42,7 +42,7 @@ auxilium
 -   If you want to read from a file instead, add the file name as an argument.
 
 ```
-python3 -m Celeratas file_you_want_to_read.clr
+celer file_you_want_to_read.clr
 ```
 
 ## Author
