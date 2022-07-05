@@ -191,9 +191,6 @@ class Interpreter:
                 ))
 
         for attr_to_get in attrs_to_get:
-            if hasattr(value, "elements") and not isinstance(value, List):
-                value = value.elements
-
             value_attr = value.attributes.get(attr_to_get, None)
             if value_attr is None:
                 return res.failure(AttrError(
@@ -203,8 +200,7 @@ class Interpreter:
                 ))
 
             value = value_attr
-        # idxes to get will have elements but value will no elements if value is a dict
-        return res.success(value.elements if isinstance(value, List) else value)
+        return res.success(value)
 
     def visit_VarAssignNode(self, node, context):
         res = RTResult()

@@ -318,7 +318,8 @@ class Parser:
                 res.register_advancement()
                 self.advance()
             else:
-                arg_nodes.append(res.register(self.expr(in_loop, in_func)))
+                arg_nodes.append(res.register(self.bin_op(in_loop, in_func,
+                                                          self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut')))))
                 if res.error:
                     return res.failure(ExpectedItemError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
@@ -329,7 +330,8 @@ class Parser:
                     res.register_advancement()
                     self.advance()
 
-                    arg_nodes.append(res.register(self.expr(in_loop, in_func)))
+                    arg_nodes.append(res.register(self.bin_op(in_loop, in_func,
+                                                              self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut')))))
                     if res.error:
                         return res
 
