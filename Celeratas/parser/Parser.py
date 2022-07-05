@@ -315,28 +315,53 @@ class Parser:
         if self.current_tok.type == toks.TT_LPAREN:
             res.register_advancement()
             self.advance()
-            arg_nodes = []
+            arg_nodes = {}
 
             if self.current_tok.type == toks.TT_RPAREN:
                 res.register_advancement()
                 self.advance()
             else:
-                arg_nodes.append(res.register(self.bin_op(in_loop, in_func,
-                                                          self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut')))))
-                if res.error:
-                    return res.failure(ExpectedItemError(
-                        self.current_tok.pos_start, self.current_tok.pos_end,
-                        "Expected ')' or expression"
-                    ))
+                keyword_arg = False
+                new_keyword = False
+                arg_idx = 0
 
-                while self.current_tok.type == toks.TT_COMMA:
+                while True:
+                    if self.current_tok.type == toks.TT_IDENTIFIER:
+                        arg_name = self.current_tok.value
+                        self.advance()
+
+                        if self.current_tok.type != toks.TT_EQ:
+                            self.reverse(1)
+                        else:
+                            res.register_advancement()
+                            res.register_advancement()
+                            self.advance()
+
+                            arg_value = res.register(self.bin_op(in_loop, in_func,
+                                                                 self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut'))))
+
+                            arg_nodes[arg_name] = arg_value
+                            keyword_arg = True
+                            new_keyword = True
+
+                    if not new_keyword:
+                        if keyword_arg:
+                            return res.failure(InvalidSyntaxError(
+                                self.current_tok.pos_start, self.current_tok.pos_end,
+                                "Positional argument cannot follow keyword argument"
+                            ))
+
+                        arg_nodes[arg_idx] = res.register(self.bin_op(in_loop, in_func,
+                                                                      self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut'))))
+                        if res.error:
+                            return res
+
+                    arg_idx += 1
+
+                    if self.current_tok.type != toks.TT_COMMA:
+                        break
                     res.register_advancement()
                     self.advance()
-
-                    arg_nodes.append(res.register(self.bin_op(in_loop, in_func,
-                                                              self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut')))))
-                    if res.error:
-                        return res
 
                 if self.current_tok.type != toks.TT_RPAREN:
                     return res.failure(ExpectedItemError(

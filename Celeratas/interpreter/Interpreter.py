@@ -529,17 +529,19 @@ class Interpreter:
             ))
 
         res = RTResult()
-        args = []
+        args = {}
 
         value_to_call = res.register(self.visit(node.node_to_call, context))
         if res.should_return():
             return res
         value_to_call = value_to_call.copy().set_pos(node.pos_start, node.pos_end)
 
-        for arg_node in node.arg_nodes:
-            args.append(res.register(self.visit(arg_node, context)))
+        for arg_key, arg_value in node.arg_nodes.items():
+            arg_value = res.register(self.visit(arg_value, context))
             if res.should_return():
                 return res
+
+            args[arg_key] = arg_value
 
         return_value = res.register(value_to_call.execute(args, self.recursion_depth))
         if res.should_return():

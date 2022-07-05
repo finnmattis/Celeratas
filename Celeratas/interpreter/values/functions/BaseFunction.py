@@ -43,10 +43,15 @@ class BaseFunction(Value):
         return res.success(None)
 
     def populate_args(self, arg_names, args, exec_ctx):
-        for i in range(len(args)):
-            arg_name = arg_names[i]
-            arg_value = args[i]
-            arg_value.set_context(exec_ctx)
+        for arg_name, arg_value in args.items():
+            if isinstance(arg_name, str):
+                arg_value.set_context(exec_ctx)
+                exec_ctx.symbol_table.set(arg_name, arg_value)
+
+            if isinstance(arg_name, int):
+                arg_name = arg_names[arg_name]
+                exec_ctx.symbol_table.set(arg_name, arg_value)
+
             exec_ctx.symbol_table.set(arg_name, arg_value)
 
     def check_and_populate_args(self, arg_names, args, exec_ctx):
