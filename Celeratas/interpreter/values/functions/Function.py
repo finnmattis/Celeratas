@@ -9,10 +9,10 @@ class Function(BaseFunction):
         self.arg_names = arg_names
         self.should_auto_return = should_auto_return
 
-    def execute(self, args):
+    def execute(self, args, recursion_depth):
         res = RTResult()
         from Celeratas.interpreter.Interpreter import Interpreter
-        interpreter = Interpreter()
+        interpreter = Interpreter(recursion_depth + 1)
         exec_ctx = self.generate_new_context()
 
         res.register(self.check_and_populate_args(

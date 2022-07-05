@@ -52,7 +52,7 @@ def run_script(fn, text):
         return None, ast.error
 
     # Run program
-    interpreter = Interpreter()
+    interpreter = Interpreter(recursion_depth=0)
     context = Context('<program>')
     context.symbol_table = global_symbol_table
     result = interpreter.visit(ast.node, context)

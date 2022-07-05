@@ -3,7 +3,7 @@
 #######################################
 
 import Celeratas.helper.tokens as toks
-from Celeratas.helper.errors import IndexingError, NamingError, AttrError, RTError, TypingError
+from Celeratas.helper.errors import IndexingError, NamingError, AttrError, RTError, RecursingError, TypingError
 
 from .values import Bool, Dict, List, Number, Numeral, String, Function
 from .RTResult import RTResult
@@ -15,6 +15,9 @@ from .RTResult import RTResult
 
 
 class Interpreter:
+    def __init__(self, recursion_depth):
+        self.recursion_depth = recursion_depth
+
     def visit(self, node, context):
         method_name = f'visit_{type(node).__name__}'
         method = getattr(self, method_name, self.no_visit_method)
@@ -517,6 +520,14 @@ class Interpreter:
         return res.success(func_value)
 
     def visit_CallNode(self, node, context):
+
+        if self.recursion_depth > 100:
+            return RTResult().failure(RecursingError(
+                node.pos_start, node.pos_end,
+                'Recursion depth exceeded',
+                context
+            ))
+
         res = RTResult()
         args = []
 
@@ -530,7 +541,7 @@ class Interpreter:
             if res.should_return():
                 return res
 
-        return_value = res.register(value_to_call.execute(args))
+        return_value = res.register(value_to_call.execute(args, self.recursion_depth))
         if res.should_return():
             return res
         if return_value is None:

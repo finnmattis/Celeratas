@@ -137,6 +137,11 @@ class IndexingError(RTError):
         super().__init__(pos_start, pos_end, details, context, 'IndexError')
 
 
+class RecursingError(RTError):
+    def __init__(self, pos_start, pos_end, details, context):
+        super().__init__(pos_start, pos_end, details, context, 'RecursionError')
+
+
 class DivisionByZeroError(RTError):
     def __init__(self, pos_start, pos_end, details, context):
         super().__init__(pos_start, pos_end, details, context, 'ZeroDivisionError')
