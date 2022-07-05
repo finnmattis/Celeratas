@@ -1,8 +1,16 @@
+#####################################
+# IMPORTS
+#####################################
+
 from Celeratas.helper.errors import TypingError
-from Celeratas.interpreter.values.Value import Value
 from Celeratas.interpreter.Context import Context
 from Celeratas.interpreter.RTResult import RTResult
 from Celeratas.interpreter.SymbolTable import SymbolTable
+from Celeratas.interpreter.values.Value import Value
+
+#####################################
+# BASE FUNCTION
+#####################################
 
 
 class BaseFunction(Value):

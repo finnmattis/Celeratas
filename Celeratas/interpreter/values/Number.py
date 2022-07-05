@@ -5,8 +5,8 @@
 from Celeratas.helper.convert_roman import toRoman
 from Celeratas.helper.errors import DivisionByZeroError
 
-from .Value import Value
 from .Bool import Bool
+from .Value import Value
 
 #######################################
 # NUMBER

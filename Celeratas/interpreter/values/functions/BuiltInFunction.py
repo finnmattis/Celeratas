@@ -6,8 +6,9 @@ import os
 
 from Celeratas.helper.errors import IndexingError, RTError, TypingError
 from Celeratas.interpreter.RTResult import RTResult
+from Celeratas.interpreter.values import List, Number, String
+
 from .BaseFunction import BaseFunction
-from Celeratas.interpreter.values import Number, String, List
 
 #####################################
 # BUILT IN FUNCTIONS

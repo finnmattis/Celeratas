@@ -12,6 +12,7 @@ __all__ = (
 __copyright__ = "Copyright 2022 Finn Mattis"
 
 import importlib_metadata
+
 metadata = importlib_metadata.metadata("Celeratas")
 
 

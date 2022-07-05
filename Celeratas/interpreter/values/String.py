@@ -2,9 +2,9 @@
 # IMPORTS
 #######################################
 
-from .Value import Value
 from .Bool import Bool
 from .Number import Number
+from .Value import Value
 
 #######################################
 # STRING

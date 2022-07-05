@@ -2,10 +2,8 @@
 # IMPORTS
 #######################################
 
-import pytest
-
 import Celeratas.helper.tokens as toks
-
+import pytest
 from Celeratas.lexer.Lexer import Lexer
 from Celeratas.lexer.Token import Token
 

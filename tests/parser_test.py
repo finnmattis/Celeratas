@@ -2,16 +2,18 @@
 # IMPORTS
 #######################################
 
-import pytest
-
 import Celeratas.helper.tokens as toks
-
+import pytest
 from Celeratas.lexer.Lexer import Lexer
 from Celeratas.lexer.Position import Position
 from Celeratas.lexer.Token import Token
+from Celeratas.parser.nodes import (BinOpNode, BreakNode, CallNode,
+                                    ContinueNode, ForNode, FuncDefNode, IfNode,
+                                    ListNode, NumberNode, NumeralNode,
+                                    ReturnNode, StringNode, TryNode,
+                                    UnaryOpNode, VarAccessNode, VarAssignNode,
+                                    WhileNode)
 from Celeratas.parser.Parser import Parser
-from Celeratas.parser.nodes import BreakNode, CallNode, ContinueNode, ForNode, FuncDefNode, IfNode, NumberNode, NumeralNode, ReturnNode, StringNode, ListNode, TryNode
-from Celeratas.parser.nodes import VarAccessNode, BinOpNode, UnaryOpNode, VarAssignNode, WhileNode
 
 #######################################
 # TESTS

@@ -3,10 +3,13 @@
 #######################################
 
 import Celeratas.helper.tokens as toks
-from Celeratas.helper.errors import ExpectedItemError, InvalidSyntaxError, IndentError
+from Celeratas.helper.errors import (ExpectedItemError, IndentError,
+                                     InvalidSyntaxError)
 
-from .nodes import NumberNode, NumeralNode, StringNode, BoolNode, ListNode, DictNode, VarAccessNode, VarAssignNode, BinOpNode, UnaryOpNode, IfNode
-from .nodes import TryNode, ForNode, WhileNode, FuncDefNode, CallNode, ReturnNode, ContinueNode, BreakNode
+from .nodes import (BinOpNode, BoolNode, BreakNode, CallNode, ContinueNode,
+                    DictNode, ForNode, FuncDefNode, IfNode, ListNode,
+                    NumberNode, NumeralNode, ReturnNode, StringNode, TryNode,
+                    UnaryOpNode, VarAccessNode, VarAssignNode, WhileNode)
 from .ParseResult import ParseResult
 
 #######################################

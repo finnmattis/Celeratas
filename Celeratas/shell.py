@@ -5,12 +5,13 @@
 import sys
 from datetime import datetime
 
-from .lexer.Lexer import Lexer
-from .parser.Parser import Parser
+import Celeratas.interpreter.constants as constants
+
+from .interpreter.Context import Context
 from .interpreter.Interpreter import Interpreter
 from .interpreter.SymbolTable import SymbolTable
-from .interpreter.Context import Context
-import Celeratas.interpreter.constants as constants
+from .lexer.Lexer import Lexer
+from .parser.Parser import Parser
 
 #######################################
 # GLOBAL SYMBOL TABLE

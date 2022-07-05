@@ -2,11 +2,12 @@
 # IMPORTS
 #######################################
 
-from Celeratas.helper.convert_roman import toNum
-from Celeratas.helper.errors import InvalidNumeral, IllegalCharError, ExpectedItemError, IndentError
 import Celeratas.helper.tokens as toks
-
 import Celeratas.lexer.constants as constants
+from Celeratas.helper.convert_roman import toNum
+from Celeratas.helper.errors import (ExpectedItemError, IllegalCharError,
+                                     IndentError, InvalidNumeral)
+
 from .Position import Position
 from .Token import Token
 

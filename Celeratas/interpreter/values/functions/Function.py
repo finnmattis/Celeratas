@@ -1,7 +1,15 @@
-from .BaseFunction import BaseFunction
+#####################################
+# IMPORTS
+#####################################
+
 from Celeratas.interpreter.RTResult import RTResult
 
+from .BaseFunction import BaseFunction
 
+
+#####################################
+# FUNCTION
+#####################################
 class Function(BaseFunction):
     def __init__(self, name, body_node, arg_names, should_auto_return):
         super().__init__(name)

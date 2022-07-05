@@ -3,11 +3,11 @@
 #######################################
 
 import Celeratas.helper.tokens as toks
-from Celeratas.helper.errors import IndexingError, NamingError, AttrError, RTError, RecursingError, TypingError
+from Celeratas.helper.errors import (AttrError, IndexingError, NamingError,
+                                     RecursingError, RTError, TypingError)
 
-from .values import Bool, Dict, List, Number, Numeral, String, Function
 from .RTResult import RTResult
-
+from .values import Bool, Dict, Function, List, Number, Numeral, String
 
 #######################################
 # INTERPRETER

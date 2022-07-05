@@ -2,11 +2,11 @@
 # IMPORTS
 #######################################
 
+from Celeratas.interpreter.Context import Context
+from Celeratas.interpreter.Interpreter import Interpreter
+from Celeratas.interpreter.SymbolTable import SymbolTable
 from Celeratas.lexer.Lexer import Lexer
 from Celeratas.parser.Parser import Parser
-from Celeratas.interpreter.Interpreter import Interpreter
-from Celeratas.interpreter.Context import Context
-from Celeratas.interpreter.SymbolTable import SymbolTable
 
 #######################################
 # TESTS
