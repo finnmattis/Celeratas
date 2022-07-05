@@ -23,3 +23,6 @@ __version__ = metadata["version"]
 __author__ = metadata["author"]
 __email__ = metadata["author-email"]
 __license__ = metadata["license"]
+
+from . import _version
+__version__ = _version.get_versions()['version']
