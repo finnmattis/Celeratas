@@ -53,6 +53,23 @@ Finn Mattis
 
 -   1.0.0
     -   The initial release of Celeratas! Integers, Floats, Roman Numerals, Bools, Strings, Arrays, Hash Maps, Variables, Conditionals, Loops, Try-excepts, Functions, and more!
+-   1.1.0
+
+    -   Added support for assign multiple vars at a time. Ex:
+
+    ```
+    a, b = val1, val2
+    ```
+
+    -   Can now access basic dunders from python import
+
+-   1.1.1
+-   Hotfix for python import dunders not working
+-   Updated Readme and Grammar rules
+-   1.2.0
+    -   Can now access the shell with 'celer'
+    -   Added keyword arguments to functions
+    -   TONS of backend changes and better tests
 
 ## License
 

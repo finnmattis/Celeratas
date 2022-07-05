@@ -1,3 +1,7 @@
+import importlib_metadata
+
+from . import _version
+
 __all__ = (
     "__title__",
     "__summary__",
@@ -11,18 +15,13 @@ __all__ = (
 
 __copyright__ = "Copyright 2022 Finn Mattis"
 
-import importlib_metadata
-
 metadata = importlib_metadata.metadata("Celeratas")
-
 
 __title__ = metadata["name"]
 __summary__ = metadata["summary"]
 __url__ = metadata["home-page"]
-__version__ = metadata["version"]
 __author__ = metadata["author"]
 __email__ = metadata["author-email"]
 __license__ = metadata["license"]
 
-from . import _version
 __version__ = _version.get_versions()['version']
