@@ -6,7 +6,7 @@ import os
 
 from Celeratas.helper.errors import IndexingError, RTError, TypingError
 from Celeratas.interpreter.RTResult import RTResult
-from Celeratas.interpreter.values import List, Number, String
+from Celeratas.interpreter.values import Bool, List, Number, String
 
 from .BaseFunction import BaseFunction
 
@@ -67,23 +67,23 @@ class BuiltInFunction(BaseFunction):
 
     def execute_is_number(self, exec_ctx):
         is_number = isinstance(exec_ctx.symbol_table.get("value"), Number)
-        return RTResult().success(Number.true if is_number else Number.false)
+        return RTResult().success(Bool(True) if is_number else Bool(False))
     execute_is_number.arg_names = [('value', None)]
 
     def execute_is_string(self, exec_ctx):
         is_number = isinstance(exec_ctx.symbol_table.get("value"), String)
-        return RTResult().success(Number.true if is_number else Number.false)
+        return RTResult().success(Bool(True) if is_number else Bool(False))
     execute_is_string.arg_names = [("value", None)]
 
     def execute_is_list(self, exec_ctx):
         is_number = isinstance(exec_ctx.symbol_table.get("value"), List)
-        return RTResult().success(Number.true if is_number else Number.false)
+        return RTResult().success(Bool(True) if is_number else Bool(False))
     execute_is_list.arg_names = [("value", None)]
 
     def execute_is_function(self, exec_ctx):
         is_number = isinstance(
             exec_ctx.symbol_table.get("value"), BaseFunction)
-        return RTResult().success(Number.true if is_number else Number.false)
+        return RTResult().success(Bool(True) if is_number else Bool(False))
     execute_is_function.arg_names = [("value", None)]
 
     def execute_append(self, exec_ctx):

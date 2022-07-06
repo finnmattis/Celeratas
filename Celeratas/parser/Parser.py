@@ -1099,7 +1099,7 @@ class Parser:
                 "Expected '('"
             ))
 
-        arg_name_toks = res.register(self._register_args())
+        args = res.register(self._register_args())
         if res.error:
             return res
 
@@ -1134,10 +1134,7 @@ class Parser:
         if res.error:
             return res
 
-        res.register_advancement()
-        self.advance()
-
-        return res.success(FuncDefNode(var_name_tok, arg_name_toks, body, False, pos_start, body.pos_end))
+        return res.success(FuncDefNode(var_name_tok, args, body, False, pos_start, body.pos_end))
 
     ###################################
 
