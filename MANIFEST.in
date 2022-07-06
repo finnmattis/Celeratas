@@ -1,2 +1,6 @@
 include versioneer.py
 include Celeratas/_version.py
+include *.txt
+include tox.ini
+recursive-include Celeratas *.txt
+recursive-include tests *.py
