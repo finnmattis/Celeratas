@@ -529,7 +529,6 @@ class Interpreter:
         return res.success(func_value)
 
     def visit_CallNode(self, node, context):
-
         if self.recursion_depth > 100:
             return RTResult().failure(RecursingError(
                 node.pos_start, node.pos_end,
@@ -579,3 +578,6 @@ class Interpreter:
 
     def visit_BreakNode(self, node, context):
         return RTResult().success_break()
+
+    def visit_PassNode(self, node, context):
+        return RTResult().success(None)

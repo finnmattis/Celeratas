@@ -123,9 +123,7 @@ class Shell:
             print(error.as_string())
         elif result:
             result.elements = [x for x in result.elements if repr(x) != "None"]
-            if len(result.elements) == 0:
-                pass
-            elif len(result.elements) == 1:
+            if len(result.elements) == 1:
                 print(repr(result.elements[0]))
             else:
                 print(repr(result))

@@ -8,8 +8,9 @@ from Celeratas.helper.errors import (ExpectedItemError, IndentError,
 
 from .nodes import (BinOpNode, BoolNode, BreakNode, CallNode, ContinueNode,
                     DictNode, ForNode, FuncDefNode, IfNode, ListNode,
-                    NumberNode, NumeralNode, ReturnNode, StringNode, TryNode,
-                    UnaryOpNode, VarAccessNode, VarAssignNode, WhileNode)
+                    NumberNode, NumeralNode, PassNode, ReturnNode, StringNode,
+                    TryNode, UnaryOpNode, VarAccessNode, VarAssignNode,
+                    WhileNode)
 from .ParseResult import ParseResult
 
 #######################################
@@ -150,7 +151,7 @@ class Parser:
                 self.reverse(res.to_reverse_count)
             return res.success(ReturnNode(expr, pos_start, self.current_tok.pos_start.copy()))
 
-        if self.current_tok.matches(toks.TT_KEYWORD, 'continua'):
+        elif self.current_tok.matches(toks.TT_KEYWORD, 'continua'):
             if not in_loop:
                 return res.failure(ExpectedItemError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
@@ -161,7 +162,7 @@ class Parser:
             self.advance()
             return res.success(ContinueNode(pos_start, self.current_tok.pos_start.copy()))
 
-        if self.current_tok.matches(toks.TT_KEYWORD, 'confringe'):
+        elif self.current_tok.matches(toks.TT_KEYWORD, 'confringe'):
             if not in_loop:
                 return res.failure(ExpectedItemError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
@@ -171,6 +172,17 @@ class Parser:
             res.register_advancement()
             self.advance()
             return res.success(BreakNode(pos_start, self.current_tok.pos_start.copy()))
+
+        elif self.current_tok.matches(toks.TT_KEYWORD, 'transiet'):
+            if not in_loop and not in_func:
+                return res.failure(ExpectedItemError(
+                    self.current_tok.pos_start, self.current_tok.pos_end,
+                    "Pass can only be used in loops or functions"
+                ))
+
+            res.register_advancement()
+            self.advance()
+            return res.success(PassNode(pos_start, self.current_tok.pos_start.copy()))
 
         expr = res.register(self.expr(in_loop, in_func))
         if res.error:
@@ -593,6 +605,11 @@ class Parser:
                                                self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut'))))
                 if res.error:
                     return res
+
+                if key.value in [x.value for x in key_pairs]:
+                    # Calling the parser to figure out the key will place the current tok ahead of the final token of the key
+                    self.reverse(1)
+                    return res.failure(InvalidSyntaxError(self.current_tok.pos_start, self.current_tok.pos_end, f"Duplicate key '{key}' in dict"))
 
                 if self.current_tok.type != toks.TT_COLON:
                     return res.failure(ExpectedItemError(
