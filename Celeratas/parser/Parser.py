@@ -4,7 +4,7 @@
 
 import Celeratas.helper.tokens as toks
 from Celeratas.helper.errors import (ExpectedItemError, IndentError,
-                                     InvalidSyntaxError)
+                                     InteractivePrompt, InvalidSyntaxError)
 
 from .nodes import (BinOpNode, BoolNode, BreakNode, CallNode, ContinueNode,
                     DictNode, ForNode, FuncDefNode, IfNode, ListNode,
@@ -730,10 +730,7 @@ class Parser:
         self.advance()
 
         if self.current_tok.type == toks.TT_EOF:
-            return res.failure(ExpectedItemError(
-                self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected statement", interactive=True
-            ))
+            return res.failure(InteractivePrompt("."))
 
         if self.current_tok.type == toks.TT_NEWLINE:
             res.register_advancement()
@@ -783,10 +780,7 @@ class Parser:
         self.advance()
 
         if self.current_tok.type == toks.TT_EOF:
-            return res.failure(ExpectedItemError(
-                self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected statement", interactive=True
-            ))
+            return res.failure(InteractivePrompt("."))
 
         if self.current_tok.type == toks.TT_NEWLINE:
             res.register_advancement()
@@ -924,10 +918,7 @@ class Parser:
         self.advance()
 
         if self.current_tok.type == toks.TT_EOF:
-            return res.failure(ExpectedItemError(
-                self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected statement", interactive=True
-            ))
+            return res.failure(InteractivePrompt("."))
 
         if self.current_tok.type == toks.TT_NEWLINE:
             res.register_advancement()
@@ -969,10 +960,7 @@ class Parser:
         self.advance()
 
         if self.current_tok.type == toks.TT_EOF:
-            return res.failure(ExpectedItemError(
-                self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected statement", interactive=True
-            ))
+            return res.failure(InteractivePrompt("."))
 
         if self.current_tok.type == toks.TT_NEWLINE:
             res.register_advancement()
@@ -1130,10 +1118,7 @@ class Parser:
         self.advance()
 
         if self.current_tok.type == toks.TT_EOF:
-            return res.failure(ExpectedItemError(
-                self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected statement", interactive=True
-            ))
+            return res.failure(InteractivePrompt("."))
 
         if self.current_tok.type != toks.TT_NEWLINE:
             return res.failure(ExpectedItemError(

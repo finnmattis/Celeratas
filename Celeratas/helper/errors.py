@@ -73,9 +73,8 @@ class IndentError(Error):
 
 
 class ExpectedItemError(Error):
-    def __init__(self, pos_start, pos_end, details, interactive=False):
+    def __init__(self, pos_start, pos_end, details):
         super().__init__(pos_start, pos_end, 'ExpectedItemError', details)
-        self.interactive = interactive
 
 
 class InvalidSyntaxError(Error):
@@ -145,3 +144,8 @@ class RecursingError(RTError):
 class DivisionByZeroError(RTError):
     def __init__(self, pos_start, pos_end, details, context):
         super().__init__(pos_start, pos_end, details, context, 'ZeroDivisionError')
+
+
+class InteractivePrompt():
+    def __init__(self, symbol):
+        self.symbol = symbol

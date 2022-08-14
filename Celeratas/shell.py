@@ -6,6 +6,7 @@ import sys
 from datetime import datetime
 
 import Celeratas.interpreter.constants as constants
+from Celeratas.helper.errors import InteractivePrompt
 
 from .interpreter.Context import Context
 from .interpreter.Interpreter import Interpreter
@@ -117,17 +118,20 @@ class Shell:
     def get_result(self, fn, script, interactive):
         result, error = run_script(fn, script)
 
-        if hasattr(error, "interactive") and error.interactive:
-            return True
-        elif error:
-            print(error.as_string())
-        elif result:
-            result.elements = [x for x in result.elements if repr(x) != "None"]
-            if len(result.elements) == 1:
-                print(repr(result.elements[0]))
+        if error:
+            if isinstance(error, InteractivePrompt):
+                return error.symbol
+            elif error:
+                print(error.as_string())
+
+        elif result and interactive:
+            result = [x for x in result.elements if repr(x) != "None"]
+            if len(result) == 1:
+                print(repr(result[0]))
             else:
                 print(repr(result))
-        return False
+
+        return None
 
     #######################################
     # RUN FILE FROM CLI ARGS OR TAKE INPUT
@@ -135,6 +139,7 @@ class Shell:
 
     def start(self):
         try:
+            # Read file from CLI args
             if len(sys.argv) > 1:
                 try:
                     fn = sys.argv[1]
@@ -146,35 +151,39 @@ class Shell:
                 except UnicodeDecodeError:
                     print(f"Can't open file {fn}: Invalid file format")
             else:
+                # Interactive Mode
                 time = self.get_time()
                 print(
                     f"Celeritas versio unum (defalta, {time})\nScribe 'auxilium' auxilio")
                 more_statements = False
                 statements_txt = ""
+                prompt_symbol = ""
 
                 while True:
-                    text = input("... " if more_statements else ">>> ")
+                    text = input(f"{prompt_symbol * 3} " if more_statements else ">>> ")
 
                     if text == "auxilium" and not more_statements:
                         self.help_menu()
                         continue
 
+                    # Blank input should be ignored while not being prompted '...' otherwise it should end the statement
                     if text.strip() == "":
                         if more_statements:
                             self.get_result(
-                                "<stdin>", statements_txt, interactive=False)
+                                "<stdin>", statements_txt, interactive=True)
                             more_statements = False
                             continue
                         else:
                             continue
 
                     if more_statements:
+                        # Add another line and tab to the new line and add it to the statement
                         statements_txt += f"\n{text.rjust(len(text) + 4)}"
                     else:
-                        error = self.get_result(
-                            "<stdin>", text, interactive=False)
+                        prompt_symbol = self.get_result(
+                            "<stdin>", text, interactive=True)
                         # Error is true when program throws an interactive error
-                        if error:
+                        if prompt_symbol:
                             more_statements = True
                             statements_txt = text
 
