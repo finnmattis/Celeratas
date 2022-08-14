@@ -338,16 +338,16 @@ class Lexer:
         return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
 
     def make_plus(self):
-        return(self.make_mult_toks(toks.TT_PLUS, toks.TT_PLUS_EQ, "="))
+        return self.make_mult_toks(toks.TT_PLUS, toks.TT_PLUS_EQ, "=")
 
     def make_minus(self):
         return self.make_mult_toks(toks.TT_MINUS, toks.TT_MIN_EQ, "=")
 
     def make_mul(self):
-        return(self.make_mult_toks(toks.TT_MUL, toks.TT_MUL_EQ, "="))
+        return self.make_mult_toks(toks.TT_MUL, toks.TT_MUL_EQ, "=")
 
     def make_div(self):
-        return(self.make_mult_toks(toks.TT_DIV, toks.TT_DIV_EQ, "="))
+        return self.make_mult_toks(toks.TT_DIV, toks.TT_DIV_EQ, "=")
 
     def make_less_than(self):
         return self.make_mult_toks(toks.TT_LT, toks.TT_LTE, "=")
