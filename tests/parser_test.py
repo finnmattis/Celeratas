@@ -8,11 +8,11 @@ from Celeratas.lexer.Lexer import Lexer
 from Celeratas.lexer.Position import Position
 from Celeratas.lexer.Token import Token
 from Celeratas.parser.nodes import (BinOpNode, BreakNode, CallNode,
-                                    ContinueNode, ForNode, FuncDefNode, IfNode,
-                                    ListNode, NumberNode, NumeralNode,
-                                    ReturnNode, StringNode, TryNode,
-                                    UnaryOpNode, VarAccessNode, VarAssignNode,
-                                    WhileNode)
+                                    ContinueNode, DictNode, ForNode,
+                                    FuncDefNode, IfNode, ListNode, NumberNode,
+                                    NumeralNode, ReturnNode, StringNode,
+                                    TryNode, UnaryOpNode, VarAccessNode,
+                                    VarAssignNode, WhileNode)
 from Celeratas.parser.Parser import Parser
 
 #######################################
@@ -105,7 +105,21 @@ def test_parser_list(test_input, expected, should_fail):
             assert i.value == e.value
 
 
-@pytest.mark.parametrize("test_input,expected", [
+@pytest.mark.parametrize("test_input,expected,should_fail", [
+    ("{\"key\":\"value\"}", DictNode({StringNode(["key"], basepos, basepos):StringNode(["value"], basepos, basepos)}, basepos, basepos), False),
+    ("{\"key\":\"value\", \"key\":\"value\"}", [], True),
+
+])
+def test_parser_dict(test_input, expected, should_fail):
+    res = parser_test_base(test_input, should_fail)
+
+    if not should_fail:
+        for (e_key, e_value) in zip(expected.key_pairs, res.key_pairs):
+            assert e_key.str_components == e_value.str_components
+            assert e_value.str_components == e_value.str_components
+
+
+@ pytest.mark.parametrize("test_input,expected", [
     ("x", VarAccessNode("x", [], [], basepos, basepos)),
     ("x[0]", VarAccessNode("x", [NumberNode(0, basepos, basepos)], [], basepos, basepos)),
     ("x[0][0]", VarAccessNode("x", [NumberNode(0, basepos, basepos), NumberNode(0, basepos, basepos)], [], basepos, basepos)),
@@ -125,7 +139,7 @@ def test_parser_var_access(test_input, expected):
         assert i.value == e.value
 
 
-@pytest.mark.parametrize("test_input,expected", [
+@ pytest.mark.parametrize("test_input,expected", [
     ("x = 1", VarAssignNode([["x", []]], [NumberNode(1, basepos, basepos)], Token(toks.TT_EQ, basepos), basepos, basepos)),
     ("x += 1", VarAssignNode([["x", []]], [NumberNode(1, basepos, basepos)], Token(toks.TT_PLUS_EQ, basepos), basepos, basepos)),
     ("x[0] = 1", VarAssignNode([["x", [NumberNode(0, basepos, basepos)]]], [NumberNode(1, basepos, basepos)], Token(toks.TT_EQ, basepos), basepos, basepos)),
@@ -147,7 +161,7 @@ def test_parser_var_assign(test_input, expected):
     assert res.assign_type.type == expected.assign_type.type
 
 
-@pytest.mark.parametrize("test_input,expected", [
+@ pytest.mark.parametrize("test_input,expected", [
     ("si 1: 1", IfNode([(NumberNode(1, basepos, basepos), NumberNode(1, basepos, basepos), False)], None, basepos, basepos)),
     ("si 1:;    1", IfNode([(NumberNode(1, basepos, basepos), ListNode([NumberNode(1, basepos, basepos)], basepos, basepos), True)], None, basepos, basepos)
      ),
@@ -260,7 +274,7 @@ def test_parser_while(test_input, expected):
         assert res.body_node.value == expected.body_node.value
 
 
-@pytest.mark.parametrize("test_input,expected,should_fail", [
+@ pytest.mark.parametrize("test_input,expected,should_fail", [
     ("() => 1", FuncDefNode(None, [], NumberNode(1, basepos, basepos), True, basepos, basepos), False),
     ("(x) => 1", FuncDefNode(None, [("x", None)], NumberNode(1, basepos, basepos), True, basepos, basepos), False),
     ("(x=1) => 1", FuncDefNode(None, [("x", NumberNode(1, basepos, basepos))], NumberNode(1, basepos, basepos), True, basepos, basepos), False),
@@ -291,7 +305,7 @@ def test_parser_func_def(test_input, expected, should_fail):
                 assert i.value == e.value
 
 
-@pytest.mark.parametrize("test_input,expected,should_fail", [
+@ pytest.mark.parametrize("test_input,expected,should_fail", [
     ("1()", CallNode(NumberNode(1, basepos, basepos), {}, basepos, basepos), False),
     ("1(1)", CallNode(NumberNode(1, basepos, basepos), {0: NumberNode(1, basepos, basepos)}, basepos, basepos), False),
     ("1(1, 1)", CallNode(NumberNode(1, basepos, basepos), {0: NumberNode(1, basepos, basepos), 1: NumberNode(1, basepos, basepos)}, basepos, basepos), False),

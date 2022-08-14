@@ -56,9 +56,12 @@ class BuiltInFunction(BaseFunction):
     execute_print.arg_names = [('value', None)]
 
     def execute_input(self, exec_ctx):
+        value = exec_ctx.symbol_table.get('value')
+        if value.value:
+            print(value)
         text = input()
         return RTResult().success(String(text))
-    execute_input.arg_names = []
+    execute_input.arg_names = [('value', String(""))]
 
     def execute_clear(self, exec_ctx):
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -67,23 +70,23 @@ class BuiltInFunction(BaseFunction):
 
     def execute_is_number(self, exec_ctx):
         is_number = isinstance(exec_ctx.symbol_table.get("value"), Number)
-        return RTResult().success(Bool(True) if is_number else Bool(False))
+        return RTResult().success(Bool(is_number))
     execute_is_number.arg_names = [('value', None)]
 
     def execute_is_string(self, exec_ctx):
         is_number = isinstance(exec_ctx.symbol_table.get("value"), String)
-        return RTResult().success(Bool(True) if is_number else Bool(False))
+        return RTResult().success(Bool(is_number))
     execute_is_string.arg_names = [("value", None)]
 
     def execute_is_list(self, exec_ctx):
         is_number = isinstance(exec_ctx.symbol_table.get("value"), List)
-        return RTResult().success(Bool(True) if is_number else Bool(False))
+        return RTResult().success(Bool(is_number))
     execute_is_list.arg_names = [("value", None)]
 
     def execute_is_function(self, exec_ctx):
         is_number = isinstance(
             exec_ctx.symbol_table.get("value"), BaseFunction)
-        return RTResult().success(Bool(True) if is_number else Bool(False))
+        return RTResult().success(Bool(is_number))
     execute_is_function.arg_names = [("value", None)]
 
     def execute_append(self, exec_ctx):

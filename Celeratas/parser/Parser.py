@@ -606,9 +606,10 @@ class Parser:
                 if res.error:
                     return res
 
-                if key.value in [x.value for x in key_pairs]:
-                    # Calling the parser to figure out the key will place the current tok ahead of the final token of the key
-                    self.reverse(1)
+                # Check for duplicate keys:
+                key_value = key.str_components if isinstance(key, StringNode) else key.value
+                prev_keys_values = [x.str_components if isinstance(x, StringNode) else x.value for x in key_pairs]
+                if key_value in prev_keys_values:
                     return res.failure(InvalidSyntaxError(self.current_tok.pos_start, self.current_tok.pos_end, f"Duplicate key '{key}' in dict"))
 
                 if self.current_tok.type != toks.TT_COLON:

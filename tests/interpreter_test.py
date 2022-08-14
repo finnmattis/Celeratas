@@ -66,7 +66,6 @@ def test_interpreter_lists(test_input, expected):
 
     ("a = [[1]];a[0][0", Number(1)),
     ("a = {1:1};a[1]", Number(1)),
-    ("a = {1:1};a[1]", Number(1)),
 ])
 def test_interpreter_var_assign(test_input, expected):
     res = interpreter_test_base(test_input)[1]
