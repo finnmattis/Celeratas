@@ -168,6 +168,21 @@ class BuiltInFunction(BaseFunction):
         return RTResult().success(Number(len(input_.elements if isinstance(input_, List) else input_.value)))
     execute_len.arg_names = [("input", None)]
 
+    def execute_split(self, exec_ctx):
+        input_ = exec_ctx.symbol_table.get("input")
+        split = exec_ctx.symbol_table.get("split")
+
+        if not isinstance(input_, String) or not isinstance(split, String):
+            return RTResult().failure(TypingError(
+                self.pos_start, self.pos_end, "Argument must be a string",
+                exec_ctx
+            ))
+
+        res = [String(x) for x in input_.value.split(split.value if split.value else None)]
+        return RTResult().success(List(res))
+
+    execute_split.arg_names = [("input", None), ("split", String(""))]
+
     def execute_run(self, exec_ctx):
         fn = exec_ctx.symbol_table.get("fn")
 
