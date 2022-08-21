@@ -115,7 +115,7 @@ def test_parser_dict(test_input, expected, should_fail):
 
     if not should_fail:
         for (e_key, e_value) in zip(expected.key_pairs, res.key_pairs):
-            assert e_key.str_components == e_value.str_components
+            assert e_key.str_components == e_key.str_components
             assert e_value.str_components == e_value.str_components
 
 

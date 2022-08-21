@@ -6,8 +6,8 @@ import pytest
 from Celeratas.interpreter.Context import Context
 from Celeratas.interpreter.Interpreter import Interpreter
 from Celeratas.interpreter.SymbolTable import SymbolTable
-from Celeratas.interpreter.values import Bool, List, String
-from Celeratas.interpreter.values.Number import Number, Numeral
+from Celeratas.interpreter.values import (Bool, Dict, List, Number, Numeral,
+                                          String)
 from Celeratas.lexer.Lexer import Lexer
 from Celeratas.parser.Parser import Parser
 
@@ -16,7 +16,7 @@ from Celeratas.parser.Parser import Parser
 #######################################
 
 
-def interpreter_test_base(test_input):
+def interpreter_test_base(test_input, should_fail=False):
     lexer = Lexer("<stdin>", test_input)
     tokens, _ = lexer.make_tokens()
 
@@ -29,8 +29,12 @@ def interpreter_test_base(test_input):
     context.symbol_table = symbol_table
     result = interpreter.visit(ast.node, context)
 
-    assert result.error is None
-    return result.value.elements
+    if should_fail:
+        assert ast.error
+        return None
+    else:
+        assert result.error is None
+        return result.value.elements
 
 
 @pytest.mark.parametrize("test_input, expected", [
@@ -55,15 +59,21 @@ def test_interpreter_lists(test_input, expected):
         i = res.elements[i]
         assert i.value == e.value
 
-# TODO Dict Test
+
+@pytest.mark.parametrize("test_input, expected", [
+    ("{1:1}", Dict({Number(1): Number(1)})),
+])
+def test_interpreter_dicts(test_input, expected):
+    res = interpreter_test_base(test_input)[0]
+    for (e_key, e_value) in zip(expected.key_pairs, res.key_pairs):
+        assert e_key == e_key
+        assert e_value == e_value
 
 
 @pytest.mark.parametrize("test_input, expected", [
     ("a = 1;a", Number(1)),
     ("a = [1];a", List([Number(1)])),
     ("a = [1];a[0]", Number(1)),
-
-
     ("a = [[1]];a[0][0", Number(1)),
     ("a = {1:1};a[1]", Number(1)),
 ])

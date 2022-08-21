@@ -607,6 +607,8 @@ class Parser:
                     return res
 
                 # Check for duplicate keys:
+                if isinstance(key, ListNode):
+                    return res.failure(InvalidSyntaxError(self.current_tok.pos_start, self.current_tok.pos_end, "Key cannot be a list"))
                 key_value = key.str_components if isinstance(key, StringNode) else key.value
                 prev_keys_values = [x.str_components if isinstance(x, StringNode) else x.value for x in key_pairs]
                 if key_value in prev_keys_values:

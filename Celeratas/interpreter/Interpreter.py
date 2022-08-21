@@ -90,13 +90,6 @@ class Interpreter:
             if res.error:
                 return res
 
-            if isinstance(key, List):
-                return res.failure(TypingError(
-                    key.pos_start, key.pos_end,
-                    "Key cannot be a list",
-                    context
-                ))
-
             value = res.register(self.visit(value, context))
             if res.error:
                 return res
