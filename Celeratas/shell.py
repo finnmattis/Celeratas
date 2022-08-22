@@ -143,7 +143,7 @@ class Shell:
 
     def get_result(self, fn, script, interactive):
         result, error = run_script(fn, script)
-        result = [x for x in result.elements if x is not None]
+        result = [x for x in result.elements if x is not None] if result else None
 
         if error:
             if isinstance(error, InteractivePrompt):
