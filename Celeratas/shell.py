@@ -14,6 +14,7 @@ from Celeratas.helper.errors import InteractivePrompt
 from .interpreter.Context import Context
 from .interpreter.Interpreter import Interpreter
 from .interpreter.SymbolTable import SymbolTable
+from .interpreter.values import List
 from .lexer.Lexer import Lexer
 from .parser.Parser import Parser
 
@@ -164,6 +165,7 @@ class Shell:
     #######################################
 
     def start(self):
+        global_symbol_table.set("__args__", List(sys.argv[2:]) if len(sys.argv) > 2 else List([]))
         try:
             # Read file from CLI args
             if len(sys.argv) > 1:
