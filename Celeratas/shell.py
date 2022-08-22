@@ -2,6 +2,7 @@
 # IMPORTS
 #######################################
 
+import readline
 import sys
 from datetime import datetime
 
@@ -96,7 +97,7 @@ class Shell:
                               carousel=True,
                               ),
             ]
-            # try block to quit help menu on keyboard interupt but not overall program - its type error bc of inquirer jank
+            # try block to quit help menu on keyboard interupt but not overall program - it catches type error bc of inquirer jank
             try:
                 num = inquirer.prompt(num_prompt)["num"]
             except TypeError:
@@ -142,6 +143,7 @@ class Shell:
 
     def get_result(self, fn, script, interactive):
         result, error = run_script(fn, script)
+        result = [x for x in result.elements if x is not None]
 
         if error:
             if isinstance(error, InteractivePrompt):
@@ -150,7 +152,6 @@ class Shell:
                 print(error.as_string())
 
         elif result and interactive:
-            result = [x for x in result.elements if repr(x) != "None"]
             if len(result) == 1:
                 print(repr(result[0]))
             else:
