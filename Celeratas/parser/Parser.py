@@ -2,15 +2,17 @@
 # IMPORTS
 #######################################
 
+from re import L
+
 import Celeratas.helper.tokens as toks
 from Celeratas.helper.errors import (ExpectedItemError, IndentError,
                                      InteractivePrompt, InvalidSyntaxError)
 
 from .nodes import (BinOpNode, BoolNode, BreakNode, CallNode, ContinueNode,
                     DictNode, ForNode, FuncDefNode, IfNode, ListNode,
-                    NumberNode, NumeralNode, PassNode, ReturnNode, StringNode,
-                    TryNode, UnaryOpNode, VarAccessNode, VarAssignNode,
-                    WhileNode)
+                    NumberNode, NumeralNode, PassNode, RaiseNode, ReturnNode,
+                    StringNode, TryNode, UnaryOpNode, VarAccessNode,
+                    VarAssignNode, WhileNode)
 from .ParseResult import ParseResult
 
 #######################################
@@ -493,6 +495,11 @@ class Parser:
             if res.error:
                 return res
             return res.success(while_expr)
+        elif tok.matches(toks.TT_KEYWORD, 'raise'):
+            raise_expr = res.register(self.raise_expr(in_loop, in_func))
+            if res.error:
+                return res
+            return res.success(raise_expr)
 
         return res.failure(ExpectedItemError(
             tok.pos_start, tok.pos_end,
@@ -983,6 +990,31 @@ class Parser:
             return res
 
         return res.success(WhileNode(condition, body, False, pos_start, body.pos_end))
+
+    def raise_expr(self, in_loop, in_func):
+        res = ParseResult()
+        pos_start = self.current_tok.pos_start.copy()
+
+        res.register_advancement()
+        self.advance()
+
+        if self.current_tok.type != toks.TT_IDENTIFIER:
+            return res.failure(ExpectedItemError(
+                self.current_tok.pos_start, self.current_tok.pos_end,
+                "Expected Identifier"
+            ))
+
+        error_to_raise = res.register(self.expr(in_loop, in_func))
+        if res.error:
+            return res
+
+        if not isinstance(error_to_raise, CallNode):
+            return res.failure(ExpectedItemError(
+                self.current_tok.pos_start, self.current_tok.pos_end,
+                "Expected Function Call"
+            ))
+
+        return res.success(RaiseNode(error_to_raise, pos_start, error_to_raise.pos_end))
 
     def _register_args(self):
         res = ParseResult()

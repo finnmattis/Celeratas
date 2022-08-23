@@ -107,8 +107,8 @@ class Shell:
             if num == "Keywords":
                 print('\nVerus -> True\nFalsus -> False\net -> and\naut -> or\nnon -> not\nsi -> if')
                 print('alioquinsi -> elif\nalioquin -> else\ntempta -> try\npraeter -> except\ntam -> as\npro -> for')
-                print('ad -> to\ngradus -> step\ndum -> while\nopus -> task\nfinis -> end\nredi -> return')
-                print('continua -> continue\nconfringe -> break\n')
+                print('ad -> to\ngradus -> step\ndum -> while\nopus -> task\nredi -> return')
+                print('continua -> continue\nconfringe -> break\ntransiet -> pass')
             elif num == "Syntax":
                 with open("Celeratas/helper/grammar.txt", "r") as grammar:
                     print(f"{grammar.read()}\n")

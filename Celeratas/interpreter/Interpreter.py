@@ -3,8 +3,10 @@
 #######################################
 
 import Celeratas.helper.tokens as toks
-from Celeratas.helper.errors import (AttrError, IndexingError, NamingError,
-                                     RecursingError, RTError, TypingError)
+from Celeratas.helper.errors import (AttrError, Error, IndexingError,
+                                     NamingError, RecursingError, RTError,
+                                     TypingError)
+from Celeratas.parser.nodes import StringNode
 
 from .RTResult import RTResult
 from .values import Bool, Dict, Function, List, Number, Numeral, String
@@ -497,6 +499,39 @@ class Interpreter:
             List(elements).set_context(context).set_pos(
                 node.pos_start, node.pos_end)
         )
+
+    def visit_RaiseNode(self, node, context):
+        res = RTResult()
+        # For pos_start and pos_end if error
+        error_to_raise = node.error_to_raise
+
+        error_name = node.error_to_raise.node_to_call.var_name_to_get
+        error_message = node.error_to_raise.arg_nodes
+        error_message_string = ""
+
+        for idx, value in enumerate(error_message.values()):
+            if not isinstance(value, StringNode):
+                return res.failure(RTError(
+                    error_to_raise.pos_start, error_to_raise.pos_end,
+                    'Argument to Exception must be a string',
+                    context
+                ))
+
+            # Two dot values bc need to unpack RTResult and Interpreter String Class
+            value = self.visit_StringNode(value, context).value.value
+            error_message_string += value
+
+            if idx < len(error_message) - 1:
+                error_message_string += ", "
+
+        if error_name not in ["Exception", "TypeError", "NameError", "IndexError", "ZeroDivisionError"]:
+            return res.failure(Error(
+                error_to_raise.pos_start, error_to_raise.pos_end,
+                'Exception type not supported',
+                context
+            ))
+
+        return res.failure(Error(error_to_raise.pos_start, error_to_raise.pos_end, error_name, error_message_string))
 
     def visit_FuncDefNode(self, node, context):
         res = RTResult()

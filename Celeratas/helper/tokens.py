@@ -59,5 +59,6 @@ KEYWORDS = [
     'redi',
     'continua',
     'confringe',
-    'transiet'
+    'transiet',
+    'raise'
 ]

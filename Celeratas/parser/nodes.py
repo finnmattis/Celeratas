@@ -1,3 +1,6 @@
+from distutils.log import error
+
+
 class NumberNode:
     def __init__(self, value, pos_start, pos_end):
         self.value = value
@@ -142,6 +145,14 @@ class WhileNode:
         self.condition_node = condition_node
         self.body_node = body_node
         self.should_return_null = should_return_null
+
+        self.pos_start = pos_start
+        self.pos_end = pos_end
+
+
+class RaiseNode:
+    def __init__(self, error_to_raise, pos_start, pos_end):
+        self.error_to_raise = error_to_raise
 
         self.pos_start = pos_start
         self.pos_end = pos_end
