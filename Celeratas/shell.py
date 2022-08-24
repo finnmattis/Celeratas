@@ -108,15 +108,15 @@ class Shell:
                 print('\nVerus -> True\nFalsus -> False\net -> and\naut -> or\nnon -> not\nsi -> if')
                 print('alioquinsi -> elif\nalioquin -> else\ntempta -> try\npraeter -> except\ntam -> as\npro -> for')
                 print('ad -> to\ngradus -> step\ndum -> while\nopus -> task\nredi -> return')
-                print('continua -> continue\nconfringe -> break\ntransiet -> pass')
+                print('continua -> continue\nconfringe -> break\ntransiet -> pass\nattolle -> raise\n')
             elif num == "Syntax":
                 with open("Celeratas/helper/grammar.txt", "r") as grammar:
                     print(f"{grammar.read()}\n")
             elif num == "Built-In Functions":
-                print('\nscribe(value_to_print) -> print\ninitus() -> input\npurgo() -> clear\nest_numerus(value_to_check) -> is_number')
+                print('\nscribe(value_to_print) -> print\ninitus(message_to_print) -> input\npurgo() -> clear\nest_numerus(value_to_check) -> is_number')
                 print('est_filum(value_to_check) -> is_string\nest_album(value_to_check) -> is_list\nest_opus(value_to_check) -> is_function')
                 print('adde(value_to_add) -> append\nremove(value_to_remove) -> pop\nextende(list_to_extend) -> extend\nlongitudo(value_to_check) -> length')
-                print('curre(file_to_run) -> run\n')
+                print('finde(string_to_split, seperator) -> split\ncurre(file_to_run) -> run\n')
             else:
                 break
 

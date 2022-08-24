@@ -8,12 +8,12 @@ statement: KEYWORD:redi{return} expr?
 		 : expr
 
 expr: IDENTIFIER (IDENTIFIER TOKEN:COMMA)* (TOKEN:LSQUARE IDENTIFIER (IDENTIFIER, TOKEN:COMMA)* TOKEN:RSQUARE)* (TOKEN:EQ || TOKEN:PLUSEQ || TOKEN:MIN_EQ || TOKEN:MUL_EQ || TOKEN:DIV_EQ ) expr
-    : comp-expr ((KEYWORD:et{and}|KEYWORD:aut{or}) comp-expr)*
+    : comp_expr ((KEYWORD:et{and}|KEYWORD:aut{or}) comp_expr)*
 
-comp-expr: non{not} comp-expr
-         : arith-expr ((EE|LT|GT|LTE|GTE) arith-expr)*
+comp_expr: non{not} comp_expr
+         : arith_expr ((EE|LT|GT|LTE|GTE) arith_expr)*
 
-arith-expr: term ((PLUS|MINUS) term)*
+arith_expr: term ((PLUS|MINUS) term)*
 
 term: factor ((MUL|DIV) factor)*
 
@@ -22,50 +22,57 @@ factor: (PLUS|MINUS) factor
 
 power: call (POW factor)*
 
-call: atom (LPAREN (expr (COMMA expr)*)? RPAREN)?
+call: atom (LPAREN (expr (TOKEN:COMMA expr)*)? RPAREN)?
 
-atom: INT|FLOAT|STRING|IDENTIFIER([idx])*(.attribute)?
-    : LPAREN expr RPAREN
-    : list-expr
-    : if-expr
-    : try-expr
-    : for-expr
-    : while-expr
+atom: LPAREN expr RPAREN
+    : var_access_expr
+    : list_expr
+    : if_expr
+    : try_expr
+    : for_expr
+    : while_expr
+    : raise_expr
     : func-def
 
-list-expr: LSQUARE (expr (COMMA expr)*)? RSQUARE
+var_access_expr: INT|FLOAT|STRING|IDENTIFIER([idx])*(.attribute)?
 
-if-expr: KEYWORD:si{if} expr TOKEN:COLON
-       (statement if-expr-b|if-expr-c?)
-       (NEWLINE statements|if-expr-b|if-expr-c)
+dict_expr: LBACE (expr (TOKEN:COMMA expr)*)? RBRACE
 
-if-expr-b: KEYWORD:alioquinsi{elif} expr TOKEN:COLON
-         (statement if-expr-b|if-expr-c?)
-         | (NEWLINE statements|if-expr-b|if-expr-c)
+list_expr: LSQUARE (expr (TOKEN:COMMA expr)*)? RSQUARE
 
-if-expr-c: KEYWORD:alioquin{else}
+if_expr: KEYWORD:si{if} expr TOKEN:COLON
+       (statement if_expr-b|if_expr-c?)
+       (NEWLINE statements|if_expr-b|if_expr-c)
+
+if_expr-b: KEYWORD:alioquinsi{elif} expr TOKEN:COLON
+         (statement if_expr-b|if_expr-c?)
+         | (NEWLINE statements|if_expr-b|if_expr-c)
+
+if_expr-c: KEYWORD:alioquin{else}
          statement
          | (NEWLINE statements)
 
-try-expr: KEYWORD:tempta{try} TOKEN:COLON
+try_expr: KEYWORD:tempta{try} TOKEN:COLON
          statement
          | (NEWLINE statements)
-         (NEWLINE statements|except-expr)
 
-except-expr: KEYWORD:praeter(except) (Exception)? (as name)? TOKEN:COLON
-           statement
-           | NEWLINE statements
+         (KEYWORD:praeter{except} (Exception)?
+         (as name)? TOKEN:COLON
+         statement
+         | NEWLINE statements)?
 
-for-expr: KEYWORD:pro{for} IDENTIFIER TOKEN:EQ expr KEYWORD:ad{to} expr 
+for_expr: KEYWORD:pro{for} IDENTIFIER TOKEN:EQ expr KEYWORD:ad{to} expr 
         (KEYWORD:gradus{step} expr)? TOKEN:COLON
         statement
         | (NEWLINE statements)
 
-while-expr: KEYWORD:dum{while} expr TOKEN:COLON
+while_expr: KEYWORD:dum{while} expr TOKEN:COLON
           statement
           | (NEWLINE statements)
 
+raise_expr: KEYWORD:attolle{raise} Exception(*message")
+
 func-def: KEYWORD:opus{fun} IDENTIFIER?
-        LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
+        LPAREN (IDENTIFIER (TOKEN:COMMA IDENTIFIER)*)? RPAREN
         (ARROW expr)
         | TOKEN:COLON (NEWLINE statements)
