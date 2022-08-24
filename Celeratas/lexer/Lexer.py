@@ -183,7 +183,7 @@ class Lexer:
             numeral_str += self.current_char
             self.advance()
         # Check if identifier
-        if self.current_char and self.current_char != " ":
+        if self.current_char and self.current_char in constants.LETTERS:
             # Return the identifier
             identifier, error = self.make_identifier(numeral_str)
             # Need this extra code because the position of the pos start of the identifier will be behind the pos start of the numeral

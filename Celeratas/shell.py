@@ -2,6 +2,7 @@
 # IMPORTS
 #######################################
 
+# Readline will make the up and down arrows cycle through history
 import readline
 import sys
 from datetime import datetime
@@ -182,7 +183,7 @@ class Shell:
                 # Interactive Mode
                 time = self.get_time()
                 print(
-                    f"Celeritas versio unum (defalta, {time})\nScribe 'auxilium' auxilio")
+                    f"Celeratas versio unum.tres (defalta, {time})\nScribe 'auxilium' auxilio")
                 more_statements = False
                 statements_txt = ""
                 prompt_symbol = ""

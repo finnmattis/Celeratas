@@ -2,8 +2,6 @@
 # IMPORTS
 #######################################
 
-from re import L
-
 import Celeratas.helper.tokens as toks
 from Celeratas.helper.errors import (ExpectedItemError, IndentError,
                                      InteractivePrompt, InvalidSyntaxError)

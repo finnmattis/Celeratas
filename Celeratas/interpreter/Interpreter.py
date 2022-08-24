@@ -455,7 +455,6 @@ class Interpreter:
 
             elements.append(value)
 
-        context.symbol_table.remove(node.var_name)
         return res.success(
             None if node.should_return_null else
             List(elements).set_context(context).set_pos(
