@@ -36,7 +36,7 @@ global_symbol_table.set("adde", constants.BuiltInFunction.append)
 global_symbol_table.set("remove", constants.BuiltInFunction.pop)
 global_symbol_table.set("extende", constants.BuiltInFunction.extend)
 global_symbol_table.set("longitudo", constants.BuiltInFunction.len)
-global_symbol_table.set("split", constants.BuiltInFunction.split)
+global_symbol_table.set("finde", constants.BuiltInFunction.split)
 global_symbol_table.set("curre", constants.BuiltInFunction.run)
 #######################################
 # RUN SCRIPT FUNCTION

@@ -495,7 +495,7 @@ class Parser:
             if res.error:
                 return res
             return res.success(while_expr)
-        elif tok.matches(toks.TT_KEYWORD, 'raise'):
+        elif tok.matches(toks.TT_KEYWORD, 'attolle'):
             raise_expr = res.register(self.raise_expr(in_loop, in_func))
             if res.error:
                 return res
