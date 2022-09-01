@@ -1,5 +1,3 @@
-from distutils.log import error
-
 
 class NumberNode:
     def __init__(self, value, pos_start, pos_end):
