@@ -69,7 +69,9 @@ Finn Mattis
 
     -   Hotfix for python import dunders not working
     -   Updated Readme and Grammar rules
-    -   1.2.0
+
+-   1.2.0
+
     -   Can now access the shell with 'celer'
     -   Added keyword arguments to functions
     -   TONS of backend changes and better tests
@@ -79,7 +81,15 @@ Finn Mattis
     -   Added versioneer and started working on CI/CD
 
 -   1.2.2
+
     -   Added automatic github actions to create a release and publish to pypi
+
+-   1.3.0
+
+    -   Can now read arguments with "\_\_args\_\_" variable
+    -   Added split function for strings
+    -   Improved help menu
+    -   Fixed a LOT of bugs
 
 ## License
 
