@@ -1040,7 +1040,7 @@ class Parser:
                 if self.current_tok.type == toks.TT_EQ:
                     res.register_advancement()
                     self.advance()
-                    arg_value = res.register(self.bin_op(False, False, self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut'))))
+                    arg_value = res.register(self.bin_op(self.comp_expr, ((toks.TT_KEYWORD, 'et'), (toks.TT_KEYWORD, 'aut'))))
                     if res.error:
                         return res
 

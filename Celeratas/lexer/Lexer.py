@@ -34,24 +34,24 @@ class Lexer:
         tokens = []
         self.start_of_statement = True
         # Start of statements is before character other than space/tab - After this is false, tabs and spaces are ignored by make_spaces() method
-        # Grammatical char is set to True is anything other than space/tab is read - This var updates start of statements at the end of while loop
+        # non_space_char is set to True if anything other than space/tab is read - This var updates start of statements at the end of while loop
         while self.current_char:
-            grammatical_char = True
+            non_space_char = True
             if self.current_char in ' \t':
                 new_toks, error = self.make_space(tokens)
                 if error:
                     return [], error
                 tokens = new_toks
-                grammatical_char = False
+                non_space_char = False
             elif self.current_char == '#':
                 self.skip_comment()
                 self.start_of_statement = True
-                grammatical_char = False
+                non_space_char = False
             elif self.current_char in ';\n':
                 tokens.append(Token(toks.TT_NEWLINE, pos_start=self.pos))
                 self.advance()
                 self.start_of_statement = True
-                grammatical_char = False
+                non_space_char = False
             elif self.current_char in constants.ROMAN_NUMERAL_CHARS:
                 token, error = self.make_numeral()
                 if error:
@@ -133,7 +133,7 @@ class Lexer:
                 return [], IllegalCharError(pos_start, self.pos, "'" + char + "'")
 
             # When Grammatical Token is read, tabs/spaces from this point on will be ignored
-            if self.start_of_statement and grammatical_char:
+            if self.start_of_statement and non_space_char:
                 self.start_of_statement = False
 
         tokens.append(Token(toks.TT_EOF, pos_start=self.pos))
