@@ -234,7 +234,7 @@ class Parser:
                         "Expected identifier"
                     ))
 
-            if self.current_tok.type not in [toks.TT_EQ, toks.TT_PLUS_EQ, toks.TT_MIN_EQ, toks.TT_MUL_EQ, toks.TT_DIV_EQ]:
+            if self.current_tok.type not in [toks.TT_EQ, toks.TT_PLUS_EQ, toks.TT_MIN_EQ, toks.TT_MUL_EQ, toks.TT_DIV_EQ, toks.TT_MOD_EQ]:
                 self.reverse(res.advance_count)
             else:
                 assign_type = self.current_tok
@@ -296,7 +296,7 @@ class Parser:
         return self.bin_op(self.term, (toks.TT_PLUS, toks.TT_MINUS))
 
     def term(self):
-        return self.bin_op(self.factor, (toks.TT_MUL, toks.TT_DIV))
+        return self.bin_op(self.factor, (toks.TT_MUL, toks.TT_DIV, toks.TT_MOD))
 
     def factor(self):
         res = ParseResult()

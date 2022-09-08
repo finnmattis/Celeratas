@@ -37,6 +37,9 @@ class Value:
     def dived_by(self, other):
         return None, self.illegal_operation(other)
 
+    def moded_by(self, other):
+        return None, self.illegal_operation(other)
+
     def powed_by(self, other):
         return None, self.illegal_operation(other)
 

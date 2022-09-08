@@ -49,6 +49,12 @@ class Number(Value):
         else:
             return None, Value.illegal_operation(self, other)
 
+    def moded_by(self, other):
+        if isinstance(other, Number) or isinstance(other, Numeral):
+            return Number(self.value % other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(self, other)
+
     def powed_by(self, other):
         if isinstance(other, Number) or isinstance(other, Numeral):
             return Number(self.value ** other.value).set_context(self.context), None

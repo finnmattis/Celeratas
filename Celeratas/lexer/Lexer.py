@@ -88,6 +88,9 @@ class Lexer:
             elif self.current_char == '/':
                 tokens.append(self.make_div())
                 self.advance()
+            elif self.current_char == "%":
+                tokens.append(self.make_mod())
+                self.advance()
             elif self.current_char == '^':
                 tokens.append(Token(toks.TT_POW, pos_start=self.pos))
                 self.advance()
@@ -348,6 +351,9 @@ class Lexer:
 
     def make_div(self):
         return self.make_mult_toks(toks.TT_DIV, toks.TT_DIV_EQ, "=")
+
+    def make_mod(self):
+        return self.make_mult_toks(toks.TT_MOD, toks.TT_MOD_EQ, "=")
 
     def make_less_than(self):
         return self.make_mult_toks(toks.TT_LT, toks.TT_LTE, "=")

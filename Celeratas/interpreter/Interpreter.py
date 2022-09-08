@@ -276,6 +276,8 @@ class Interpreter:
                     value, error = old_value.multed_by(value)
                 elif assign_type.type == "DIV_EQ":
                     value, error = old_value.dived_by(value)
+                elif assign_type.type == "MOD_EQ":
+                    value, error = old_value.moded_by(value)
 
                 if error:
                     return res.failure(error)
@@ -301,6 +303,8 @@ class Interpreter:
             result, error = left.multed_by(right)
         elif node.op_tok.type == toks.TT_DIV:
             result, error = left.dived_by(right)
+        elif node.op_tok.type == toks.TT_MOD:
+            result, error = left.moded_by(right)
         elif node.op_tok.type == toks.TT_POW:
             result, error = left.powed_by(right)
         elif node.op_tok.type == toks.TT_EE:
