@@ -79,17 +79,17 @@ class Lexer:
                     return [], error
                 tokens.append(token)
             elif self.current_char == '+':
-                tokens.append(self.make_plus())
+                tokens.append(self.make_mult_toks(toks.TT_PLUS, toks.TT_PLUS_EQ, "="))
             elif self.current_char == '-':
-                tokens.append(self.make_minus())
+                tokens.append(self.make_mult_toks(toks.TT_MINUS, toks.TT_MIN_EQ, "="))
             elif self.current_char == '*':
-                tokens.append(self.make_mul())
+                tokens.append(self.make_mult_toks(toks.TT_MUL, toks.TT_MUL_EQ, "="))
                 self.advance()
             elif self.current_char == '/':
-                tokens.append(self.make_div())
+                tokens.append(self.make_mult_toks(toks.TT_DIV, toks.TT_DIV_EQ, "="))
                 self.advance()
             elif self.current_char == "%":
-                tokens.append(self.make_mod())
+                tokens.append(self.make_mult_toks(toks.TT_MOD, toks.TT_MOD_EQ, "="))
                 self.advance()
             elif self.current_char == '^':
                 tokens.append(Token(toks.TT_POW, pos_start=self.pos))
@@ -120,9 +120,9 @@ class Lexer:
             elif self.current_char == '=':
                 tokens.append(self.make_equals())
             elif self.current_char == '<':
-                tokens.append(self.make_less_than())
+                tokens.append(self.make_mult_toks(toks.TT_LT, toks.TT_LTE, "="))
             elif self.current_char == '>':
-                tokens.append(self.make_greater_than())
+                tokens.append(self.make_mult_toks(toks.TT_GT, toks.TT_GTE, "="))
             elif self.current_char == ':':
                 tokens.append(Token(toks.TT_COLON, pos_start=self.pos))
                 self.advance()
@@ -339,27 +339,6 @@ class Lexer:
             tok_type = tok_type_2
 
         return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
-
-    def make_plus(self):
-        return self.make_mult_toks(toks.TT_PLUS, toks.TT_PLUS_EQ, "=")
-
-    def make_minus(self):
-        return self.make_mult_toks(toks.TT_MINUS, toks.TT_MIN_EQ, "=")
-
-    def make_mul(self):
-        return self.make_mult_toks(toks.TT_MUL, toks.TT_MUL_EQ, "=")
-
-    def make_div(self):
-        return self.make_mult_toks(toks.TT_DIV, toks.TT_DIV_EQ, "=")
-
-    def make_mod(self):
-        return self.make_mult_toks(toks.TT_MOD, toks.TT_MOD_EQ, "=")
-
-    def make_less_than(self):
-        return self.make_mult_toks(toks.TT_LT, toks.TT_LTE, "=")
-
-    def make_greater_than(self):
-        return self.make_mult_toks(toks.TT_GT, toks.TT_GTE, "=")
 
     def skip_comment(self):
         self.advance()
