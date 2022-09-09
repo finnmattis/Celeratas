@@ -232,22 +232,25 @@ class Interpreter:
                 element_to_change = var_to_change
 
                 for for_idx, idx_to_change in enumerate(idxes_to_change):
+                    idx_to_change = res.register(self.visit(idx_to_change, context))
+                    idx_to_change = idx_to_change.value
+
                     if isinstance(element_to_change, List):
-                        if idx_to_change.value > len(element_to_change.elements) - 1:
+                        if idx_to_change > len(element_to_change.elements) - 1:
                             return res.failure(IndexingError(
                                 node.pos_start, node.pos_end,
                                 'List index out of bounds',
                                 context
                             ))
                         if for_idx == len(idxes_to_change) - 1:
-                            element_to_change.elements[idx_to_change.value] = value
+                            element_to_change.elements[idx_to_change] = value
                         else:
-                            element_to_change = element_to_change.elements[idx_to_change.value]
+                            element_to_change = element_to_change.elements[idx_to_change]
                     elif isinstance(element_to_change, Dict) or (hasattr(element_to_change, "elements") and isinstance(element_to_change.elements, Dict)):
                         if for_idx == len(idxes_to_change) - 1:
-                            element_to_change.key_pairs[idx_to_change.value] = value
+                            element_to_change.key_pairs[idx_to_change] = value
                         else:
-                            element_to_change = element_to_change.key_pairs[idx_to_change.value]
+                            element_to_change = element_to_change.key_pairs[idx_to_change]
                     else:
                         return res.failure(IndexingError(
                             node.pos_start, node.pos_end,
