@@ -183,7 +183,7 @@ class Shell:
                 # Interactive Mode
                 time = self.get_time()
                 print(
-                    f"Celeratas versio unum.tres (defalta, {time})\nScribe 'auxilium' auxilio")
+                    f"Celeratas versio unus.tres.unus (defalta, {time})\nScribe 'auxilium' auxilio")
                 more_statements = False
                 statements_txt = ""
                 prompt_symbol = ""
